@@ -1,0 +1,30 @@
+<h1>Listing Bills</h1>
+
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Payee</th>
+    <th>Bill Amount</th>
+    <th>Credit Amount</th>
+    <th>Type</th>
+    <th>Note</th>
+  </tr>
+
+<% @bills.each do |bill| %>
+  <tr>
+    <td><%= bill.entered_on %></td>
+    <td><%= bill.recipient %></td>
+    <td><%= number_to_currency (bill.bill_amount) %></td>
+    <td><%= number_to_currency (bill.credit_amount) %></td>
+    <td><%= bill.bill_type.name %></td>
+    <td><%= bill.note %></td>
+    <td><%= link_to 'Show', [:edit,@account,bill] %></td>
+    <td><%= link_to 'Destroy', [@account,bill], :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<%= link_to 'New bill paid by housemate', new_account_shareholder_bill_path(@account) %>
+<br />
+<%= link_to 'New bill paid from account', new_account_account_bill_path(@account) %>

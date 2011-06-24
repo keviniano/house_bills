@@ -1,0 +1,35 @@
+<h1>Listing Account Entries</h1>
+
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Check #</th>
+    <th>Payee</th>
+    <th>Deposit</th>
+    <th>Withdrawal</th>
+    <th>Cleared</th>
+  </tr>
+
+  <% @account_entries.each do |account_entry| %>
+    <tr>
+      <td><%= account_entry.entered_on %></td>
+      <td><%= account_entry.check_number %></td>
+      <td><%= account_entry.recipient %></td>
+      <td><%= number_to_currency account_entry.deposit_amount %></td>
+      <td><%= number_to_currency account_entry.withdrawal_amount %></td>
+      <td><%= account_entry.cleared ? "\u2714" : nil %></td>
+      <% if account_entry.type == 'BillAccountEntry' %>
+        <td><%= link_to 'Show', [:edit,@account,account_entry.bill] %></td>
+        <td><%= link_to 'Destroy', [@account,account_entry.bill] , :confirm => 'Are you sure?', :method => :delete %></td>
+      <% else %>  
+        <td><%= link_to 'Show', [:edit,@account,account_entry] %></td>
+        <td><%= link_to 'Destroy', [@account,account_entry] , :confirm => 'Are you sure?', :method => :delete %></td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
+
+<br />
+<%= link_to 'New deposit or withdrawal by shareholder', new_account_shareholder_account_entry_path(@account) %>
+<br />
+<%= link_to 'New deposit or withdrawal unrelated to bills', new_account_unbound_account_entry_path(@account) %>

@@ -1,0 +1,3 @@
+class BillAccountEntry < AccountEntry
+
+end

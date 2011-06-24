@@ -1,0 +1,2 @@
+module ShareholderAccountEntriesHelper
+end
