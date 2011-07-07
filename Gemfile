@@ -4,7 +4,7 @@ gem 'rails', '3.0.9'
 gem 'devise'
 gem 'default_value_for'
 gem 'jquery-rails'
-gem 'will_paginate'
+gem 'will_paginate', '~> 3.0.pre2'
 gem 'simple_form'
 gem 'pg'
 

@@ -23,7 +23,7 @@
   </tr>
 <% end %>
 </table>
-
+<%= will_paginate @bills %>
 <br />
 <%= link_to 'New bill paid by housemate', new_account_shareholder_bill_path(@account) %>
 <br />
