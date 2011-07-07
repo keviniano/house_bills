@@ -7,7 +7,6 @@ class CreateBillTypes < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :bill_types, :name, :unique => true
   end
 
   def self.down

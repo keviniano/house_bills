@@ -5,7 +5,7 @@ class BillsController < ApplicationController
   # GET /bills
   def index
     @shareholder, @account = verify_account_access(current_user, params)
-    @bills = @account.bills.order(:entered_on,:id).all
+    @bills = @account.bills.order('bills.entered_on DESC, bills.id DESC').all
 
     respond_with @bills
   end

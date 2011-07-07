@@ -8,7 +8,7 @@ class CreateAccountEntries < ActiveRecord::Migration
       t.references :account
       t.column :check_number, :integer
       t.column :entered_on,   :date, :null => false
-      t.column :payee,        :string, :limit => 100, :null => false
+      t.column :payee,        :string, :limit => 100
       t.column :amount,       :decimal, :precision => 10, :scale => 2, :null => false
       t.column :note,         :text
       t.column :cleared,      :boolean

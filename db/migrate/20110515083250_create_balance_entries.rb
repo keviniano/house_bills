@@ -8,7 +8,6 @@ class CreateBalanceEntries < ActiveRecord::Migration
       t.references :shareholder
       t.column :share, :integer
       t.column :amount, :decimal, :precision => 10, :scale => 2
-      t.boolean :is_pot_entry, :default => false
       t.column :lock_version, :integer, :default => 0
 
       t.timestamps

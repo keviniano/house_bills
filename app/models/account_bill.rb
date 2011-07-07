@@ -9,6 +9,7 @@ class AccountBill < Bill
   private
 
   def update_offset
+    build_bill_account_entry if bill_account_entry.blank?
     bill_account_entry.entry_type = (entry_type == 'Bill' ? 'Withdrawal' : 'Deposit')
     bill_account_entry.entry_amount = entry_amount
     %w{ payee entered_on note account_id }.each {|attr| bill_account_entry[attr] = self[attr] }

@@ -4,7 +4,7 @@ class Shareholder < ActiveRecord::Base
   belongs_to :role
   
   validates_presence_of :name
-  validates_presence_of :email
+  #validates_presence_of :email
   validates_presence_of :opened_on
 
   default_value_for :opened_on do

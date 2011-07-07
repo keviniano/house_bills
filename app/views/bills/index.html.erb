@@ -17,7 +17,7 @@
     <td><%= number_to_currency (bill.bill_amount) %></td>
     <td><%= number_to_currency (bill.credit_amount) %></td>
     <td><%= bill.bill_type.name %></td>
-    <td><%= bill.note %></td>
+    <td><%= truncate bill.note %></td>
     <td><%= link_to 'Show', [:edit,@account,bill] %></td>
     <td><%= link_to 'Destroy', [@account,bill], :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>

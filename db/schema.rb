@@ -13,14 +13,14 @@
 ActiveRecord::Schema.define(:version => 20110515083254) do
 
   create_table "account_entries", :force => true do |t|
-    t.string   "entry_type",        :limit => 50
+    t.string   "type",              :limit => 25
     t.integer  "bill_id"
     t.integer  "balance_offset_id"
     t.integer  "shareholder_id"
     t.integer  "account_id"
     t.integer  "check_number"
     t.date     "entered_on",                                                                     :null => false
-    t.string   "payee",             :limit => 100,                                               :null => false
+    t.string   "payee",             :limit => 100
     t.decimal  "amount",                           :precision => 10, :scale => 2,                :null => false
     t.text     "note"
     t.boolean  "cleared"
@@ -38,14 +38,15 @@ ActiveRecord::Schema.define(:version => 20110515083254) do
   end
 
   create_table "balance_entries", :force => true do |t|
+    t.string   "type",             :limit => 25
     t.integer  "account_id"
     t.integer  "bill_id"
     t.integer  "account_entry_id"
     t.integer  "shareholder_id"
     t.integer  "share"
-    t.decimal  "amount",           :precision => 10, :scale => 2
-    t.boolean  "is_pot_entry",                                    :default => false
-    t.integer  "lock_version",                                    :default => 0
+    t.decimal  "amount",                         :precision => 10, :scale => 2
+    t.boolean  "is_pot_entry",                                                  :default => false
+    t.integer  "lock_version",                                                  :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -58,9 +59,8 @@ ActiveRecord::Schema.define(:version => 20110515083254) do
     t.datetime "updated_at"
   end
 
-  add_index "bill_types", ["name"], :name => "index_bill_types_on_name", :unique => true
-
   create_table "bills", :force => true do |t|
+    t.string   "type",           :limit => 25
     t.integer  "bill_type_id",                                                                :null => false
     t.integer  "shareholder_id"
     t.integer  "account_id"
@@ -91,14 +91,13 @@ ActiveRecord::Schema.define(:version => 20110515083254) do
 
   create_table "shareholders", :force => true do |t|
     t.integer  "account_id"
+    t.integer  "user_id"
     t.integer  "role_id"
-    t.date     "opened_on",                                       :null => false
-    t.date     "inactivated_on"
-    t.date     "closed_on"
     t.string   "name",           :limit => 50
     t.string   "email"
-    t.boolean  "is_pot",                       :default => false
-    t.integer  "user_id"
+    t.date     "opened_on",                                   :null => false
+    t.date     "inactivated_on"
+    t.date     "closed_on"
     t.integer  "lock_version",                 :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"

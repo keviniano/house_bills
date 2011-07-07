@@ -3,8 +3,12 @@ class Account < ActiveRecord::Base
   has_many :shareholder_bills
   has_many :account_bills
   has_many :account_entries
+  has_many :bill_account_entries
   has_many :shareholder_account_entries
   has_many :unbound_account_entries
+  has_many :account_offset_balance_entries
+  has_many :bill_offset_balance_entries
+  has_many :bill_share_balance_entries
   has_many :shareholders, :dependent => :destroy
   has_many :users, :through => :shareholders
   has_many :payees

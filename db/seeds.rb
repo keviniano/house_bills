@@ -6,18 +6,18 @@
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
     
-u = User.find_or_initialize_by_name('KC')
-if u.new_record?
-  u.email = "kc@kevinchambers.com"
-  u.encrypted_password = "$2a$10$HU0K/fky2Xo8nOG.jpTFgeIobMgf9NdCNGmd8kGpkMRotIdvRNkJO"
-  u.save!
-end
+# u = User.find_or_initialize_by_name('KC')
+# if u.new_record?
+#   u.email = "kc@kevinchambers.com"
+#   u.encrypted_password = "$2a$10$HU0K/fky2Xo8nOG.jpTFgeIobMgf9NdCNGmd8kGpkMRotIdvRNkJO"
+#   u.save!
+# end
 
-BillType.find_or_create_by_name('Utility')
-BillType.find_or_create_by_name('Internet')
-BillType.find_or_create_by_name('Food')
-BillType.find_or_create_by_name('Misc')
-BillType.find_or_create_by_name('Supplies')
+# BillType.find_or_create_by_name('Utility')
+# BillType.find_or_create_by_name('Internet')
+# BillType.find_or_create_by_name('Food')
+# BillType.find_or_create_by_name('Misc')
+# BillType.find_or_create_by_name('Supplies')
 
 Role.find_or_create_by_name 'User'
 Role.find_or_create_by_name 'Power User'

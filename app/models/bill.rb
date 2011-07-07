@@ -70,12 +70,10 @@ class Bill < ActiveRecord::Base
   end
 
   def entry_amount=(val)
-    logger.info "----------------entry_amount set at #{val}"
     @entry_amount = val
   end
 
   def entry_amount
-    logger.info "----------------entry_amount queried: #{@entry_amount || amount.abs}"
     ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, :precision => 2)
   end
   
