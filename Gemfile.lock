@@ -52,6 +52,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.16)
+    nifty-generators (0.4.6)
     orm_adapter (0.0.5)
     pg (0.11.0)
     polyglot (0.3.1)
@@ -104,6 +105,7 @@ DEPENDENCIES
   default_value_for
   devise
   jquery-rails
+  nifty-generators
   pg
   rails (= 3.0.9)
   ruby-debug19
