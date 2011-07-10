@@ -12,7 +12,7 @@
 
   <% @account_entries.each do |account_entry| %>
     <tr>
-      <td><%= account_entry.entered_on %></td>
+      <td><%= account_entry.date %></td>
       <td><%= account_entry.check_number %></td>
       <td><%= account_entry.recipient %></td>
       <td><%= number_to_currency account_entry.deposit_amount %></td>

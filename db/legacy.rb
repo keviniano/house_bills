@@ -41,7 +41,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: tr
     else
       raise 'What??'
     end
-    b.entered_on = fix_up_date(r['ReceivedDate'])
+    b.date = fix_up_date(r['ReceivedDate'])
     b.entry_amount = fix_up_currency(r['ExpenseAmount']).abs
     b.entry_type = (fix_up_currency(r['ExpenseAmount']) > 0 ? 'Bill' : 'Credit')
     b.note = r['Description']
@@ -67,7 +67,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: 
     ae.payee = r['Payee']
   end
   ae.check_number = r['CheckNumber']
-  ae.entered_on = fix_up_date(r['EntryDate'])
+  ae.date = fix_up_date(r['EntryDate'])
   ae.cleared = r['Cleared']
   ae.note = r['Description']
   if r['Credit'].present?
@@ -88,6 +88,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
     if r['LedgerID'].present?
       be = a.account_offset_balance_entries.find_or_initialize_by_id(r['BillPmtID'])
       be.account_entry_id = r['LedgerID']
+      be.date = be.account_entry.date
     elsif r['ExpenseID'].present?
       if r['IsShare'].to_i == 1
         be = a.bill_share_balance_entries.find_or_initialize_by_id(r['BillPmtID'])
@@ -96,6 +97,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
         be = a.bill_offset_balance_entries.find_or_initialize_by_id(r['BillPmtID'])
       end
       be.bill_id = r['ExpenseID']
+      be.date = be.bill.date
     end
     be.shareholder_id = r['PersonID']
     be.amount = fix_up_currency(r['Amount'])
@@ -108,6 +110,7 @@ AccountBill.all.each do |sb|
   share_total = sb.bill_share_balance_entries.sum(:amount)
   p = sb.build_pot_balance_entry if sb.pot_balance_entry.blank?
   p.account = a
+  p.date = sb.date
   p.amount = -(sb.amount + share_total)
   p.save!
 end
@@ -116,6 +119,7 @@ ShareholderBill.all.each do |sb|
   share_total = sb.bill_share_balance_entries.sum(:amount)
   p = sb.build_pot_balance_entry if sb.pot_balance_entry.blank?
   p.account = a
+  p.date = sb.date
   p.amount = -(sb.amount + share_total)
   p.save!
 end

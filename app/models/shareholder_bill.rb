@@ -7,6 +7,6 @@ class ShareholderBill < Bill
 
   def update_offset
     build_bill_offset_balance_entry if bill_offset_balance_entry.blank?
-    %w{ shareholder_id account_id amount }.each {|attr| bill_offset_balance_entry[attr] = self[attr] }
+    %w{ shareholder_id account_id date amount }.each {|attr| bill_offset_balance_entry[attr] = self[attr] }
   end
 end

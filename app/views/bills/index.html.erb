@@ -12,7 +12,7 @@
 
 <% @bills.each do |bill| %>
   <tr>
-    <td><%= bill.entered_on %></td>
+    <td><%= bill.date %></td>
     <td><%= bill.recipient %></td>
     <td><%= number_to_currency (bill.bill_amount) %></td>
     <td><%= number_to_currency (bill.credit_amount) %></td>

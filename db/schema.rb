@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110710173829) do
+ActiveRecord::Schema.define(:version => 20110710175623) do
 
   create_table "account_entries", :force => true do |t|
     t.string   "type",              :limit => 25
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(:version => 20110710173829) do
     t.integer  "shareholder_id"
     t.integer  "account_id"
     t.integer  "check_number"
-    t.date     "entered_on",                                                                     :null => false
+    t.date     "date",                                                                           :null => false
     t.string   "payee",             :limit => 100
     t.decimal  "amount",                           :precision => 10, :scale => 2,                :null => false
     t.text     "note"
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(:version => 20110710173829) do
     t.integer  "shareholder_id"
     t.integer  "account_id"
     t.string   "payee",          :limit => 100
-    t.date     "entered_on",                                                                  :null => false
+    t.date     "date",                                                                        :null => false
     t.decimal  "amount",                        :precision => 10, :scale => 2,                :null => false
     t.text     "note"
     t.integer  "lock_version",                                                 :default => 0

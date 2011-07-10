@@ -1,7 +1,7 @@
 <% simple_form_for([@account,@account_entry]) do |f| %>
   <%= f.input :entry_type, :as => :radio, :collection => AccountEntry.valid_entry_types %>
   <%= f.input :check_number, :input_html => {:size => 5} %>
-  <%= f.input :entered_on %>
+  <%= f.input :date %>
   <% if @account_entry.type == 'UnboundAccountEntry' %>
     <%= f.input :payee %>
   <% else %>

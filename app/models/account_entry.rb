@@ -9,17 +9,17 @@ class AccountEntry < ActiveRecord::Base
   validates_presence_of     :entry_amount
   validates_presence_of     :entry_type
   validates_numericality_of :check_number, :allow_nil => true
-  validates_presence_of     :entered_on
+  validates_presence_of     :date
   validates_associated      :account_offset_balance_entry 
 
-  default_value_for :entered_on do
+  default_value_for :date do
     Date.today
   end
   default_value_for :amount, 0
   default_value_for :cleared, false
 
   def open_shareholders  
-    account.shareholders.open_as_of(entered_on) if account.present?
+    account.shareholders.open_as_of(date) if account.present?
   end
 
   def recipient
@@ -31,23 +31,23 @@ class AccountEntry < ActiveRecord::Base
   end
   
   def self.find_in_date_range(start_date,end_date)
-    self.find(:all, :conditions => {:entered_on => start_date..end_date}, :order => "entered_on, check_number, id")
+    self.find(:all, :conditions => {:date => start_date..end_date}, :order => "date, check_number, id")
   end
 
   def self.balance_before(d)
-    self.sum(:amount, :conditions => ['entered_on < ?',d]) || 0
+    self.sum(:amount, :conditions => ['date < ?',d]) || 0
   end
 
   def self.balance_as_of(d)
-    self.sum(:amount, :conditions => ['entered_on <= ?',d]) || 0
+    self.sum(:amount, :conditions => ['date <= ?',d]) || 0
   end
 
   def self.cleared_balance_before(d)
-    self.sum(:amount, :conditions => ['cleared = ? and entered_on < ?',true,d]) || 0
+    self.sum(:amount, :conditions => ['cleared = ? and date < ?',true,d]) || 0
   end
 
   def self.cleared_balance_as_of(d)
-    self.sum(:amount, :conditions => ['cleared = ? and entered_on <= ?',true,d]) || 0
+    self.sum(:amount, :conditions => ['cleared = ? and date <= ?',true,d]) || 0
   end
 
   def entry_type

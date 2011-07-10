@@ -1,6 +1,6 @@
 <%= simple_form_for([@account,@bill]) do |f| %>
   <%= f.input :entry_type, :as => :radio, :collection => Bill.valid_entry_types %>
-  <%= f.input :entered_on %>
+  <%= f.input :date %>
   <% if @bill.type == 'AccountBill' %>
     <%=  f.simple_fields_for :bill_account_entry, @bill.bill_account_entry do |bae| %>
       <%= bae.input :check_number, :input_html => {:size => 5} %>

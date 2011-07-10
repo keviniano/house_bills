@@ -21,22 +21,22 @@ class Bill < ActiveRecord::Base
   validates_inclusion_of    :entry_type, :in => valid_entry_types
   validates_numericality_of :entry_amount, :greater_than_or_equal_to => 0
   validates_presence_of     :bill_type_id
-  validates_presence_of     :entered_on
+  validates_presence_of     :date
   validates_associated      :bill_share_balance_entries
   validates_presence_of     :entry_amount
 # TODO: Make sure there's always at least one bill share entry
   
-  default_value_for :entered_on do
+  default_value_for :date do
     Date.today
   end
   default_value_for :amount, 0
 
   def open_shareholders  
-    account.shareholders.open_as_of(entered_on) if account.present?
+    account.shareholders.open_as_of(date) if account.present?
   end
 
   def active_shareholders
-    account.shareholders.active_as_of(entered_on) if account.present?
+    account.shareholders.active_as_of(date) if account.present?
   end
 
   def excluded_open_shareholders
