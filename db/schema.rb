@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110515083254) do
+ActiveRecord::Schema.define(:version => 20110710173829) do
 
   create_table "account_entries", :force => true do |t|
     t.string   "type",              :limit => 25
@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(:version => 20110515083254) do
     t.integer  "lock_version",                                                  :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.date     "date"
   end
 
   create_table "bill_types", :force => true do |t|
