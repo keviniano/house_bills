@@ -80,7 +80,7 @@ class Bill < ActiveRecord::Base
   def build_bill_share_entries!
     if account.present?
       active_shareholders.each do |s|
-        bill_share_balance_entries.build :shareholder => s, :account => account
+        bill_share_balance_entries.build :shareholder => s, :account => account, :date => date
       end
     end
   end
@@ -100,8 +100,10 @@ class Bill < ActiveRecord::Base
       
       s.each do |b|
         b.amount = (b.share == 0) ? 0 : (-b.share/gcd) * base_portion
+        b.date = self.date
       end
       p.amount = remainder
+      p.date = self.date
     end
   end
 
