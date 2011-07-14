@@ -33,21 +33,21 @@ ActiveRecord::Base.connection.execute("SELECT setval('shareholders_id_seq',#{Sha
 CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: true) do |r|
   if r['Payee'].present?
     if r['LedgerID'].present?
-      b = a.account_bills.find_or_initialize_by_id(r['ExpenseID'])
-      b.payee = r['Payee']
+      bill = a.account_bills.find_or_initialize_by_id(r['ExpenseID'])
+      bill.payee = r['Payee']
     elsif r['BillPmtID'].present?
-      b = a.shareholder_bills.find_or_initialize_by_id(r['ExpenseID'])
-      b.shareholder = Shareholder.find_by_name(r['Payee']) 
+      bill = a.shareholder_bills.find_or_initialize_by_id(r['ExpenseID'])
+      bill.shareholder = Shareholder.find_by_name(r['Payee']) 
     else
       raise 'What??'
     end
-    b.date = fix_up_date(r['ReceivedDate'])
-    b.entry_amount = fix_up_currency(r['ExpenseAmount']).abs
-    b.entry_type = (fix_up_currency(r['ExpenseAmount']) > 0 ? 'Bill' : 'Credit')
-    b.note = r['Description']
-    b.bill_type = a.bill_types.find_or_create_by_name(r['BillType']) unless r['BillType'].blank?
-    b.bill_type = unknown_bill_type if b.bill_type.blank?
-    b.save!
+    bill.date = fix_up_date(r['ReceivedDate'])
+    bill.entry_amount = fix_up_currency(r['ExpenseAmount']).abs
+    bill.entry_type = (fix_up_currency(r['ExpenseAmount']) > 0 ? 'Bill' : 'Credit')
+    bill.note = r['Description']
+    bill.bill_type = a.bill_types.find_or_create_by_name(r['BillType']) unless r['BillType'].blank?
+    bill.bill_type = unknown_bill_type if bill.bill_type.blank?
+    bill.save!
   end
 end
 ActiveRecord::Base.connection.execute("SELECT setval('bills_id_seq',#{Bill.maximum(:id)})")
@@ -87,8 +87,9 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
   if r['Amount'].present?
     if r['LedgerID'].present?
       be = a.account_offset_balance_entries.find_or_initialize_by_id(r['BillPmtID'])
-      be.account_entry_id = r['LedgerID']
-      be.date = be.account_entry.date
+      ae = AccountEntry.find(r['LedgerID'])
+      be.account_entry = ae
+      be.date = ae.date
     elsif r['ExpenseID'].present?
       if r['IsShare'].to_i == 1
         be = a.bill_share_balance_entries.find_or_initialize_by_id(r['BillPmtID'])
@@ -96,8 +97,9 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
       else
         be = a.bill_offset_balance_entries.find_or_initialize_by_id(r['BillPmtID'])
       end
-      be.bill_id = r['ExpenseID']
-      be.date = be.bill.date
+      bill = Bill.find(r['ExpenseID'])
+      be.bill = bill
+      be.date = bill.date
     end
     be.shareholder_id = r['PersonID']
     be.amount = fix_up_currency(r['Amount'])
@@ -106,6 +108,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
 end
 ActiveRecord::Base.connection.execute("SELECT setval('balance_entries_id_seq',#{BalanceEntry.maximum(:id)})")
 
+PotBalanceEntry.destroy_all
 AccountBill.all.each do |sb|
   share_total = sb.bill_share_balance_entries.sum(:amount)
   p = sb.build_pot_balance_entry if sb.pot_balance_entry.blank?

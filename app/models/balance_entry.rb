@@ -8,4 +8,7 @@ class BalanceEntry < ActiveRecord::Base
   validates_presence_of :amount
   validates_presence_of :date
   
+  default_value_for :date do
+    Date.today
+  end
 end
