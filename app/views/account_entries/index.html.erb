@@ -8,8 +8,10 @@
     <th>Deposit</th>
     <th>Withdrawal</th>
     <th>Cleared</th>
+    <th>Balance</th>
   </tr>
 
+  <% balance = @account_entries.first.balance %>
   <% @account_entries.each do |account_entry| %>
     <tr>
       <td><%= account_entry.date %></td>
@@ -18,6 +20,8 @@
       <td><%= number_to_currency account_entry.deposit_amount %></td>
       <td><%= number_to_currency account_entry.withdrawal_amount %></td>
       <td><%= account_entry.cleared ? "\u2714" : nil %></td>
+      <td><%= number_to_currency balance %></td>
+      <% balance -= account_entry.amount %>
       <% if account_entry.type == 'BillAccountEntry' %>
         <td><%= link_to 'Show', [:edit,@account,account_entry.bill] %></td>
         <td><%= link_to 'Destroy', [@account,account_entry.bill] , :confirm => 'Are you sure?', :method => :delete %></td>
@@ -28,7 +32,7 @@
     </tr>
   <% end %>
 </table>
-
+<%= will_paginate @bills %>
 <br />
 <%= link_to 'New deposit or withdrawal by shareholder', new_account_shareholder_account_entry_path(@account) %>
 <br />

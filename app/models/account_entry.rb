@@ -50,6 +50,10 @@ class AccountEntry < ActiveRecord::Base
     self.sum(:amount, :conditions => ['cleared = ? and date <= ?',true,d]) || 0
   end
 
+  def balance
+    AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id <= ?)',date,date,id])
+  end
+  
   def entry_type
     @entry_type || ( amount < 0 ? 'Withdrawal' : 'Deposit' )
   end
