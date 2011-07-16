@@ -8,6 +8,7 @@
     <th>Credit Amount</th>
     <th>Type</th>
     <th>Note</th>
+    <th>My Part</th>
   </tr>
 
 <% @bills.each do |bill| %>
@@ -18,6 +19,7 @@
     <td><%= number_to_currency (bill.credit_amount) %></td>
     <td><%= bill.bill_type.name %></td>
     <td><%= truncate bill.note %></td>
+    <td><%= number_to_currency bill.shareholder_amount(current_user.shareholder) %></td>
     <td><%= link_to 'Show', [:edit,@account,bill] %></td>
     <td><%= link_to 'Destroy', [@account,bill], :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>

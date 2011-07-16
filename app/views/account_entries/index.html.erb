@@ -9,9 +9,11 @@
     <th>Withdrawal</th>
     <th>Cleared</th>
     <th>Balance</th>
+    <th>Cleared Balance</th>
   </tr>
 
   <% balance = @account_entries.first.balance %>
+  <% cleared_balance = nil %>
   <% @account_entries.each do |account_entry| %>
     <tr>
       <td><%= account_entry.date %></td>
@@ -21,7 +23,10 @@
       <td><%= number_to_currency account_entry.withdrawal_amount %></td>
       <td><%= account_entry.cleared ? "\u2714" : nil %></td>
       <td><%= number_to_currency balance %></td>
+      <td><%= number_to_currency cleared_balance || account_entry.cleared_balance %></td>
       <% balance -= account_entry.amount %>
+      <% cleared_balance = account_entry.cleared_balance if cleared_balance.blank? %>
+      <% cleared_balance -= account_entry.amount if cleared_balance.present? && account_entry.cleared? %>
       <% if account_entry.type == 'BillAccountEntry' %>
         <td><%= link_to 'Show', [:edit,@account,account_entry.bill] %></td>
         <td><%= link_to 'Destroy', [@account,account_entry.bill] , :confirm => 'Are you sure?', :method => :delete %></td>

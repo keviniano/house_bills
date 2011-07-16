@@ -50,6 +50,12 @@ class AccountEntry < ActiveRecord::Base
     self.sum(:amount, :conditions => ['cleared = ? and date <= ?',true,d]) || 0
   end
 
+  def cleared_balance
+    if cleared
+      AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])
+    end
+  end
+  
   def balance
     AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id <= ?)',date,date,id])
   end

@@ -7,4 +7,11 @@ class BillShareBalanceEntry < BalanceEntry
 
   default_value_for :share, 1
   default_value_for :amount, 0
+
+  class << self
+    def shareholder(s)
+      where(:shareholder_id == s.id).first
+    end
+  end
+
 end
