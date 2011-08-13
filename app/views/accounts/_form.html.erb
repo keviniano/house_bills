@@ -8,9 +8,9 @@
         <th>Opened</th>
         <th>Inactivated</th>
         <th>Closed</th>
-        <th>Delete</th>
+        <th>Balance</th>
       </tr>
-      <%= f.simple_fields_for :shareholders, @account.shareholders do |m| %>
+      <%= f.simple_fields_for :shareholders, @account.shareholders.order(:opened_on, :inactivated_on, :name) do |m| %>
         <tr>
           <td />
           <td><%= m.input :name, :label => false, :input_html => { :size => 25 } %></td>
@@ -18,7 +18,7 @@
           <td><%= m.input :opened_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
           <td><%= m.input :inactivated_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
           <td><%= m.input :closed_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
-          <td><%= m.input :_destroy, :as => :boolean, :label => false %></td>
+          <td><%= number_to_currency m.object.balance  %></td>
         </tr>
       <%  end %>
       <%= f.simple_fields_for :shareholders, @account.shareholders.build do |m| %>
