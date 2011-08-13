@@ -2,13 +2,20 @@ class Shareholder < ActiveRecord::Base
   belongs_to :account
   belongs_to :user
   belongs_to :role
-  
+  has_many   :bills
+  has_many   :account_entries
+  has_many   :balance_entries
+
   validates_presence_of :name
   #validates_presence_of :email
   validates_presence_of :opened_on
 
   default_value_for :opened_on do
     Date.today
+  end
+
+  def balance
+    balance_entries.sum(:amount)
   end
 
   class << self
