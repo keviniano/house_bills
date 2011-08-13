@@ -27,8 +27,8 @@ CSV.foreach(File.join(Rails.root,'db','legacy','lkpPayee.txt'),headers: true) do
   end
 end
 
-ActiveRecord::Base.connection.execute("SELECT setval('payees_id_seq',#{Payee.maximum(:id)})")
-ActiveRecord::Base.connection.execute("SELECT setval('shareholders_id_seq',#{Shareholder.maximum(:id)})")
+ActiveRecord::Base.connection.execute("SELECT setval('payees_id_seq',#{Payee.maximum(:id) + 1000})")
+ActiveRecord::Base.connection.execute("SELECT setval('shareholders_id_seq',#{Shareholder.maximum(:id) + 1000})")
 
 CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: true) do |r|
   if r['Payee'].present?
@@ -50,7 +50,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: tr
     bill.save!
   end
 end
-ActiveRecord::Base.connection.execute("SELECT setval('bills_id_seq',#{Bill.maximum(:id)})")
+ActiveRecord::Base.connection.execute("SELECT setval('bills_id_seq',#{Bill.maximum(:id) + 1000})")
 
 AccountEntry.destroy_all
 CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: true) do |r|
@@ -80,7 +80,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: 
     ae.save!
   end
 end
-ActiveRecord::Base.connection.execute("SELECT setval('account_entries_id_seq',#{AccountEntry.maximum(:id)})")
+ActiveRecord::Base.connection.execute("SELECT setval('account_entries_id_seq',#{AccountEntry.maximum(:id) + 1000})")
 
 BalanceEntry.destroy_all
 CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: true) do |r|
@@ -106,7 +106,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
     be.save!
   end
 end
-ActiveRecord::Base.connection.execute("SELECT setval('balance_entries_id_seq',#{BalanceEntry.maximum(:id)})")
+ActiveRecord::Base.connection.execute("SELECT setval('balance_entries_id_seq',#{BalanceEntry.maximum(:id) + 1000})")
 
 PotBalanceEntry.destroy_all
 AccountBill.all.each do |sb|
@@ -125,4 +125,18 @@ ShareholderBill.all.each do |sb|
   p.date = sb.date
   p.amount = -(sb.amount + share_total)
   p.save!
+end
+
+CSV.foreach(File.join(Rails.root,'db','legacy','lkpPayee.txt'),headers: true) do |r|
+  if r["Initials"].present?
+    s = a.shareholders.find(r["PayeeID"])
+    first_entry_date = s.balance_entries.minimum(:date)
+    s.opened_on = first_entry_date
+    if r["Active"] == '0'
+      last_entry_date = s.balance_entries.maximum(:date)
+      s.inactivated_on = last_entry_date
+      s.closed_on = last_entry_date
+    end
+    s.save!
+  end
 end
