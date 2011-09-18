@@ -80,6 +80,10 @@ class AccountEntry < ActiveRecord::Base
     @entry_amount = val
   end
 
+  def shareholder_amount(sh)
+    shareholder_id == sh.id ? amount : 0
+  end
+
   def entry_amount
     ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, :precision => 2) unless @entry_amount.nil? && amount.nil?
   end

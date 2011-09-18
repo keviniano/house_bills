@@ -1,0 +1,11 @@
+<tr>
+  <td><%= bill_row.date %></td>
+  <td><%= bill_row.recipient %></td>
+  <td><%= number_to_currency (bill_row.bill_amount) %></td>
+  <td><%= number_to_currency (bill_row.credit_amount) %></td>
+  <td><%= bill_row.bill_type.name %></td>
+  <td><%= truncate bill_row.note %></td>
+  <td><%= number_to_currency bill_row.shareholder_amount(current_user.shareholder) %></td>
+  <td><%= link_to 'Show', [:edit,@account,bill_row] %></td>
+  <td><%= link_to 'Destroy', [@account,bill_row], :confirm => 'Are you sure?', :method => :delete %></td>
+</tr>
