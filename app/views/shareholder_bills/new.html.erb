@@ -1,6 +1,6 @@
-<% content_for :title, "New Shareholder Bill" %>
+<% content_for :title, "#{@account.name}: New Shareholder Bill" %>
 
-<h1>New Shareholder Bill</h1>
+<h1><%= @account.name %>: New Shareholder Bill</h1>
 
 <%= render :partial => 'bills/form' %>
 

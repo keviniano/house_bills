@@ -1,4 +1,6 @@
-<h1>New Shareholder Account Entry</h1>
+<% content_for :title, "#{@account.name}: New Shareholder Account Entry" %>
+
+<h1><%= @account.name %>: New Shareholder Account Entry</h1>
 
 <%= render :partial => 'account_entries/form' %>
 

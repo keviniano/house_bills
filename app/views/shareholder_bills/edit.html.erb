@@ -1,4 +1,6 @@
-<h1>Editing Shareholder Bill</h1>
+<% content_for :title, "#{@account.name}: Edit Shareholder Bill" %>
+
+<h1><%= @account.name %>: Edit Shareholder Bill</h1>
 
 <%= render :partial => 'bills/form' %>
 
