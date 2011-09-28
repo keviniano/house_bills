@@ -1,5 +1,5 @@
 body {
-  background-color: #4B7399;
+  background-color: #BF9200;
   font-family: Verdana, Helvetica, Arial;
   font-size: 14px;
 }
@@ -116,4 +116,22 @@ a {
   font-style: italic;
 }
 
+table {
+  border-collapse: collapse;
+}
 
+td, th {
+  padding: 5px 10px;
+}
+
+tr:nth-child(2n+1) {
+  background-color: #EFE9D2;
+}
+
+th {
+  background-color: #EDCD5A;
+}
+
+td.currency {
+  text-align: right;
+}
