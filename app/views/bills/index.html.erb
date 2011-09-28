@@ -5,23 +5,21 @@
   <tr>
     <th>Date</th>
     <th>Payee</th>
-    <th>Bill Amount</th>
-    <th>Credit Amount</th>
+    <th>Bill</th>
+    <th>Credit</th>
     <th>Type</th>
     <th>Note</th>
     <th>My Part</th>
+    <th>My Balance</th>
+    <th></th>
   </tr>
-<% @bills_and_entries.each do |item| %>
-  <% if item.type.include? 'Bill' %>
-    <%= render :partial => 'bill_row', :locals => { :bill_row => item } %>
+<% @balance_events.each do |item| %>
+  <% if item.bill.present? %>
+    <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill } %>
   <% else %>
-    <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item } %>
+    <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry } %>
   <% end %>
 <% end %>
 
 </table>
-<%= will_paginate @bills %>
-<br />
-<%= link_to 'New bill paid by housemate', new_account_shareholder_bill_path(@account) %>
-<br />
-<%= link_to 'New bill paid from account', new_account_account_bill_path(@account) %>
+<%= will_paginate @balance_events %>

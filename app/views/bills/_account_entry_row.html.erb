@@ -1,11 +1,11 @@
 <tr>
   <td><%= account_entry_row.date %></td>
   <td><%= account_entry_row.recipient %></td>
-  <td><%= number_to_currency (account_entry_row.withdrawal_amount) %></td>
-  <td><%= number_to_currency (account_entry_row.deposit_amount) %></td>
+  <td class="currency"><%= number_to_currency (account_entry_row.withdrawal_amount) %></td>
+  <td class="currency"><%= number_to_currency (account_entry_row.deposit_amount) %></td>
   <td><%= account_entry_row.entry_type %></td>
   <td><%= truncate account_entry_row.note %></td>
-  <td><%= number_to_currency account_entry_row.shareholder_amount(current_user.shareholder) %></td>
-  <td><%= link_to 'Show', [:edit,@account,account_entry_row] %></td>
-  <td><%= link_to 'Destroy', [@account,account_entry_row], :confirm => 'Are you sure?', :method => :delete %></td>
+  <td class="currency"><%= number_to_currency account_entry_row.shareholder_amount(current_user.shareholder) %></td>
+  <td class="currency"><%= number_to_currency account_entry_row.balance_for(current_user.shareholder) %></td>
+  <td><%= link_to 'Details', [:edit,@account,account_entry_row] %></td>
 </tr>

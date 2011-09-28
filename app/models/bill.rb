@@ -16,6 +16,10 @@ class Bill < ActiveRecord::Base
   def self.valid_entry_types
     %w( Bill Credit )
   end
+
+  def balance_for(shareholder) 
+    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).sum(:amount)
+  end
   
   validates_presence_of     :entry_type
   validates_inclusion_of    :entry_type, :in => valid_entry_types
