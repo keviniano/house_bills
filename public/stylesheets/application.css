@@ -1,5 +1,5 @@
 body {
-  background-color: #BF9200;
+  background-color: #6D7DB1;
   font-family: Verdana, Helvetica, Arial;
   font-size: 14px;
 }
@@ -23,8 +23,10 @@ a {
   margin: 0 auto;
   background-color: #FFF;
   padding: 20px 40px;
-  border: solid 1px black;
   margin-top: 20px;
+  border-radius: 20px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
 }
 
 #flash_notice, #flash_error, #flash_alert {
@@ -125,11 +127,11 @@ td, th {
 }
 
 tr:nth-child(2n+1) {
-  background-color: #EFE9D2;
+  background-color: #E7C883;
 }
 
 th {
-  background-color: #EDCD5A;
+  background-color: #dfb862
 }
 
 td.currency {
