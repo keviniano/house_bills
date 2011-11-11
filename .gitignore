@@ -9,3 +9,4 @@ public/system
 *.swo
 db/legacy
 .DS_Store
+tags
