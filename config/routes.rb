@@ -21,7 +21,7 @@ HouseBills::Application.routes.draw do
     get "edit_pot", :on => :member
     put "update_pot", :on => :member
   
-    resources :bills
+    resources :balance_entries, :only => [:index]
     resources :shareholder_bills
     resources :account_bills
 
@@ -34,7 +34,7 @@ HouseBills::Application.routes.draw do
     resources :bill_types
   end
 
-  root :to => 'pages#home'
+  root :to => 'account_entries#index'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

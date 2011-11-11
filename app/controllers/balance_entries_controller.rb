@@ -1,4 +1,4 @@
-class BillsController < ApplicationController
+class BalanceEntriesController < ApplicationController
   before_filter :authenticate_user!
   respond_to :html
 
