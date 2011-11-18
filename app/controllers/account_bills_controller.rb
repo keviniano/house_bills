@@ -1,4 +1,4 @@
-class AccountBillsController < BillsController
+class AccountBillsController < ApplicationController
   before_filter :authenticate_user!
 
   # GET /account_bills/new
