@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   has_one :shareholder
 
   validates_presence_of :name
+  validates_presence_of :email
 
   after_create :attach_shareholders
 
