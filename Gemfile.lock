@@ -32,6 +32,7 @@ GEM
     arel (2.0.10)
     bcrypt-ruby (3.0.1)
     builder (2.1.2)
+    cancan (1.6.7)
     columnize (0.3.5)
     default_value_for (1.0.7)
     devise (1.5.2)
@@ -105,6 +106,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  cancan
   default_value_for
   devise
   jquery-rails
