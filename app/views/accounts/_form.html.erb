@@ -1,9 +1,9 @@
 <%= simple_form_for(@account) do |f| %>
-    <%= f.input :name %> 
+    <%= f.input :name, :label => "Account Name" %> 
     <table>
       <tr>
         <th />
-        <th>Name</th>
+        <th>Shareholder Name</th>
         <th>Email</th>
         <th>Opened</th>
         <th>Inactivated</th>
@@ -18,7 +18,7 @@
           <td><%= m.input :opened_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
           <td><%= m.input :inactivated_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
           <td><%= m.input :closed_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
-          <td><%= number_to_currency m.object.balance  %></td>
+          <td class="currency"><%= number_to_currency m.object.balance  %></td>
         </tr>
       <%  end %>
       <%= f.simple_fields_for :shareholders, @account.shareholders.build do |m| %>
