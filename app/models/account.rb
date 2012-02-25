@@ -1,4 +1,5 @@
 class Account < ActiveRecord::Base
+  stampable
   has_many :bills
   has_many :shareholder_bills
   has_many :account_bills
