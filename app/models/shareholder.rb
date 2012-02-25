@@ -18,6 +18,14 @@ class Shareholder < ActiveRecord::Base
     balance_entries.sum(:amount)
   end
 
+  def admin?
+    role.name == 'Administrator' || role.name == 'Owner'
+  end
+
+  def owner?
+    role.name == 'Owner'
+  end
+
   class << self
     def by_user(user)
       where(:user_id => user.id)
