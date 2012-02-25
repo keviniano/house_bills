@@ -98,6 +98,7 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.31)
+    userstamp (2.0.1)
     warden (1.1.0)
       rack (>= 1.0)
     will_paginate (3.0.2)
@@ -115,4 +116,5 @@ DEPENDENCIES
   rails (= 3.0.11)
   ruby-debug19
   simple_form
+  userstamp
   will_paginate (~> 3.0.pre2)
