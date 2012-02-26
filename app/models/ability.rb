@@ -2,61 +2,77 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    open_holdings = Shareholder.open_now.where(:user_id: user.id)
+    open_holdings = Shareholder.open_now.where(:user_id => user.id)
     active_holdings = open_holdings.delete_if {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.today}
-    admin_holdings = active_holdings.delete_if {|holding| !holding.admin? }
-    non_admin_holdings = active_holdings.delete_if {|holding| holding.admin? }
-    non_owner_holdings = active_holdings.delete_if {|holding| holding.owner? }
 
+    open_account_ids = open_holdings.map{|r| r.account_id}
+    active_account_ids = active_holdings.map{|r| r.account_id }
+    admin_account_ids = active_holdings.delete_if {|holding| !holding.admin? }.map {|r| r.account_id }
+    non_owner_account_ids = active_holdings.delete_if {|holding| holding.owner? }.map {|r| r.account_id }
+
+    # Any user can create a new account
+    can    :create, Account
     # Any open user can read
-    can    :read,   Account, :id: open_holdings.map{|r| r.account_id}
+    can    :read,   Account, :id => open_account_ids
     # Admins can manage
-    can    :manage, Account, :id: admin_holdings.map{|r| r.account_id}
+    can    :manage, Account, :id => admin_account_ids
     # But non-owners cannot delete
-    cannot :delete, Account, :id: non_owner_holdings.map{|r| r.account_id}
+    cannot :delete, Account, :id => non_owner_account_ids
 
     # Any open user can read
-    can    :read,   BillType, :id: open_holdings.map{|r| r.account_id}
+    can    :read,   BillType, :account_id => open_account_ids
     # Admins can manage
-    can    :manage, BillType, :id: admin_holdings.map{|r| r.account_id}
+    can    :manage, BillType, :account_id => admin_account_ids
 
     # Any open user can read
-    can    :read,   Payee, :id: open_holdings.map{|r| r.account_id}
+    can    :read,   Payee, :account_id => open_account_ids
     # Admins can manage
-    can    :manage, Payee, :id: admin_holdings.map{|r| r.account_id}
+    can    :manage, Payee, :account_id => admin_account_ids
 
     # Admins can manage the shareholder records of others 
-    can    :manage, Shareholder, :account_id: admin_holdings.map{|r| r.account_id}
+    can    :manage, Shareholder, :account_id => admin_account_ids
     # But they can't manage the shareholder records of owners if the user is not an owner themselves
-    cannot :manage, Shareholder, :account_id: non_owner_holdings.map{|r| r.account_id}, :role_id: Role.owner.id
+    cannot :manage, Shareholder, :account_id => non_owner_account_ids, :role_id => Role.owner.id
     # Any open user can read
-    can    :read,   Shareholder, :account_id: open_holdings.map{|r| r.account_id}
+    can    :read,   Shareholder, :account_id => open_account_ids
 
     # Any open user can read
-    can    :view,   AccountEntry, :account_id: open_holdings.map{|r| r.account_id}
+    can    :read,   AccountEntry, :account_id => open_account_ids
 
     # Any open user can read
-    can    :view,   BillAccountEntry, :account_id: open_holdings.map{|r| r.account_id}
+    can    :read,   BillAccountEntry, :account_id => open_account_ids
     # Users can manage their own entries
-    can    :manage, BillAccountEntry, :account_id: active_holdings.map{|r| r.account_id}, :created_by: user.id
+    can    :manage, BillAccountEntry, :account_id => active_account_ids, :creator_id => user.id
     # Admins can manage any entry
-    can    :manage, BillAccountEntry, :account_id: admin_holdings.map{|r| r.account_id}
+    can    :manage, BillAccountEntry, :account_id => admin_account_ids
 
     # Any open user can read
-    can    :view,   ShareholderAccountEntry, :account_id: open_holdings.map{|r| r.account_id}
+    can    :read,   ShareholderAccountEntry, :account_id => open_account_ids
     # Users can manage their own entries
-    can    :manage, ShareholderAccountEntry, :account_id: active_holdings.map{|r| r.account_id}, :created_by: user.id
+    can    :manage, ShareholderAccountEntry, :account_id => active_account_ids, :creator_id => user.id
     # Admins can manage any entry
-    can    :manage, ShareholderAccountEntry, :account_id: admin_holdings.map{|r| r.account_id}
+    can    :manage, ShareholderAccountEntry, :account_id => admin_account_ids
 
     # Any open user can read
-    can    :view,   UnboundAccountEntry, :account_id: open_holdings.map{|r| r.account_id}
+    can    :read,   UnboundAccountEntry, :account_id => open_account_ids
     # Users can manage their own entries
-    can    :manage, UnboundAccountEntry, :account_id: active_holdings.map{|r| r.account_id}, :created_by: user.id
+    can    :manage, UnboundAccountEntry, :account_id => active_account_ids, :creator_id => user.id
     # Admins can manage any entry
-    can    :manage, UnboundAccountEntry, :account_id: admin_holdings.map{|r| r.account_id}
+    can    :manage, UnboundAccountEntry, :account_id => admin_account_ids
 
+    # Any open user can read
+    can    :read,   AccountBill, :account_id => open_account_ids
+    # Users can manage their own entries
+    can    :manage, AccountBill, :account_id => active_account_ids, :creator_id => user.id
+    # Admins can manage any entry
+    can    :manage, AccountBill, :account_id => admin_account_ids
 
+    # Any open user can read
+    can    :read,   ShareholderBill, :account_id => open_account_ids
+    # Users can manage their own entries
+    can    :manage, ShareholderBill, :account_id => active_account_ids, :creator_id => user.id
+    # Admins can manage any entry
+    can    :manage, ShareholderBill, :account_id => admin_account_ids
 
 
     # Define abilities for the passed in user here. For example:
