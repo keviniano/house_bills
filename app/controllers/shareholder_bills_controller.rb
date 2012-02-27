@@ -1,27 +1,24 @@
 class ShareholderBillsController < ApplicationController
   before_filter :authenticate_user!
+  load_and_authorize_resource :account
+  load_and_authorize_resource :shareholder_bill, :through => :account
 
   # GET /shareholder_bills/new
   def new
-    @shareholder, @account = verify_account_access(current_user, params)
-    @bill = @account.shareholder_bills.build :shareholder => @shareholder
-    @bill.build_bill_share_entries!
-    render :new
+    @shareholder = Shareholder.find_by_user_id_and_account_id(current_user.id,@account.id)
+    @shareholder_bill.shareholder = @shareholder 
+    @shareholder_bill.build_bill_share_entries! 
   end
 
   # GET /shareholder_bills/1/edit
   def edit
-    @shareholder, @account = verify_account_access(current_user, params)
-    @bill = @account.shareholder_bills.find(params[:id])
-    render :edit
+
   end
 
   # POST /shareholder_bills
   def create
-    @shareholder, @account = verify_account_access(current_user, params)
-    @bill = @account.shareholder_bills.new(params[:shareholder_bill])
-    if @bill.save
-      redirect_to [:edit,@account,@bill], :notice => 'Bill was successfully created.'
+    if @shareholder_bill.save
+      redirect_to [:edit,@account,@shareholder_bill], :notice => 'Bill was successfully created.'
     else
       render :new
     end
@@ -29,10 +26,8 @@ class ShareholderBillsController < ApplicationController
 
   # PUT /shareholder_bills/1
   def update
-    @shareholder, @account = verify_account_access(current_user, params)
-    @bill = @account.shareholder_bills.find(params[:id])
-    if @bill.update_attributes(params[:shareholder_bill])
-      redirect_to [:edit,@account,@bill], :notice => 'Bill was successfully updated.'
+    if @shareholder_bill.update_attributes(params[:shareholder_bill])
+      redirect_to [:edit,@account,@shareholder_bill], :notice => 'Bill was successfully updated.'
     else
       render :edit
     end
@@ -40,9 +35,7 @@ class ShareholderBillsController < ApplicationController
 
   # DELETE /shareholder_bills/1
   def destroy
-    @shareholder, @account = verify_account_access(current_user, params)
-    @bill = @account.bills.find(params[:id])
-    @bill.destroy
+    @shareholder_bill.destroy
     redirect_to :action => :index, :controller => :bills
   end
 end

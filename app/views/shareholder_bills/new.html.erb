@@ -2,4 +2,4 @@
 
 <h1><%= @account.name %>: New Shareholder Bill</h1>
 
-<%= render :partial => 'bills/form' %>
+<%= render :partial => 'bills/form', :locals => {:bill => @shareholder_bill} %>

@@ -2,4 +2,4 @@
 
 <h1><%= @account.name %>: Edit Bill</h1>
 
-<%= render :partial => 'bills/form' %>
+<%= render :partial => 'bills/form', :locals => {:bill => @account_bill} %>

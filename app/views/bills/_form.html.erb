@@ -1,13 +1,13 @@
-<%= simple_form_for([@account,@bill]) do |f| %>
+<%= simple_form_for([@account,bill]) do |f| %>
   <%= f.input :entry_type, :as => :radio, :collection => Bill.valid_entry_types %>
   <%= f.input :date %>
-  <% if @bill.type == 'AccountBill' %>
-    <%=  f.simple_fields_for :bill_account_entry, @bill.bill_account_entry do |bae| %>
+  <% if bill.type == 'AccountBill' %>
+    <%=  f.simple_fields_for :bill_account_entry, bill.bill_account_entry do |bae| %>
       <%= bae.input :check_number, :input_html => {:size => 5} %>
     <% end %>
     <%= f.input :payee %>
   <% else %>
-    <%= f.association :shareholder, :collection => @bill.open_shareholders, :include_blank => false %>
+    <%= f.association :shareholder, :collection => bill.open_shareholders, :include_blank => false %>
   <% end %>
   <%= f.input :entry_amount, :input_html => {:size => 5} %>
   <%= f.association :bill_type, :collection => @account.bill_types %>
@@ -28,21 +28,21 @@
         <td><%= b.input :_destroy, :label => false, :as => :boolean %></td>
       </tr>
     <% end %>
-    <% if @bill.excluded_open_shareholders.present? %>
-      <%= f.fields_for :bill_share_balance_entries, @bill.bill_share_balance_entries.build(:account => @account) do |b| %>
+    <% if bill.excluded_open_shareholders.present? %>
+      <%= f.fields_for :bill_share_balance_entries, bill.bill_share_balance_entries.build(:account => @account) do |b| %>
         <tr>
-          <td><%= b.association :shareholder, :label => false, :collection => @bill.excluded_open_shareholders %></td>
+          <td><%= b.association :shareholder, :label => false, :collection => bill.excluded_open_shareholders %></td>
           <td><%= b.input :share, :label => false, :input_html => {:size => 1} %><%= b.input :account_id, :as => :hidden %></td>
           <td />
           <td />
         </tr>
       <% end %>
     <% end %>
-    <% unless @bill.new_record? %>
+    <% unless bill.new_record? %>
       <tr>
         <td>Pot</td>
         <td />
-        <td><%= number_to_currency(@bill.pot_balance_entry.amount) %></td>
+        <td><%= number_to_currency(bill.pot_balance_entry.amount) %></td>
         <td />
       </tr>
     <% end %>

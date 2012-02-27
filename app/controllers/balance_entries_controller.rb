@@ -1,10 +1,10 @@
 class BalanceEntriesController < ApplicationController
   before_filter :authenticate_user!
-  respond_to :html
+  load_and_authorize_resource :account
+  load_and_authorize_resource :balance_entry, :through => :account
 
   # GET /bills
   def index
-    @shareholder, @account = verify_account_access(current_user, params)
-    @balance_events = @account.balance_entries.events.paginate :page => params[:page]
+    @balance_events = @balance_entries.events.paginate :page => params[:page]
   end
 end

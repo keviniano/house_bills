@@ -1,16 +1,14 @@
 class BillAccountEntriesController < ApplicationController
+  before_filter :authenticate_user!
+  load_and_authorize_resource :account
+  load_and_authorize_resource :bill_account_entry, :through => :account
+
   def show
+
   end
 
   def edit
-    @shareholder = Shareholder.find_by_user_id_and_account_id(current_user.id,params[:account_id])
-    if @shareholder.nil?
-      flash[:error] = "Account not found"
-      redirect_to :action => :index
-    else
-      @account = @shareholder.account
-      @account_entry = @account.account_entries.find(params[:id])
-      @bill = @account_entry.bill
+      @bill = @bill_account_entry.bill
       redirect_to [:edit,@account,@bill]
     end
   end
