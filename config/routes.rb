@@ -27,9 +27,8 @@ HouseBills::Application.routes.draw do
     resources :shareholder_bills
     resources :account_bills
 
-    resources :account_entries
+    resources :account_entries, :only => [:index]
     resources :shareholder_account_entries
-    resources :bill_account_entries
     resources :unbound_account_entries 
     
     resources :payees
