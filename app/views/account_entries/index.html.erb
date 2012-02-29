@@ -12,7 +12,7 @@
     <th>Cleared Balance</th>
   </tr>
 
-  <% balance = @account_entries.first.balance %>
+  <% balance = @account_entries.first.try(:balance) %>
   <% cleared_balance = nil %>
   <% @account_entries.each do |account_entry| %>
     <tr>

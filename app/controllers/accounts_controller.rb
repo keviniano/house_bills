@@ -4,7 +4,7 @@ class AccountsController < ApplicationController
 
   # GET /accounts
   def index
-
+    @accounts = @accounts.order(:name)
   end
 
   # GET /accounts/new

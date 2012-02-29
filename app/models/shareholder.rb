@@ -11,6 +11,8 @@ class Shareholder < ActiveRecord::Base
   #validates_presence_of :email
   validates_presence_of :opened_on
 
+  # before_create :attach_user
+
   default_value_for :opened_on do
     Date.today
   end
@@ -50,5 +52,10 @@ class Shareholder < ActiveRecord::Base
   end
 
   private
+
+  def attach_user
+    self.user = User.find_by_email(email)
+    true
+  end
 
 end

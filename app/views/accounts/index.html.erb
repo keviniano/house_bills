@@ -1,9 +1,11 @@
-<h1>My Accounts</h1>
+<% content_for :title, "#{current_user.name}: Accounts" %>
+<h1><%= current_user.name %>: Accounts</h1>
 
 <% @accounts.each do |account| %>
   <h2><%= account.name %></h2>
     <ul>
       <li><%= link_to 'View account activity', account_balance_entries_path(account) %></li>
+      <li><%= link_to 'View account ledger', account_account_entries_path(account) %></li>
       <li><%= link_to 'Enter a bill paid for by a housemate', new_account_shareholder_bill_path(account) %></li>
       <li><%= link_to 'Enter a bill that was paid directly out of this account', new_account_account_bill_path(account) %></li>
       <li><%= link_to 'Add an account entry for which a housemate should be credited', new_account_shareholder_account_entry_path(account) %></li>
