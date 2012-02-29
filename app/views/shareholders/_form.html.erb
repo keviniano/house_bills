@@ -1,0 +1,11 @@
+<%= simple_form_for [@account,@shareholder] do |s| %>
+  <%= s.input :name, :input_html => { :size => 25 } %>
+  <%= s.association :role, :prompt => true, :include_blank => false %>
+  <%= s.input :email, :input_html => { :size => 25 } %>
+  <% unless @shareholder.new_record? %>
+    <%= s.input :opened_on, :as => :string, :input_html => { :size => 12 } %>
+    <%= s.input :inactivated_on, :as => :string, :input_html => { :size => 12 } %>
+    <%= s.input :closed_on, :as => :string, :input_html => { :size => 12 } %>
+  <% end %>
+  <%= s.button :submit %>
+<% end %>

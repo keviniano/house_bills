@@ -7,6 +7,11 @@ class AccountsController < ApplicationController
     @accounts = @accounts.order(:name)
   end
 
+  # GET /accounts/1
+  def show
+
+  end
+
   # GET /accounts/new
   def new
   
@@ -26,7 +31,7 @@ class AccountsController < ApplicationController
     m.role = Role.find_by_name("Owner")
 
     if @account.save
-      redirect_to :accounts, :notice => "Account '#{@account.name}' was successfully created."
+      redirect_to @account, :notice => "Account '#{@account.name}' was successfully created."
     else
       render :action => "new"
     end
@@ -35,7 +40,7 @@ class AccountsController < ApplicationController
   # PUT /accounts/1
   def update
     if @account.update_attributes(params[:account])
-      redirect_to :edit_account, :notice => "Account '#{@account.name}' was successfully edited."
+      redirect_to @account, :notice => "Account '#{@account.name}' was successfully edited."
     else
       render :action => "edit"
     end

@@ -1,0 +1,33 @@
+<% content_for :title, "#{@account.name} Account" %>
+
+<h1>
+  <%= @account.name %> Account
+</h1>
+
+<%= link_to "Edit Account", [:edit,@account] %>
+
+<table>
+  <tr>
+    <th>Shareholder Name</th>
+    <th>Role</th>
+    <th>Email</th>
+    <th>Opened</th>
+    <th>Inactivated</th>
+    <th>Closed</th>
+    <th>Current Balance</th>
+    <th></th>
+  </tr>
+  <% @account.shareholders.order(:opened_on, :inactivated_on, :name).each do |shareholder| %>
+    <tr>
+      <td><%= shareholder.name %></td>
+      <td><%= shareholder.role.name %></td>
+      <td><%= shareholder.email %></td>
+      <td><%= shareholder.opened_on %></td>
+      <td><%= shareholder.inactivated_on %></td>
+      <td><%= shareholder.closed_on %></td>
+      <td class="currency"><%= number_to_currency shareholder.balance  %></td>
+      <td><%= link_to 'Edit', edit_account_shareholder_path(@account,shareholder) %></td>
+    </tr>
+  <%  end %>
+</table>
+<%= link_to "Add new shareholder", new_account_shareholder_path(@account) %>

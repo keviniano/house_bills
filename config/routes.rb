@@ -17,9 +17,11 @@ HouseBills::Application.routes.draw do
 
   devise_for :users
 
-  resources :accounts, :except => :show do 
+  resources :accounts do 
     get "edit_pot", :on => :member
     put "update_pot", :on => :member
+
+    resources :shareholders, :except => [:index, :show]
   
     resources :balance_entries, :only => [:index]
     resources :shareholder_bills

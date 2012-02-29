@@ -1,42 +1,4 @@
 <%= simple_form_for(@account) do |f| %>
-    <%= f.input :name, :label => "Account Name" %> 
-    <table>
-      <tr>
-        <th>Shareholder Name</th>
-        <th>Role</th>
-        <th>Email</th>
-        <th>Opened</th>
-        <th>Inactivated</th>
-        <th>Closed</th>
-        <th>Balance</th>
-      </tr>
-      <%= f.simple_fields_for :shareholders, @account.shareholders.order(:opened_on, :inactivated_on, :name) do |m| %>
-        <tr>
-          <td><%= m.input :name, :label => false, :input_html => { :size => 25 } %></td>
-          <td><%= m.association :role, :label => false, :prompt => true, :include_blank => false %></td>
-          <td><%= m.input :email, :label => false, :input_html => { :size => 25 } %></td>
-          <td><%= m.input :opened_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
-          <td><%= m.input :inactivated_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
-          <td><%= m.input :closed_on, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
-          <td class="currency"><%= number_to_currency m.object.balance  %></td>
-        </tr>
-      <%  end %>
-      <tr>
-        <th colspan="7">New Shareholder</th>
-      </tr>
-      <%= f.simple_fields_for :shareholders, @account.shareholders.build do |m| %>
-        <tr>
-          <td><%= m.input :name, :required => false, :label => false, :input_html => { :size => 25 } %></td>
-          <td><%= m.association :role, :label => false, :prompt => true, :include_blank => false %></td>
-          <td><%= m.input :email, :required => false, :label => false, :input_html => { :size => 25 } %></td>
-          <td><%= m.input :opened_on, :required => false, :as => :string, :label => false, :input_html => { :size => 12 } %></td>
-          <td />
-          <td />
-          <td />
-        </tr>
-      <% end %>
-      <tr>
-        <td><%= f.button :submit %></td>
-      </tr> 
-    </table>
+  <%= f.input :name, :label => "Account Name" %> 
+  <%= f.button :submit %>
 <% end %>

@@ -11,8 +11,7 @@
       <li><%= link_to 'Add an account entry for which a housemate should be credited', new_account_shareholder_account_entry_path(account) %></li>
       <li><%= link_to 'Add an account entry unrelated to bills', new_account_unbound_account_entry_path(account) %></li>
       <li><%= link_to 'Distribute account\'s pot', edit_pot_account_path(account) %></li>
-      <li><%= link_to 'Edit this account', edit_account_path(account) %></li>
-      <li><%= link_to 'Delete this account', account, :confirm => 'Are you sure?', :method => :delete %></li>
+      <li><%= link_to 'Account details', account_path(account) %></li>
     </ul>
 <% end %>
 
