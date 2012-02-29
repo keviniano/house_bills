@@ -43,13 +43,6 @@ class Ability
     can    :read,   AccountEntry, :account_id => open_account_ids
 
     # Any open user can read
-    can    :read,   BillAccountEntry, :account_id => open_account_ids
-    # Users can manage their own entries
-    can    :manage, BillAccountEntry, :account_id => active_account_ids, :creator_id => user.id
-    # Admins can manage any entry
-    can    :manage, BillAccountEntry, :account_id => admin_account_ids
-
-    # Any open user can read
     can    :read,   ShareholderAccountEntry, :account_id => open_account_ids
     # Users can manage their own entries
     can    :manage, ShareholderAccountEntry, :account_id => active_account_ids, :creator_id => user.id
