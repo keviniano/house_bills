@@ -6,5 +6,6 @@ class BalanceEntriesController < ApplicationController
   # GET /bills
   def index
     @balance_events = @balance_entries.events.paginate :page => params[:page]
+    @shareholder = current_user.shareholder_for_account(@account)
   end
 end

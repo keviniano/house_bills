@@ -9,13 +9,16 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :name, :email, :password, :password_confirmation, :remember_me
 
-  has_one :shareholder
+  has_many :shareholders
 
   validates_presence_of :name
   validates_presence_of :email
 
   after_create :attach_shareholders
 
+  def shareholder_for_account(account)
+    Shareholder.where(:user_id => self.id, :account_id => account.id).first
+  end
 
   private
 

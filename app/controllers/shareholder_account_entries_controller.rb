@@ -4,7 +4,7 @@ class ShareholderAccountEntriesController < ApplicationController
   load_and_authorize_resource :shareholder_account_entry, :through => :account
 
   def new
-    @shareholder = Shareholder.find_by_user_id_and_account_id(current_user.id,@account.id)
+    @shareholder = current_user.shareholder_for_account(@account)
     @shareholder_account_entry.shareholder = @shareholder 
   end
 
