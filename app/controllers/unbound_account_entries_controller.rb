@@ -4,6 +4,7 @@ class UnboundAccountEntriesController < ApplicationController
   load_and_authorize_resource :unbound_account_entry, :through => :account
 
   def new
+    @payees = @account.payees
 
   end
 
@@ -11,11 +12,13 @@ class UnboundAccountEntriesController < ApplicationController
     if @unbound_account_entry.save
       redirect_to [:edit,@account,@unbound_account_entry], :notice => 'Account entry was successfully created.'
     else
+      @payees = @account.payees
       render :new
     end
   end
 
   def edit
+    @payees = @account.payees
 
   end
 
@@ -23,6 +26,7 @@ class UnboundAccountEntriesController < ApplicationController
     if @unbound_account_entry.update_attributes(params[:unbound_account_entry])
       redirect_to [:edit,@account,@unbound_account_entry], :notice => 'Account entry was successfully updated.'
     else
+      @payees = @account.payees
       render :edit
     end
   end

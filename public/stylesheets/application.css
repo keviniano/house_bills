@@ -127,6 +127,7 @@ form input.check-number {
 
 form input.entry-amount {
   width: 75px;
+  text-align: right;
   }
 
 form input.datepicker {
