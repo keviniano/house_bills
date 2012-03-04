@@ -24,6 +24,7 @@ a {
   background-color: #FFF;
   padding: 20px 40px;
   margin-top: 20px;
+  border: 1px solid #363280;
   border-radius: 20px;
   -moz-border-radius: 20px;
   -webkit-border-radius: 20px;
@@ -138,6 +139,68 @@ th {
   background-color: #dfb862
 }
 
-td.currency {
+td.currency, div.currency {
   text-align: right;
 }
+
+div.table {
+  max-width: 400px;
+  border: 1px solid #363280;
+  border-radius: 5px;
+  }
+
+div.row {
+  clear: both;
+  overflow: auto;
+  padding: 5px;
+  }
+
+div.row:nth-of-type(odd) {
+  background: #E7D083;
+  }
+
+div.row:last-child {
+  border-radius: 0 0 5px 5px;
+  }
+
+div.row.header {
+  font-weight: bold;
+  background: #DFB862;
+  border-bottom: 1px solid black;
+  border-radius: 5px 5px 0 0;
+  }
+
+div.cell {
+  float: left;
+  }
+
+div.cell div.boolean {
+  margin-left: 0;
+  }
+
+div.cell div.input {
+  margin-bottom: 0;
+  }
+
+div.column-first {
+  width: 165px;
+  }
+
+div.column-second {
+  width: 70px;
+  }
+
+div.column-third {
+  width: 70px;
+  }
+
+div.column-fourth {
+  width: 50px;
+  margin-left: 20px;
+  text-align: center;
+  }
+
+div.button {
+  clear: both;
+}
+

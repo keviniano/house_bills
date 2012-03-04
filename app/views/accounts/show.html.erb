@@ -6,6 +6,10 @@
 
 <%= link_to "Edit Account", [:edit,@account] %>
 
+<h2>
+  Shareholders
+</h2>
+<%= link_to "Add new shareholder", new_account_shareholder_path(@account) %>
 <table>
   <tr>
     <th>Shareholder Name</th>
@@ -30,4 +34,31 @@
     </tr>
   <%  end %>
 </table>
-<%= link_to "Add new shareholder", new_account_shareholder_path(@account) %>
+
+<h2>
+  Bill Types
+</h2>
+<div class="table">
+  <% @account.bill_types.order(:name).each do |bill_type| %>
+    <div class="row">
+      <div class="cell">
+        <%= bill_type.name %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<h2>
+  Bill Types
+</h2>
+<div class="table">
+  <% @account.payees.order(:name).each do |payee| %>
+    <div class="row">
+      <div class="cell">
+        <%= payee.name %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
