@@ -1,3 +1,13 @@
+<% if bill.type == 'AccountBill' %>
+  <script>
+    $(function() {
+            var availablePayees = [
+              <%= @payees.map{|p| "\"#{p.name}\""}.join(',').html_safe %>
+            ];
+            $("#account_bill_payee").autocomplete({ source: availablePayees, delay: 0 });
+    });
+  </script>  
+<% end %>
 <%= simple_form_for([@account,bill]) do |f| %>
   <%= f.input :entry_type, :as => :radio, :collection => Bill.valid_entry_types %>
   <%= f.input :date %>

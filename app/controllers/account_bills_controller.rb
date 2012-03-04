@@ -7,11 +7,12 @@ class AccountBillsController < ApplicationController
   def new
     @account_bill.build_bill_share_entries!
     @account_bill.build_bill_account_entry
+    @payees = @account.payees
   end
 
   # GET /account_bills/1/edit
   def edit
-
+    @payees = @account.payees
   end
 
   # POST /account_bills
