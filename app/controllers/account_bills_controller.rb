@@ -17,9 +17,10 @@ class AccountBillsController < ApplicationController
 
   # POST /account_bills
   def create
-    if @account_bill.save!
+    if @account_bill.save
       redirect_to [:edit,@account,@account_bill], :notice => 'Bill was successfully created.'
     else
+      @payees = @account.payees
       render :new
     end
   end
@@ -29,6 +30,7 @@ class AccountBillsController < ApplicationController
     if @account_bill.update_attributes(params[:account_bill])
       redirect_to [:edit,@account,@account_bill], :notice => 'Bill was successfully updated.'
     else
+      @payees = @account.payees
       render :edit
     end
   end

@@ -121,6 +121,31 @@ a {
   font-style: italic;
   }
 
+form input.check-number {
+  width: 75px;
+  }
+
+form input.entry-amount {
+  width: 75px;
+  }
+
+form input.datepicker {
+  width: 75px;
+  }
+
+form input.payee {
+  width: 300px;
+  }
+
+form input.share-ratio {
+  width: 35px;
+  }
+
+form textarea.note {
+  width: 300px;
+  height: 50px;
+  }
+
 table {
   border-collapse: collapse;
   }
