@@ -2,21 +2,21 @@ body {
   background-color: #6D7DB1;
   font-family: Verdana, Helvetica, Arial;
   font-size: 14px;
-}
+  }
 
 a img {
   border: none;
-}
+  }
 
 a {
   color: #0000FF;
-}
+  }
 
 .clear {
   clear: both;
   height: 0;
   overflow: hidden;
-}
+  }
 
 #container {
   width: 75%;
@@ -26,28 +26,26 @@ a {
   margin-top: 20px;
   border: 1px solid #363280;
   border-radius: 20px;
-  -moz-border-radius: 20px;
-  -webkit-border-radius: 20px;
-}
+  }
 
 #flash_notice, #flash_error, #flash_alert {
   padding: 5px 8px;
   margin: 10px 0;
-}
+  }
 
 #flash_notice {
   background-color: #CFC;
   border: solid 1px #6C6;
-}
+  }
 
 #flash_error, #flash_alert {
   background-color: #FCC;
   border: solid 1px #C66;
-}
+  }
 
 .fieldWithErrors {
   display: inline;
-}
+  }
 
 .error_messages {
   width: 400px;
@@ -57,7 +55,7 @@ a {
   margin-bottom: 20px;
   background-color: #f0f0f0;
   font-size: 12px;
-}
+  }
 
 .error_messages h2 {
   text-align: left;
@@ -67,44 +65,44 @@ a {
   margin: 0;
   background-color: #c00;
   color: #fff;
-}
+  }
 
 .error_messages p {
   margin: 8px 10px;
-}
+  }
 
 .error_messages ul {
   margin: 0;
-}
+  }
 
 .simple_form label {
   float: left;
   width: 150px;
   text-align: left;
   margin: 2px 10px;
-}
+  }
 
 .simple_form div.input {
   margin-bottom: 10px;
-}
+  }
 
 .simple_form div.boolean, .simple_form input[type='submit'] {
   margin-left: 170px;
-}
+  }
 
 .simple_form td input[type='submit'] {
   margin-left: 0;
-}
+  }
 
 .simple_form div.boolean label, .simple_form label.collection_radio {
   float: none;
   margin: 0;
-}
+  }
 
 .simple_form label.collection_radio {
   margin-right: 10px;
   margin-left: 2px;
-}
+  }
 
 .simple_form .error {
   clear: left;
@@ -112,7 +110,7 @@ a {
   font-size: 12px;
   color: #D00;
   display: block;
-}
+  }
 
 .simple_form .hint {
   clear: left;
@@ -121,27 +119,27 @@ a {
   color: #555;
   display: block;
   font-style: italic;
-}
+  }
 
 table {
   border-collapse: collapse;
-}
+  }
 
 td, th {
   padding: 5px 10px;
-}
+  }
 
 tr:nth-child(2n+1) {
   background-color: #E7C883;
-}
+  }
 
 th {
   background-color: #dfb862
-}
+  }
 
 td.currency, div.currency {
   text-align: right;
-}
+  }
 
 div.table {
   max-width: 400px;
@@ -159,6 +157,10 @@ div.row:nth-of-type(odd) {
   background: #E7D083;
   }
 
+div.row:first-child {
+  border-radius: 5px 5px 0 0;
+  }
+  
 div.row:last-child {
   border-radius: 0 0 5px 5px;
   }
@@ -167,7 +169,6 @@ div.row.header {
   font-weight: bold;
   background: #DFB862;
   border-bottom: 1px solid black;
-  border-radius: 5px 5px 0 0;
   }
 
 div.cell {
@@ -202,5 +203,5 @@ div.column-fourth {
 
 div.button {
   clear: both;
-}
+  }
 
