@@ -4,7 +4,10 @@
   <%= @account.name %> Account
 </h1>
 
-<%= link_to "Edit Account", [:edit,@account] %>
+<ul>
+  <li><%= link_to "Edit Account", [:edit,@account] %></li>
+  <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
+</ul>
 
 <h2>
   Shareholders
