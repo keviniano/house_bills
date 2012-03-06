@@ -1,3 +1,4 @@
+
 <% content_for :title, "#{@account.name} Account" %>
 
 <h1>
@@ -9,59 +10,69 @@
   <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
 </ul>
 
-<h2>
-  Shareholders
-</h2>
-<%= link_to "Add new shareholder", new_account_shareholder_path(@account) %>
-<table>
-  <tr>
-    <th>Shareholder Name</th>
-    <th>Role</th>
-    <th>Email</th>
-    <th>Opened</th>
-    <th>Inactivated</th>
-    <th>Closed</th>
-    <th>Current Balance</th>
-    <th></th>
-  </tr>
-  <% @account.shareholders.order(:opened_on, :inactivated_on, :name).each do |shareholder| %>
-    <tr>
-      <td><%= shareholder.name %></td>
-      <td><%= shareholder.role.name %></td>
-      <td><%= shareholder.email %></td>
-      <td><%= shareholder.opened_on %></td>
-      <td><%= shareholder.inactivated_on %></td>
-      <td><%= shareholder.closed_on %></td>
-      <td class="currency"><%= number_to_currency shareholder.balance  %></td>
-      <td><%= link_to 'Edit', edit_account_shareholder_path(@account,shareholder) %></td>
-    </tr>
-  <%  end %>
-</table>
+<div id="accordion">
+  <h3>
+    <a href="#">Shareholders</a>
+  </h3>
+  <div>
+    <%= link_to "Add new shareholder", new_account_shareholder_path(@account) %>
+    <table>
+      <tr>
+        <th>Shareholder Name</th>
+        <th>Role</th>
+        <th>Email</th>
+        <th>Opened</th>
+        <th>Inactivated</th>
+        <th>Closed</th>
+        <th>Current Balance</th>
+        <th></th>
+      </tr>
+      <% @account.shareholders.order(:opened_on, :inactivated_on, :name).each do |shareholder| %>
+        <tr>
+          <td><%= shareholder.name %></td>
+          <td><%= shareholder.role.name %></td>
+          <td><%= shareholder.email %></td>
+          <td><%= shareholder.opened_on %></td>
+          <td><%= shareholder.inactivated_on %></td>
+          <td><%= shareholder.closed_on %></td>
+          <td class="currency"><%= number_to_currency shareholder.balance  %></td>
+          <td><%= link_to 'Edit', edit_account_shareholder_path(@account,shareholder) %></td>
+        </tr>
+      <%  end %>
+    </table>
+  </div>
 
-<h2>
-  Bill Types
-</h2>
-<div class="table">
-  <% @account.bill_types.order(:name).each do |bill_type| %>
-    <div class="row">
-      <div class="cell">
-        <%= bill_type.name %>
-      </div>
+  <h3>
+    <a href="#">Bill Types</a>
+  </h3>
+  <div>
+    <%= link_to "Add new bill type", new_account_bill_type_path(@account) %>
+    <div class="table">
+      <% @account.bill_types.order(:name).each do |bill_type| %>
+        <div class="row">
+          <div class="cell">
+            <%= bill_type.name %>
+          </div>
+        </div>
+      <% end %>
     </div>
-  <% end %>
-</div>
+  </div>
 
-<h2>
-  Payees
-</h2>
-<div class="table">
-  <% @account.payees.order(:name).each do |payee| %>
-    <div class="row">
-      <div class="cell">
-        <%= payee.name %>
-      </div>
+  <h3>
+    <a href="#">Payees</a>
+  </h3>
+  <div>
+    <%= link_to "Add new payee", new_account_payee_path(@account) %>
+    <div class="table">
+      <% @account.payees.order(:name).each do |payee| %>
+        <div class="row">
+          <div class="cell">
+            <%= payee.name %>
+          </div>
+        </div>
+      <% end %>
     </div>
-  <% end %>
-</div>
+  </div>
+  </div>
 
 

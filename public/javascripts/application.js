@@ -5,4 +5,6 @@ $(document).ready(function(){
 
   $(".datepicker").datepicker({ dateFormat: 'yy-mm-dd' });
 
+  $("#accordion").accordion({ collapsible: true, active: false });
+
 });
