@@ -199,6 +199,7 @@ div.row.header {
 
 div.cell {
   float: left;
+  padding: 0 5px;
   }
 
 div.cell div.boolean {

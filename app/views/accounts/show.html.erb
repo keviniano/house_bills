@@ -66,8 +66,14 @@
     <div class="table">
       <% @account.payees.order(:name).each do |payee| %>
         <div class="row">
-          <div class="cell">
+          <div class="cell column-first">
             <%= payee.name %>
+          </div>
+          <div class="cell">
+            <%= link_to "Rename", [:edit,@account,payee] %>
+          </div>
+          <div class="cell">
+            <%= link_to "Delete", [@account,payee], :method => :delete, :confirm => "Delete the payee \"#{payee.name}\"?" %>
           </div>
         </div>
       <% end %>

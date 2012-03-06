@@ -1,4 +1,4 @@
-<% simple_form_for(@payee) do |f| %>
+<% simple_form_for [@account,@payee] do |f| %>
   <%= f.input :name %>
   <%= f.button :submit %>
 <% end %>

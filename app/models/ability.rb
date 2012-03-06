@@ -27,7 +27,7 @@ class Ability
     # Any open user can read
     can    :read,   Payee, :account_id => open_account_ids
     # Admins can manage
-    can    :manage, Payee, :account_id => admin_account_ids
+    can    :manage, Payee
 
     # Admins can manage the shareholder records of others 
     can    :manage, Shareholder, :account_id => admin_account_ids

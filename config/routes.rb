@@ -22,6 +22,8 @@ HouseBills::Application.routes.draw do
     put "update_pot", :on => :member
 
     resources :shareholders, :except => [:index, :show]
+    resources :payees, :except => [:index, :show]
+    resources :bill_types, :except => [:index, :show]
   
     resources :balance_entries, :only => [:index]
     resources :shareholder_bills
@@ -31,8 +33,6 @@ HouseBills::Application.routes.draw do
     resources :shareholder_account_entries
     resources :unbound_account_entries 
     
-    resources :payees
-    resources :bill_types
   end
 
   root :to => 'account_entries#index'
