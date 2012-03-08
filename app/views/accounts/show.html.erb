@@ -50,9 +50,17 @@
     <div class="table">
       <% @account.bill_types.order(:name).each do |bill_type| %>
         <div class="row">
-          <div class="cell">
+          <div class="cell column-first">
             <%= bill_type.name %>
           </div>
+          <div class="cell">
+            <%= link_to "Rename", [:edit,@account,bill_type] %>
+          </div>
+          <% unless bill_type.bills.exists? %>
+            <div class="cell">
+              <%= link_to "Delete", [@account,bill_type], :method => :delete, :confirm => "Delete the bill type \"#{bill_type.name}\"?" %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>
