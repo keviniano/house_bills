@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120225035539) do
+ActiveRecord::Schema.define(:version => 20120308061021) do
 
   create_table "account_entries", :force => true do |t|
     t.string   "type",              :limit => 25
@@ -61,7 +61,7 @@ ActiveRecord::Schema.define(:version => 20120225035539) do
 
   create_table "bill_types", :force => true do |t|
     t.integer  "account_id"
-    t.text     "name"
+    t.string   "name"
     t.integer  "lock_version", :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
