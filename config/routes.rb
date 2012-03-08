@@ -35,7 +35,7 @@ HouseBills::Application.routes.draw do
     
   end
 
-  root :to => 'account_entries#index'
+  root :to => 'accounts#index'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
