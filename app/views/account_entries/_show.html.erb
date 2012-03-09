@@ -1,0 +1,27 @@
+<dl>
+  <dt>Entry type</dt>
+  <dd><%= account_entry.entry_type %></dd>
+
+  <dt>Date</dt>
+  <dd><%= account_entry.date %></dd>
+
+  <dt>Check number</dt>
+  <dd><%= account_entry.check_number || 'N/A' %></dd>
+
+  <% if account_entry.type == 'UnboundAccountEntry' %>
+    <dt>Payee</dt>
+    <dd><%= account_entry.payee %></dd>
+  <% else %>
+    <dt>Shareholder</dt>
+    <dd><%= account_entry.shareholder.name %></dd>
+  <% end %>
+
+  <dt>Entry amount</dt>
+  <dd><%= number_to_currency(account_entry.entry_amount) %></dd>
+
+  <dt>Note</dt>
+  <dd><%= account_entry.note %>&nbsp;</dd>
+
+  <dt>Cleared</dt>
+  <dd><%= account_entry.cleared ? 'Yes' : 'No' %></dd>
+</dl>

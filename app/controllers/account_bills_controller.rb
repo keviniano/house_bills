@@ -3,6 +3,11 @@ class AccountBillsController < ApplicationController
   load_and_authorize_resource :account
   load_and_authorize_resource :account_bill, :through => :account
 
+  # GET /account_bills/1
+  def show
+
+  end
+
   # GET /account_bills/new
   def new
     @account_bill.build_bill_share_entries!

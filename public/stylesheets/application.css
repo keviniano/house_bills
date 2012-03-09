@@ -232,3 +232,13 @@ div.button {
   clear: both;
   }
 
+dl dt {
+  float: left;
+  width: 170px;
+  padding: 5px 0;
+  }
+
+dl dd {
+  font-weight: bold;
+  padding: 5px 0;
+  }

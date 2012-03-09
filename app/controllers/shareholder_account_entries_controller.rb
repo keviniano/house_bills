@@ -3,6 +3,10 @@ class ShareholderAccountEntriesController < ApplicationController
   load_and_authorize_resource :account
   load_and_authorize_resource :shareholder_account_entry, :through => :account
 
+  def show
+
+  end
+
   def new
     @shareholder = current_user.shareholder_for_account(@account)
     @shareholder_account_entry.shareholder = @shareholder 

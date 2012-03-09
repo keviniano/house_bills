@@ -3,6 +3,11 @@ class ShareholderBillsController < ApplicationController
   load_and_authorize_resource :account
   load_and_authorize_resource :shareholder_bill, :through => :account
 
+  # GET /shareholder_bills/1
+  def show
+
+  end
+
   # GET /shareholder_bills/new
   def new
     @shareholder = current_user.shareholder_for_account(@account)

@@ -1,0 +1,47 @@
+<dl>
+  <dt>Entry type</dt>
+  <dd><%= bill.entry_type %></dd>
+
+  <dt>Date</dt>
+  <dd><%= bill.date %></dd>
+
+  <% if bill.type == 'AccountBill' %>
+    <dt>Check number</dt>
+    <dd><%= bill.bill_account_entry.check_number || 'N/A' %></dd>
+
+    <dt>Payee</dt>
+    <dd><%= bill.payee %></dd>
+  <% else %>
+    <dt>Shareholder</dt>
+    <dd><%= bill.shareholder.name %></dd>
+  <% end %>
+
+  <dt>Entry amount</dt>
+  <dd><%= number_to_currency(bill.entry_amount) %></dd>
+
+  <dt>Bill type</dt>
+  <dd><%= bill.bill_type.name %></dd>
+
+  <dt>Note</dt>
+  <dd><%= bill.note %></dd>
+</dl>
+  <h3>Bill Shares</h3>
+  <div class="table shares">
+    <div class="row header">
+      <div class="cell column-first">Name</div>
+      <div class="cell column-second">Share</div>
+      <div class="cell column-third currency">Amount</div>
+    </div>
+    <% bill.bill_share_balance_entries.each do |be| %>
+      <div class="row data">
+        <div class="cell column-first"><%= be.shareholder.name %></div>
+        <div class="cell column-second"><%= be.share %></div>
+        <div class="cell column-third currency"><%= number_to_currency(be.amount) %></div>
+      </div>
+    <% end %>
+    <div class="row data">
+      <div class="cell column-first">Pot</div>
+      <div class="cell column-second">&nbsp;</div>
+      <div class="cell column-third currency"><%= number_to_currency(bill.pot_balance_entry.amount) %></div>
+    </div>
+  </div>

@@ -10,6 +10,8 @@
     <th>Cleared</th>
     <th>Balance</th>
     <th>Cleared Balance</th>
+    <th></th>
+    <th></th>
   </tr>
 
   <% balance = @account_entries.first.try(:balance) %>
@@ -28,11 +30,11 @@
       <% cleared_balance = account_entry.cleared_balance if cleared_balance.blank? %>
       <% cleared_balance -= account_entry.amount if cleared_balance.present? && account_entry.cleared? %>
       <% if account_entry.type == 'BillAccountEntry' %>
-        <td><%= link_to 'Show', [:edit,@account,account_entry.bill] %></td>
-        <td><%= link_to 'Destroy', [@account,account_entry.bill] , :confirm => 'Are you sure?', :method => :delete %></td>
+        <td><%= link_to 'View', [@account,account_entry.bill] %></td>
+        <td><%= link_to('Edit', [:edit,@account,account_entry.bill]) if can? :edit, account_entry.bill %></td>
       <% else %>  
-        <td><%= link_to 'Show', [:edit,@account,account_entry] %></td>
-        <td><%= link_to 'Destroy', [@account,account_entry] , :confirm => 'Are you sure?', :method => :delete %></td>
+        <td><%= link_to 'View', [@account,account_entry] %></td>
+        <td><%= link_to('Edit', [:edit,@account,account_entry]) if can? :edit, account_entry %></td>
       <% end %>
     </tr>
   <% end %>

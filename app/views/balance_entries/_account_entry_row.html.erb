@@ -7,5 +7,6 @@
   <td><%= truncate account_entry_row.note %></td>
   <td class="currency"><%= number_to_currency account_entry_row.shareholder_amount(@shareholder) %></td>
   <td class="currency"><%= number_to_currency account_entry_row.balance_for(@shareholder) %></td>
-  <td><%= link_to 'Details', [:edit,@account,account_entry_row] %></td>
+  <td><%= link_to('View', [@account,account_entry_row]) %></td>
+  <td><%= link_to('Edit', [:edit,@account,account_entry_row]) if can? :edit, account_entry_row %></td>
 </tr>

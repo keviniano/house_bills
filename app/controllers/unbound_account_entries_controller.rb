@@ -3,6 +3,10 @@ class UnboundAccountEntriesController < ApplicationController
   load_and_authorize_resource :account
   load_and_authorize_resource :unbound_account_entry, :through => :account
 
+  def show
+
+  end
+
   def new
     @payees = @account.payees
 

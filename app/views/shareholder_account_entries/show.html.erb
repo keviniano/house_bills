@@ -1,0 +1,5 @@
+<% content_for :title, "#{@account.name}: View Shareholder Account Entry" %>
+
+<h1><%= @account.name %>: View Shareholder Account Entry</h1>
+
+<%= render :partial => 'account_entries/show', :locals => {:account_entry => @shareholder_account_entry} %>
