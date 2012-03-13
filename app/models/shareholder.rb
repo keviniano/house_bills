@@ -49,6 +49,10 @@ class Shareholder < ActiveRecord::Base
     def active_as_of(date)
       where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.inactivated_on,?)",date,date])    
     end
+
+    def for_account(account)
+      where(:account_id => account.id)
+    end
   end
 
   private

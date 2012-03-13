@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation, :remember_me
 
   has_many :shareholders
+  has_many :accounts, :through => :shareholders
 
   validates_presence_of :name
   validates_presence_of :email

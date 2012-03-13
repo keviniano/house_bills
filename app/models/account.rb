@@ -15,7 +15,15 @@ class Account < ActiveRecord::Base
   has_many :users, :through => :shareholders
   has_many :payees, :dependent => :destroy
   has_many :bill_types, :dependent => :destroy
+  has_many :pot_balance_entries
 
   validates_presence_of :name
 
+  def pot_balance
+    pot_balance_entries.sum(:amount)
+  end
+
+  def balance
+    account_entries.sum(:amount)
+  end
 end

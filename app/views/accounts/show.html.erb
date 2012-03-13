@@ -5,6 +5,33 @@
   <%= @account.name %> Account
 </h1>
 
+<h2>
+  Account Balance: <%= number_to_currency(@account.balance) %>
+</h2>
+<h3>
+  Shareholder Balances
+</h3>
+<div class="table">
+  <% Shareholder.open_now.for_account(@account).each do |sh| %>
+    <div class="row">
+      <div class="cell column-first">
+        <%= sh.name %>
+      </div>
+      <div class="cell column-second currency">
+        <%= number_to_currency(sh.balance) %>
+      </div>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="cell column-first">
+      Pot Balance
+    </div>
+    <div class="cell column-second currency">
+      <%= number_to_currency(@account.pot_balance) %>
+    </div>
+  </div>
+</div>
+
 <ul>
   <li><%= link_to "Edit Account", [:edit,@account] %></li>
   <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
