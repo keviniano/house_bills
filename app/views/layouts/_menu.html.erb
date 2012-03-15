@@ -1,11 +1,16 @@
-<div class="navbar">
+<div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
       <a class="brand" href="#">Shared Bills</a>
       <div class="nav-collapse">
         <ul class="nav">
           <% if current_user %>
-            <li class="dropdown open">
+            <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 Accounts
                 <b class="caret"></b>
@@ -20,7 +25,7 @@
             </li>
           <% end %>
           <% if @account %>
-            <li class="dropdown open">
+            <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <%= @account.name %>
                 <b class="caret"></b>
@@ -55,14 +60,12 @@
           <% end %>
         </ul>
         <ul class="nav pull-right">
-          <li>
-            <% if user_signed_in? %>
-              Signed in as <%= current_user.name %>. 
-              <%= link_to "Sign out", destroy_user_session_path, :method => :delete %>
-            <% else %>
-              <%= link_to "Sign up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %>
-            <% end %>
-          </li> 
+          <% if user_signed_in? %>
+            <li class="navbar-text">Signed in as <%= current_user.name %>.</li> 
+            <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
+          <% else %>
+            <li><%= link_to "Sign up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %></li>
+          <% end %>
         </ul>
       </div>
     </div>

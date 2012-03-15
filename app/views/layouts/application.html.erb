@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Untitled" %></title>
     <%= javascript_include_tag "application" %>
@@ -8,8 +8,8 @@
     <%= yield(:head) %>
   </head>
   <body>
-    <div id="container">
-      <%= render "layouts/menu" %>
+    <%= render "layouts/menu" %>
+    <div class="container">
       <% flash.each do |name, msg| %>
         <%= content_tag :div, msg, :id => "flash_#{name}" %>
       <% end %>
