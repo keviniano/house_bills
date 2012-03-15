@@ -10,3 +10,4 @@ public/system
 db/legacy
 .DS_Store
 tags
+.sass-cache/
