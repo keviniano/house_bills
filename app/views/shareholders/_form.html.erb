@@ -1,4 +1,5 @@
-<%= simple_form_for [@account,@shareholder] do |s| %>
+<%= simple_form_for([@account,@shareholder], :html => {:class => 'form-horizontal' }) do |s| %>
+  <%= s.error_notification %>
   <%= s.input :name, :input_html => { :size => 25 } %>
   <%= s.association :role, :prompt => true, :include_blank => false %>
   <%= s.input :email, :input_html => { :size => 25 } %>
