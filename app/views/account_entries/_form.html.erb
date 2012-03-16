@@ -8,8 +8,9 @@
     });
   </script>  
 <% end %>
-<% simple_form_for([@account,account_entry]) do |f| %>
-  <%= f.input :entry_type, :as => :radio, :collection => AccountEntry.valid_entry_types %>
+<%= simple_form_for([@account,account_entry], :html => {:class => 'form-horizontal' }) do |f| %>
+  <%= f.error_notification %>
+  <%= f.input :entry_type, :as => :radio_buttons, :collection => AccountEntry.valid_entry_types %>
   <%= f.input :date, :as => :string, :input_html => {:class => "datepicker"} %>
   <%= f.input :check_number, :input_html => {:class => "check-number"} %>
   <% if account_entry.type == 'UnboundAccountEntry' %>

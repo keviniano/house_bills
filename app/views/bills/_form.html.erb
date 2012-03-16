@@ -8,8 +8,9 @@
     });
   </script>  
 <% end %>
-<%= simple_form_for([@account,bill]) do |f| %>
-  <%= f.input :entry_type, :as => :radio, :collection => Bill.valid_entry_types %>
+<%= simple_form_for([@account,bill], :html => {:class => 'form-horizontal' }) do |f| %>
+  <%= f.error_notification %>
+  <%= f.input :entry_type, :as => :radio_buttons, :collection => Bill.valid_entry_types %>
   <%= f.input :date, :as => :string, :input_html => {:class => "datepicker"} %>
   <% if bill.type == 'AccountBill' %>
     <%=  f.simple_fields_for :bill_account_entry, bill.bill_account_entry do |bae| %>
@@ -23,37 +24,37 @@
   <%= f.association :bill_type, :collection => @account.bill_types %>
   <%= f.input :note, :input_html => {:class => "note"} %>
   <h3>Bill Shares</h3>
-  <div class="table shares">
-    <div class="row header">
-      <div class="cell column-first">Name</div>
-      <div class="cell column-second">Share</div>
-      <div class="cell column-third currency">Amount</div>
-      <div class="cell column-fourth">Delete</div>
+  <div class="grid shares">
+    <div class="grid-row header">
+      <div class="grid-cell column-first">Name</div>
+      <div class="grid-cell column-second">Share</div>
+      <div class="grid-cell column-third currency">Amount</div>
+      <div class="grid-cell column-fourth">Delete</div>
     </div>
     <%=  f.simple_fields_for :bill_share_balance_entries, @bill_share_balance_entries do |b| %>
-      <div class="row data">
-        <div class="cell column-first"><%= b.object.shareholder.name %><%= b.input :shareholder_id, :as => :hidden %></div>
-        <div class="cell column-second"><%= b.input :share, :label => false, :input_html => {:class => "share-ratio"}  %></div>
-        <div class="cell column-third currency"><%= number_to_currency(b.object.amount) %><%= b.input :account_id, :as => :hidden %></div>
-        <div class="cell column-fourth"><%= b.input :_destroy, :label => false, :as => :boolean %></div>
+      <div class="grid-row data">
+        <div class="grid-cell column-first"><%= b.object.shareholder.name %><%= b.input :shareholder_id, :as => :hidden %></div>
+        <div class="grid-cell column-second"><%= b.input :share, :label => false, :input_html => {:class => "share-ratio"}  %></div>
+        <div class="grid-cell column-third currency"><%= number_to_currency(b.object.amount) %><%= b.input :account_id, :as => :hidden %></div>
+        <div class="grid-cell column-fourth"><%= b.input :_destroy, :label => false, :as => :boolean %></div>
       </div>
     <% end %>
     <% if bill.excluded_open_shareholders.present? %>
       <%= f.fields_for :bill_share_balance_entries, bill.bill_share_balance_entries.build(:account => @account) do |b| %>
-        <div class="row data">
-          <div class="cell column-first"><%= b.association :shareholder, :label => false, :collection => bill.excluded_open_shareholders %></div>
-          <div class="cell column-second"><%= b.input :share, :label => false, :input_html => {:class => "share-ratio"} %><%= b.input :account_id, :as => :hidden %></div>
-          <div class="cell column-third"></div>
-          <div class="cell column-fourth"></div>
+        <div class="grid-row data">
+          <div class="grid-cell column-first"><%= b.association :shareholder, :label => false, :collection => bill.excluded_open_shareholders %></div>
+          <div class="grid-cell column-second"><%= b.input :share, :label => false, :input_html => {:class => "share-ratio"} %><%= b.input :account_id, :as => :hidden %></div>
+          <div class="grid-cell column-third"></div>
+          <div class="grid-cell column-fourth"></div>
         </div>
       <% end %>
     <% end %>
     <% unless bill.new_record? %>
-      <div class="row data">
-        <div class="cell column-first">Pot</div>
-        <div class="cell column-second">&nbsp;</div>
-        <div class="cell column-third currency"><%= number_to_currency(bill.pot_balance_entry.amount) %></div>
-        <div class="cell column-fourth"></div>
+      <div class="grid-row data">
+        <div class="grid-cell column-first">Pot</div>
+        <div class="grid-cell column-second">&nbsp;</div>
+        <div class="grid-cell column-third currency"><%= number_to_currency(bill.pot_balance_entry.amount) %></div>
+        <div class="grid-cell column-fourth"></div>
       </div>
     <% end %>
   </div>

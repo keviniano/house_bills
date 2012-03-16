@@ -1,6 +1,6 @@
 <h1>Listing Account Entries</h1>
 
-<table>
+<table class="table-striped table-bordered table-condensed">
   <tr>
     <th>Date</th>
     <th>Check #</th>
@@ -39,8 +39,4 @@
     </tr>
   <% end %>
 </table>
-<%= will_paginate @bills %>
-<br />
-<%= link_to 'New deposit or withdrawal by shareholder', new_account_shareholder_account_entry_path(@account) %>
-<br />
-<%= link_to 'New deposit or withdrawal unrelated to bills', new_account_unbound_account_entry_path(@account) %>
+<%= will_paginate @account_entries %>

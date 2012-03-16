@@ -11,22 +11,22 @@
 <h3>
   Shareholder Balances
 </h3>
-<div class="table">
+<div class="grid">
   <% Shareholder.open_now.for_account(@account).each do |sh| %>
-    <div class="row">
-      <div class="cell column-first">
+    <div class="grid-row">
+      <div class="grid-cell column-first">
         <%= sh.name %>
       </div>
-      <div class="cell column-second currency">
+      <div class="grid-cell column-second currency">
         <%= number_to_currency(sh.balance) %>
       </div>
     </div>
   <% end %>
-  <div class="row">
-    <div class="cell column-first">
+  <div class="grid-row">
+    <div class="grid-cell column-first">
       Pot Balance
     </div>
-    <div class="cell column-second currency">
+    <div class="grid-cell column-second currency">
       <%= number_to_currency(@account.pot_balance) %>
     </div>
   </div>
@@ -74,17 +74,17 @@
   </h3>
   <div>
     <%= link_to "Add new bill type", new_account_bill_type_path(@account) %>
-    <div class="table">
+    <div class="grid">
       <% @account.bill_types.order(:name).each do |bill_type| %>
-        <div class="row">
-          <div class="cell column-first">
+        <div class="grid-row">
+          <div class="grid-cell column-first">
             <%= bill_type.name %>
           </div>
-          <div class="cell">
+          <div class="grid-cell">
             <%= link_to "Rename", [:edit,@account,bill_type] %>
           </div>
           <% unless bill_type.bills.exists? %>
-            <div class="cell">
+            <div class="grid-cell">
               <%= link_to "Delete", [@account,bill_type], :method => :delete, :confirm => "Delete the bill type \"#{bill_type.name}\"?" %>
             </div>
           <% end %>
@@ -98,16 +98,16 @@
   </h3>
   <div>
     <%= link_to "Add new payee", new_account_payee_path(@account) %>
-    <div class="table">
+    <div class="grid">
       <% @account.payees.order(:name).each do |payee| %>
-        <div class="row">
-          <div class="cell column-first">
+        <div class="grid-row">
+          <div class="grid-cell column-first">
             <%= payee.name %>
           </div>
-          <div class="cell">
+          <div class="grid-cell">
             <%= link_to "Rename", [:edit,@account,payee] %>
           </div>
-          <div class="cell">
+          <div class="grid-cell">
             <%= link_to "Delete", [@account,payee], :method => :delete, :confirm => "Delete the payee \"#{payee.name}\"?" %>
           </div>
         </div>
