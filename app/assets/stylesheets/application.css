@@ -137,3 +137,11 @@ dl dd {
   font-weight: bold;
   padding: 5px 0;
   }
+
+table td.center {
+  text-align: center;
+  }
+
+div.submit {
+  margin-top: 20px;
+  }

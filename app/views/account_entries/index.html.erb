@@ -23,7 +23,7 @@
       <td><%= account_entry.recipient %></td>
       <td class="currency"><%= number_to_currency account_entry.deposit_amount %></td>
       <td class="currency"><%= number_to_currency account_entry.withdrawal_amount %></td>
-      <td><%= account_entry.cleared ? "\u2714" : nil %></td>
+      <td class="center"><%= account_entry.cleared ? "\u2714" : nil %></td>
       <td class="currency"><%= number_to_currency balance %></td>
       <td class="currency"><%= number_to_currency cleared_balance || account_entry.cleared_balance %></td>
       <% balance -= account_entry.amount %>
