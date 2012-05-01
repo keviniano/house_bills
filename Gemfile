@@ -20,11 +20,7 @@ group :assets do
 end
 
 group :development, :test do 
-  if RUBY_VERSION =~ /1.9/ 
-    gem 'ruby-debug19' 
-  else 
-    gem 'ruby-debug' 
-  end 
+  gem 'debugger'
   gem "nifty-generators"
 end
 
