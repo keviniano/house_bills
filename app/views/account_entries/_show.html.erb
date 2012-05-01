@@ -25,3 +25,5 @@
   <dt>Cleared</dt>
   <dd><%= account_entry.cleared ? 'Yes' : 'No' %></dd>
 </dl>
+
+<%= button_to "Delete This Account Entry", [@account,account_entry], {method: :delete, confirm: "Are you sure you want to delete this account entry?", class: "btn btn-danger"} %> 

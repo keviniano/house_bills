@@ -36,9 +36,8 @@ class UnboundAccountEntriesController < ApplicationController
   end
 
   def destroy
-    # TODO fix up redirect, flash msg
     @unbound_account_entry.destroy
-    redirect_to :action => :index, :controller => :account_entries
+    redirect_to account_account_entries_path(@account), notice: 'Account entry was successfully deleted.'
   end
 end
 

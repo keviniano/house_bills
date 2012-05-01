@@ -25,23 +25,26 @@
   <dt>Note</dt>
   <dd><%= bill.note %></dd>
 </dl>
-  <h3>Bill Shares</h3>
-  <div class="grid shares">
-    <div class="grid-row header">
-      <div class="grid-cell column-first">Name</div>
-      <div class="grid-cell column-second">Share</div>
-      <div class="grid-cell column-third currency">Amount</div>
-    </div>
-    <% bill.bill_share_balance_entries.each do |be| %>
-      <div class="grid-row data">
-        <div class="grid-cell column-first"><%= be.shareholder.name %></div>
-        <div class="grid-cell column-second"><%= be.share %></div>
-        <div class="grid-cell column-third currency"><%= number_to_currency(be.amount) %></div>
-      </div>
-    <% end %>
-    <div class="grid-row data">
-      <div class="grid-cell column-first">Pot</div>
-      <div class="grid-cell column-second">&nbsp;</div>
-      <div class="grid-cell column-third currency"><%= number_to_currency(bill.pot_balance_entry.amount) %></div>
-    </div>
+
+<h3>Bill Shares</h3>
+<div class="grid shares">
+  <div class="grid-row header">
+    <div class="grid-cell column-first">Name</div>
+    <div class="grid-cell column-second">Share</div>
+    <div class="grid-cell column-third currency">Amount</div>
   </div>
+  <% bill.bill_share_balance_entries.each do |be| %>
+    <div class="grid-row data">
+      <div class="grid-cell column-first"><%= be.shareholder.name %></div>
+      <div class="grid-cell column-second"><%= be.share %></div>
+      <div class="grid-cell column-third currency"><%= number_to_currency(be.amount) %></div>
+    </div>
+  <% end %>
+  <div class="grid-row data">
+    <div class="grid-cell column-first">Pot</div>
+    <div class="grid-cell column-second">&nbsp;</div>
+    <div class="grid-cell column-third currency"><%= number_to_currency(bill.pot_balance_entry.amount) %></div>
+  </div>
+</div>
+
+<%= button_to "Delete This Bill", [@account,bill], {method: :delete, confirm: "Are you sure you want to delete this bill?", class: "btn btn-danger"} %> 

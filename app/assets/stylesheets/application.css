@@ -42,6 +42,10 @@ div.grid {
   border-radius: 5px;
   }
 
+div.grid.shares {
+  margin-bottom: 20px;
+  }
+
 div.grid-row {
   clear: both;
   overflow: auto;
