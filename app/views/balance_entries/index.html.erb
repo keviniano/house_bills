@@ -1,6 +1,23 @@
 <% content_for :title, "#{@account.name}: Listing Bills" %>
 <h1><%= @account.name %>: Listing Account Events</h1>
 
+<form class="well form-inline">
+  <%= select :query, :bill_type_id, BalanceEntryQuery.bill_types(@account) %>
+  <%= label :query, :with_text, "entries containing" %>
+  <%= text_field :query, :with_text, placeholder: 'any text' %> 
+  <br>
+  <%= label :query, :start_date, "from" %>
+  <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
+  <%= label :query, :end_date, "to" %>
+  <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
+  <%= label :query, :payee_shareholder_id, "entered by" %>
+  <%= select :query, :payee_shareholder_id, grouped_options_for_select(BalanceEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
+  <%= label :query, :share_shareholder_id, "and shared by" %>
+  <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEntryQuery.grouped_shareholders,@query.share_shareholder_id) %>
+  <br>
+  <button type="submit" class="btn">Search</button> 
+</form>
+
 <table class="table-striped table-bordered table-condensed">
   <tr>
     <th>Date</th>

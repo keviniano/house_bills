@@ -28,6 +28,14 @@ class Shareholder < ActiveRecord::Base
   def owner?
     role.name == 'Owner'
   end
+  
+  def active?
+    opened_on <= Date.today && (inactivated_on.nil? || inactivated_on > Date.today)
+  end
+
+  def status
+    active? ? 'Active' : 'Inactive'
+  end
 
   class << self
     def by_user(user)

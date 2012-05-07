@@ -9,7 +9,7 @@
 
 $(document).ready(function(){
 
-  $(".datepicker").datepicker({ dateFormat: 'yy-mm-dd' });
+  $(".datepicker").datepicker({ dateFormat: 'mm-dd-yy' });
 
   $("#accordion").accordion({ collapsible: true, active: false });
 

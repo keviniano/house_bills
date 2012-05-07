@@ -16,7 +16,7 @@ form input.entry-amount {
   }
 
 form input.datepicker {
-  width: 75px;
+  width: 80px;
   }
 
 form input.payee {
@@ -149,3 +149,9 @@ table td.center {
 div.submit {
   margin-top: 20px;
   }
+
+form.form-inline br {
+  display: block;
+  margin: 4px;
+  }
+
