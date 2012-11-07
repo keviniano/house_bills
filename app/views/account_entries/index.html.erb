@@ -1,5 +1,22 @@
 <h1>Listing Account Entries</h1>
 
+<form class="well form-inline">
+  <%= select :query, :cleared_status, AccountEntryQuery.cleared_statuses %>
+  <%= label :query, :cleared_status, "entries," %>
+  <%= select :query, :entry_type, AccountEntryQuery.entry_types %>
+  <%= label :query, :with_text, ", containing" %>
+  <%= text_field :query, :with_text, placeholder: 'any text' %> 
+  <br>
+  <%= label :query, :start_date, "from" %>
+  <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
+  <%= label :query, :end_date, "to" %>
+  <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
+  <%= label :query, :payee_shareholder_id, "entered by" %>
+  <%= select :query, :payee_shareholder_id, grouped_options_for_select(AccountEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
+  <br>
+  <button type="submit" class="btn">Search</button> 
+</form>
+
 <table class="table-striped table-bordered table-condensed">
   <tr>
     <th>Date</th>
