@@ -5,115 +5,144 @@
   <%= @account.name %> Account
 </h1>
 
-<h2>
-  Account Balance: <%= number_to_currency(@account.balance) %>
-</h2>
-<h3>
-  Shareholder Balances
-</h3>
-<div class="grid">
-  <% Shareholder.open_now.for_account(@account).each do |sh| %>
-    <div class="grid-row">
-      <div class="grid-cell column-first">
-        <%= sh.name %>
-      </div>
-      <div class="grid-cell column-second currency">
-        <%= number_to_currency(sh.balance) %>
-      </div>
-    </div>
-  <% end %>
-  <div class="grid-row">
-    <div class="grid-cell column-first">
-      Pot Balance
-    </div>
-    <div class="grid-cell column-second currency">
-      <%= number_to_currency(@account.pot_balance) %>
-    </div>
-  </div>
-</div>
 
-<ul>
-  <li><%= link_to "Edit Account", [:edit,@account] %></li>
-  <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
+
+<ul class="nav nav-tabs" id="myTab">
+  <li class="active"><a href="#balances">Balances</a></li>
+  <li><a href="#shareholders">Shareholders</a></li>
+  <li><a href="#bill-types">Bill Types</a></li>
+  <li><a href="#payees">Payees</a></li>
+  <li><a href="#admin">Admin</a></li>
 </ul>
 
-<div id="accordion">
-  <h3>
-    <a href="#">Shareholders</a>
-  </h3>
-  <div>
-    <%= link_to "Add new shareholder", new_account_shareholder_path(@account) %>
-    <table class="table table-striped table-bordered table-condensed">
-      <tr>
-        <th>Shareholder Name</th>
-        <th>Role</th>
-        <th>Email</th>
-        <th>Opened</th>
-        <th>Inactivated</th>
-        <th>Closed</th>
-        <th>Current Balance</th>
-        <th></th>
-      </tr>
-      <% @account.shareholders.order(:opened_on, :inactivated_on, :name).each do |shareholder| %>
+<div class="tab-content">
+  <div class="tab-pane active" id="balances">
+    <h2>
+      Account Balance: <%= number_to_currency(@account.balance) %>
+    </h2>
+    <h3>
+      Shareholder Balances
+    </h3>
+    <div class="grid">
+      <% Shareholder.open_now.for_account(@account).each do |sh| %>
+        <div class="grid-row">
+          <div class="grid-cell column-first">
+            <%= sh.name %>
+          </div>
+          <div class="grid-cell column-second currency">
+            <%= number_to_currency(sh.balance) %>
+          </div>
+        </div>
+      <% end %>
+      <div class="grid-row">
+        <div class="grid-cell column-first">
+          Pot Balance
+        </div>
+        <div class="grid-cell column-second currency">
+          <%= number_to_currency(@account.pot_balance) %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane" id="shareholders">
+    <h3>
+      Shareholders
+    </h3>
+    <div>
+      <table class="table table-striped table-bordered table-condensed">
         <tr>
-          <td><%= shareholder.name %></td>
-          <td><%= shareholder.role.name %></td>
-          <td><%= shareholder.email %></td>
-          <td><%= shareholder.opened_on %></td>
-          <td><%= shareholder.inactivated_on %></td>
-          <td><%= shareholder.closed_on %></td>
-          <td class="currency"><%= number_to_currency shareholder.balance  %></td>
-          <td><%= link_to 'Edit', edit_account_shareholder_path(@account,shareholder) %></td>
+          <th>Shareholder Name</th>
+          <th>Role</th>
+          <th>Email</th>
+          <th>Opened</th>
+          <th>Inactivated</th>
+          <th>Closed</th>
+          <th>Current Balance</th>
+          <th></th>
         </tr>
-      <%  end %>
-    </table>
+        <% @account.shareholders.order(:opened_on, :inactivated_on, :name).each do |shareholder| %>
+          <tr>
+            <td><%= shareholder.name %></td>
+            <td><%= shareholder.role.name %></td>
+            <td><%= shareholder.email %></td>
+            <td><%= shareholder.opened_on %></td>
+            <td><%= shareholder.inactivated_on %></td>
+            <td><%= shareholder.closed_on %></td>
+            <td class="currency"><%= number_to_currency shareholder.balance  %></td>
+            <td><%= link_to 'Edit', edit_account_shareholder_path(@account,shareholder) %></td>
+          </tr>
+        <%  end %>
+      </table>
+      <%= link_to "Add new shareholder", new_account_shareholder_path(@account), :class => "btn" %>
+    </div>
   </div>
-
-  <h3>
-    <a href="#">Bill Types</a>
-  </h3>
-  <div>
-    <%= link_to "Add new bill type", new_account_bill_type_path(@account) %>
-    <div class="grid">
-      <% @account.bill_types.order(:name).each do |bill_type| %>
-        <div class="grid-row">
-          <div class="grid-cell column-first">
-            <%= bill_type.name %>
-          </div>
-          <div class="grid-cell">
-            <%= link_to "Rename", [:edit,@account,bill_type] %>
-          </div>
-          <% unless bill_type.bills.exists? %>
-            <div class="grid-cell">
-              <%= link_to "Delete", [@account,bill_type], :method => :delete, :confirm => "Delete the bill type \"#{bill_type.name}\"?" %>
+  <div class="tab-pane" id="bill-types">
+    <h3>
+      Bill Types
+    </h3>
+    <div>
+      <div class="grid">
+        <% @account.bill_types.order(:name).each do |bill_type| %>
+          <div class="grid-row">
+            <div class="grid-cell column-first">
+              <%= bill_type.name %>
             </div>
-          <% end %>
-        </div>
-      <% end %>
+            <div class="grid-cell">
+              <%= link_to "Rename", [:edit,@account,bill_type] %>
+            </div>
+            <% unless bill_type.bills.exists? %>
+              <div class="grid-cell">
+                <%= link_to "Delete", [@account,bill_type], :method => :delete, :confirm => "Delete the bill type \"#{bill_type.name}\"?" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <%= link_to "Add new bill type", new_account_bill_type_path(@account), :class => 'btn' %>
     </div>
   </div>
-
-  <h3>
-    <a href="#">Payees</a>
-  </h3>
-  <div>
-    <%= link_to "Add new payee", new_account_payee_path(@account) %>
-    <div class="grid">
-      <% @account.payees.order(:name).each do |payee| %>
-        <div class="grid-row">
-          <div class="grid-cell column-first">
-            <%= payee.name %>
+  <div class="tab-pane" id="payees">
+    <h3>
+      Payees
+    </h3>
+    <div>
+      <div class="grid">
+        <% @account.payees.order(:name).each do |payee| %>
+          <div class="grid-row">
+            <div class="grid-cell column-first">
+              <%= payee.name %>
+            </div>
+            <div class="grid-cell">
+              <%= link_to "Rename", [:edit,@account,payee] %>
+            </div>
+            <div class="grid-cell">
+              <%= link_to "Delete", [@account,payee], :method => :delete, :confirm => "Delete the payee \"#{payee.name}\"?" %>
+            </div>
           </div>
-          <div class="grid-cell">
-            <%= link_to "Rename", [:edit,@account,payee] %>
-          </div>
-          <div class="grid-cell">
-            <%= link_to "Delete", [@account,payee], :method => :delete, :confirm => "Delete the payee \"#{payee.name}\"?" %>
-          </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
+      <%= link_to "Add new payee", new_account_payee_path(@account), :class => 'btn' %>
     </div>
   </div>
+  <div class="tab-pane" id="admin">
+    <h3>
+      Administrative Actions
+    </h3>
+    <ul>
+      <li><%= link_to "Edit Account", [:edit,@account] %></li>
+      <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
+    </ul>
   </div>
+</div>
+ 
+<script>
+  $(function () {
+    $('#myTab a:first').tab('show');
+  })
 
+  $('#myTab a').click(function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+  })
+</script>
 
