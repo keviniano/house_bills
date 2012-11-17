@@ -9,6 +9,7 @@ gem 'simple_form'
 gem 'pg'
 gem 'cancan'
 gem 'userstamp', git: 'git://github.com/keviniano/userstamp.git'
+gem 'csv_builder'
 
 # Gems used only for assets and not required
 # in production environments by default.

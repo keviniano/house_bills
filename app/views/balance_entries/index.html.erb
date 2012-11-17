@@ -15,7 +15,8 @@
   <%= label :query, :share_shareholder_id, "and shared by" %>
   <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEntryQuery.grouped_shareholders,@query.share_shareholder_id) %>
   <br>
-  <button type="submit" class="btn">Search</button> 
+  <button type="submit" class="btn btn-primary">Search</button> 
+  <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
 
 <table class="table-striped table-bordered table-condensed">
