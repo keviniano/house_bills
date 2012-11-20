@@ -18,7 +18,7 @@ class BalanceEntry < ActiveRecord::Base
   scope :starting_on, lambda{|start_date| where("date >= ?", start_date)}
   scope :ending_on, lambda{|end_date| where("date <= ?", end_date)}
   scope :with_payee_shareholder_id, lambda{|shareholder| where("bill_id IN (SELECT id FROM bills WHERE shareholder_id = ?) OR account_entry_id IN (SELECT id FROM account_entries WHERE shareholder_id = ?)", shareholder, shareholder)}
-  scope :with_share_shareholder_id, lambda{|shareholder| where(:shareholder_id => shareholder)}
+  scope :with_share_shareholder_id, lambda{|shareholder| where('bill_id IN (SELECT bill_id FROM balance_entries WHERE shareholder_id = ?) OR shareholder_id = ?',shareholder, shareholder)}
   scope :with_text, lambda{|text| where("bill_id IN (SELECT id FROM bills WHERE payee ILIKE :text OR note ILIKE :text) OR account_entry_id IN (SELECT id FROM account_entries WHERE payee ILIKE :text OR note ILIKE :text)", text: "%#{text}%")}
   scope :deposits, where('account_entry_id IN (SELECT id FROM account_entries WHERE amount >= 0)')
   scope :withdrawals, where('account_entry_id IN (SELECT id FROM account_entries WHERE amount < 0)')

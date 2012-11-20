@@ -54,7 +54,7 @@ class BalanceEntriesController < ApplicationController
   load_and_authorize_resource :account
   load_and_authorize_resource :balance_entry, :through => :account
 
-  # GET /bills
+  # GET /balance_entries
   def index
     @query = BalanceEntryQuery.new(params[:query],session,current_user)
     @balance_entries = @query.apply_conditions(@balance_entries)
