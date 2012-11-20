@@ -57,13 +57,16 @@ class BalanceEntriesController < ApplicationController
   # GET /bills
   def index
     @query = BalanceEntryQuery.new(params[:query],session,current_user)
+    @balance_entries = @query.apply_conditions(@balance_entries)
     @shareholder = current_user.shareholder_for_account(@account)
     if params[:output] == 'CSV'
-      @balance_events = @query.apply_conditions(@balance_entries).events
+      @balance_events = @balance_entries.events
+      @shareholders = @balance_entries.unique_shareholders.map{|be| be.shareholder }.sort_by{|sh| sh.name }
       @filename = "house_bills.csv"
       render "index.csv" 
     else
-      @balance_events = @query.apply_conditions(@balance_entries).events.paginate :page => params[:page]
+      total_entries = @balance_entries.group_by_events.to_a.count
+      @balance_events = @balance_entries.events.paginate :page => params[:page], :total_entries => total_entries
     end
   end
 end

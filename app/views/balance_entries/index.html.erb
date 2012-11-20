@@ -32,13 +32,12 @@
     <th></th>
     <th></th>
   </tr>
-<% @balance_events.each do |item| %>
-  <% if item.bill.present? %>
-    <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill } %>
-  <% else %>
-    <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry } %>
+  <% @balance_events.each do |item| %>
+    <% if item.bill.present? %>
+      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill } %>
+    <% else %>
+      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry } %>
+    <% end %>
   <% end %>
-<% end %>
-
 </table>
 <%= will_paginate @balance_events %>

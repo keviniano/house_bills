@@ -1,35 +1,38 @@
-csv << [
+line = [
   "Date",
   "Payee",
   "Bill",
   "Credit",
   "Type",
-  "Note",
-  "My Part",
-  "My Balance"
+  "Note"
 ]
+@shareholders.each{|sh| line << sh.name }
+line << "#{@shareholder.name} balance"
+csv << line
 @balance_events.each do |event|
   if event.bill.present?
-    csv << [
+    line = [
       event.bill.date,
       event.bill.recipient,
       number_to_currency(event.bill.bill_amount),
       number_to_currency(event.bill.credit_amount),
       event.bill.bill_type.name,
       truncate(event.bill.note),
-      number_to_currency(event.bill.shareholder_amount(@shareholder)),
-      number_to_currency(event.bill.balance_for(@shareholder))
     ]
+    @shareholders.each{|sh| line << number_to_currency(event.bill.shareholder_amount(sh)) }
+    line << number_to_currency(event.bill.balance_for(@shareholder))
+    csv << line
   else
-    csv << [
+    line = [
       event.account_entry.date,
       event.account_entry.recipient,
       number_to_currency(event.account_entry.withdrawal_amount),
       number_to_currency(event.account_entry.deposit_amount),
       event.account_entry.entry_type,
       truncate(event.account_entry.note),
-      number_to_currency(event.account_entry.shareholder_amount(@shareholder)),
-      number_to_currency(event.account_entry.balance_for(@shareholder)) 
     ]
+    @shareholders.each{|sh| line << number_to_currency(event.account_entry.shareholder_amount(sh)) }
+    line << number_to_currency(event.account_entry.balance_for(@shareholder)) 
+    csv << line
   end
 end

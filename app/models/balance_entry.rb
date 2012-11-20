@@ -10,9 +10,10 @@ class BalanceEntry < ActiveRecord::Base
   validates_presence_of :date
   
   scope :default_order, order('balance_entries.date DESC,balance_entries.account_entry_id DESC,balance_entries.bill_id DESC')
-  scope :events, default_order.select('balance_entries.bill_id,balance_entries.account_entry_id,balance_entries.date').
-    group('balance_entries.bill_id,balance_entries.account_entry_id,balance_entries.date').
+  scope :group_by_events, select('balance_entries.bill_id,balance_entries.account_entry_id,balance_entries.date').group('balance_entries.bill_id,balance_entries.account_entry_id,balance_entries.date')
+  scope :events, group_by_events.default_order.
     includes({:bill => [:shareholder, :bill_type, :bill_share_balance_entries, :bill_offset_balance_entry],:account_entry => :shareholder})
+  scope :unique_shareholders, select(:shareholder_id).where("shareholder_id IS NOT NULL").uniq.includes(:shareholder)
   scope :by_shareholder, lambda{|shareholder| where(:shareholder_id => shareholder.id)}
   scope :starting_on, lambda{|start_date| where("date >= ?", start_date)}
   scope :ending_on, lambda{|end_date| where("date <= ?", end_date)}
