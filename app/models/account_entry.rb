@@ -64,6 +64,10 @@ class AccountEntry < ActiveRecord::Base
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id <= ?)",self.date,self.date,self.id).sum(:amount)
   end
   
+  def prior_balance_for(shareholder) 
+    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id < ?)",self.date,self.date,self.id).sum(:amount)
+  end
+  
   def cleared_balance
     if cleared
       AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])

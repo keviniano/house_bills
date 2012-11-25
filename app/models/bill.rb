@@ -22,6 +22,10 @@ class Bill < ActiveRecord::Base
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).sum(:amount)
   end
   
+  def prior_balance_for(shareholder) 
+    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) < ?)",self.date,self.date,self.id,self.id).sum(:amount)
+  end
+  
   validates_presence_of     :entry_type
   validates_inclusion_of    :entry_type, :in => valid_entry_types
   validates_numericality_of :entry_amount, :greater_than_or_equal_to => 0

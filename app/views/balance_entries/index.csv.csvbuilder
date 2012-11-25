@@ -7,8 +7,23 @@ line = [
   "Note"
 ]
 @shareholders.each{|sh| line << sh.name }
-line << "#{@shareholder.name} balance"
 csv << line
+
+line = [
+  nil,
+  "Ending Balance",
+  nil,
+  nil,
+  nil,
+  nil
+]
+if @balance_events.first.bill.present?
+  @shareholders.each{|sh| line << number_to_currency(@balance_events.first.bill.balance_for(sh)) }
+else
+  @shareholders.each{|sh| line << number_to_currency(@balance_events.first.account_entry.balance_for(sh)) }
+end
+csv << line
+
 @balance_events.each do |event|
   if event.bill.present?
     line = [
@@ -20,7 +35,6 @@ csv << line
       truncate(event.bill.note),
     ]
     @shareholders.each{|sh| line << number_to_currency(event.bill.shareholder_amount(sh)) }
-    line << number_to_currency(event.bill.balance_for(@shareholder))
     csv << line
   else
     line = [
@@ -32,7 +46,21 @@ csv << line
       truncate(event.account_entry.note),
     ]
     @shareholders.each{|sh| line << number_to_currency(event.account_entry.shareholder_amount(sh)) }
-    line << number_to_currency(event.account_entry.balance_for(@shareholder)) 
     csv << line
   end
 end
+
+line = [
+  nil,
+  "Starting Balance",
+  nil,
+  nil,
+  nil,
+  nil
+]
+if @balance_events.last.bill.present?
+  @shareholders.each{|sh| line << number_to_currency(@balance_events.last.bill.prior_balance_for(sh)) }
+else
+  @shareholders.each{|sh| line << number_to_currency(@balance_events.last.account_entry.prior_balance_for(sh)) }
+end
+csv << line
