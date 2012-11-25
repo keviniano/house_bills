@@ -32,7 +32,7 @@ csv << line
       number_to_currency(event.bill.bill_amount),
       number_to_currency(event.bill.credit_amount),
       event.bill.bill_type.name,
-      truncate(event.bill.note),
+      event.bill.note,
     ]
     @shareholders.each{|sh| line << number_to_currency(event.bill.shareholder_amount(sh)) }
     csv << line
@@ -43,7 +43,7 @@ csv << line
       number_to_currency(event.account_entry.withdrawal_amount),
       number_to_currency(event.account_entry.deposit_amount),
       event.account_entry.entry_type,
-      truncate(event.account_entry.note),
+      event.account_entry.note,
     ]
     @shareholders.each{|sh| line << number_to_currency(event.account_entry.shareholder_amount(sh)) }
     csv << line

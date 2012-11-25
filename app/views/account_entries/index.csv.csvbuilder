@@ -1,0 +1,37 @@
+csv << [
+  "Date",
+  "Check",
+  "Payee",
+  "Amount",
+  "Cleared Amount",
+  "Note"
+]
+
+csv << [
+  nil,
+  nil,
+  "Ending Balance",
+  number_to_currency(@account_entries.first.balance),
+  number_to_currency(@account_entries.first.cleared_balance),
+  nil
+]
+
+@account_entries.each do |account_entry|
+  csv << [
+    account_entry.date,
+    account_entry.check_number,
+    account_entry.recipient,
+    number_to_currency(account_entry.amount),
+    (account_entry.cleared ? number_to_currency(account_entry.amount) : nil),
+    account_entry.note,
+  ]
+end
+
+csv << [
+  nil,
+  nil,
+  "Starting Balance",
+  number_to_currency(@account_entries.last.prior_balance),
+  number_to_currency(@account_entries.last.prior_cleared_balance),
+  nil
+]

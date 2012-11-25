@@ -69,13 +69,19 @@ class AccountEntry < ActiveRecord::Base
   end
   
   def cleared_balance
-    if cleared
-      AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])
-    end
+    AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])
+  end
+  
+  def prior_cleared_balance
+    AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id < ?)',true,date,date,id])
   end
   
   def balance
     AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id <= ?)',date,date,id])
+  end
+  
+  def prior_balance
+    AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id < ?)',date,date,id])
   end
   
   def entry_type

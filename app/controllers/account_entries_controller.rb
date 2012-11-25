@@ -63,6 +63,12 @@ class AccountEntriesController < ApplicationController
   # GET /account_entries
   def index
     @query = AccountEntryQuery.new(params[:query],session,current_user)
-    @account_entries = @query.apply_conditions(@account_entries).order('account_entries.date DESC, account_entries.id DESC').includes(:bill).paginate :page => params[:page]
+    @account_entries = @query.apply_conditions(@account_entries).order('account_entries.date DESC, account_entries.id DESC').includes(:bill)
+    if params[:output] == 'CSV'
+      @filename = "account_entries.csv"
+      render "index.csv" 
+    else
+      @account_entries = @account_entries.paginate :page => params[:page]
+    end
   end
 end
