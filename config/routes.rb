@@ -29,7 +29,9 @@ HouseBills::Application.routes.draw do
     resources :shareholder_bills
     resources :account_bills
 
-    resources :account_entries, :only => [:index]
+    resources :account_entries, :only => [:index] do 
+      post 'update_cleared', :on => :collection
+    end
     resources :shareholder_account_entries
     resources :unbound_account_entries 
     

@@ -55,6 +55,9 @@ class Ability
     can    :manage, UnboundAccountEntry, :account_id => active_account_ids, :creator_id => user.id
     # Admins can manage any entry
     can    :manage, UnboundAccountEntry, :account_id => admin_account_ids
+    
+    # Any open user can mark which account entries have cleared
+    can    :update_cleared, AccountEntry, :account_id => open_account_ids
 
     # Any open user can read
     can    :read,   AccountBill, :account_id => open_account_ids

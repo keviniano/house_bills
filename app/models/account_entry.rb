@@ -115,6 +115,8 @@ class AccountEntry < ActiveRecord::Base
 private
   
   def set_amount
-    self.amount = (entry_type == 'Withdrawal' ? - @entry_amount.to_d : @entry_amount)
+    if @entry_amount.present?
+      self.amount = (entry_type == 'Withdrawal' ? - @entry_amount.to_d : @entry_amount)
+    end
   end
 end  

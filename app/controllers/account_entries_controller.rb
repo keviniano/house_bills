@@ -71,4 +71,9 @@ class AccountEntriesController < ApplicationController
       @account_entries = @account_entries.paginate :page => params[:page]
     end
   end
+
+  def update_cleared
+    AccountEntry.update(params[:account_entries].keys,params[:account_entries].values)
+    redirect_to account_account_entries_path @account
+  end
 end

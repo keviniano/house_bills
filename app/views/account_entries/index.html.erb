@@ -19,43 +19,46 @@
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
 
-<table class="table-striped table-bordered table-condensed">
-  <tr>
-    <th>Date</th>
-    <th>Check #</th>
-    <th>Payee</th>
-    <th>Deposit</th>
-    <th>Withdrawal</th>
-    <th>Cleared</th>
-    <th>Balance</th>
-    <th>Cleared Balance</th>
-    <th></th>
-    <th></th>
-  </tr>
-
-  <% balance = @account_entries.first.try(:balance) %>
-  <% cleared_balance = nil %>
-  <% @account_entries.each do |account_entry| %>
+<%= form_tag update_cleared_account_account_entries_path do |f| %>
+  <table class="table-striped table-bordered table-condensed">
     <tr>
-      <td><%= account_entry.date %></td>
-      <td><%= account_entry.check_number %></td>
-      <td><%= account_entry.recipient %></td>
-      <td class="currency"><%= number_to_currency account_entry.deposit_amount %></td>
-      <td class="currency"><%= number_to_currency account_entry.withdrawal_amount %></td>
-      <td class="center"><%= account_entry.cleared ? "\u2714" : nil %></td>
-      <td class="currency"><%= number_to_currency balance %></td>
-      <td class="currency"><%= number_to_currency cleared_balance || account_entry.cleared_balance %></td>
-      <% balance -= account_entry.amount %>
-      <% cleared_balance = account_entry.cleared_balance if cleared_balance.blank? %>
-      <% cleared_balance -= account_entry.amount if cleared_balance.present? && account_entry.cleared? %>
-      <% if account_entry.type == 'BillAccountEntry' %>
-        <td><%= link_to 'View', [@account,account_entry.bill] %></td>
-        <td><%= link_to('Edit', [:edit,@account,account_entry.bill]) if can? :edit, account_entry.bill %></td>
-      <% else %>  
-        <td><%= link_to 'View', [@account,account_entry] %></td>
-        <td><%= link_to('Edit', [:edit,@account,account_entry]) if can? :edit, account_entry %></td>
-      <% end %>
+      <th>Date</th>
+      <th>Check #</th>
+      <th>Payee</th>
+      <th>Deposit</th>
+      <th>Withdrawal</th>
+      <th>Cleared</th>
+      <th>Balance</th>
+      <th>Cleared Balance</th>
+      <th></th>
+      <th></th>
     </tr>
-  <% end %>
-</table>
+
+    <% @account_entries.each do |account_entry| %>
+      <%= fields_for "account_entries[]", account_entry do |account_entry_fields| %>
+        <tr>
+          <td><%= account_entry.date %></td>
+          <td><%= account_entry.check_number %></td>
+          <td><%= account_entry.recipient %></td>
+          <td class="currency"><%= number_to_currency account_entry.deposit_amount %></td>
+          <td class="currency"><%= number_to_currency account_entry.withdrawal_amount %></td>
+          <td class="center">
+            <%= account_entry_fields.check_box :cleared %>
+          </td>
+          <td class="currency"><%= number_to_currency account_entry.balance %></td>
+          <td class="currency"><%= account_entry.cleared ? number_to_currency(account_entry.cleared_balance) : nil %></td>
+          <% if account_entry.type == 'BillAccountEntry' %>
+            <td><%= link_to 'View', [@account,account_entry.bill] %></td>
+            <td><%= link_to('Edit', [:edit,@account,account_entry.bill]) if can? :edit, account_entry.bill %></td>
+          <% else %>  
+            <td><%= link_to 'View', [@account,account_entry] %></td>
+            <td><%= link_to('Edit', [:edit,@account,account_entry]) if can? :edit, account_entry %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+  <br>
+  <%= submit_tag "Update", :class => "btn btn-primary" %>
+<% end %>
 <%= will_paginate @account_entries %>
