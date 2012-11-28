@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   validates_presence_of :email
 
   after_create :attach_shareholders
+  after_save   :update_shareholders
 
   def shareholder_for_account(account)
     Shareholder.where(:user_id => self.id, :account_id => account.id).first
@@ -28,6 +29,16 @@ class User < ActiveRecord::Base
     shareholders.each do |m|
       m.user = self
       m.name = name
+      m.updated_through_user = true
+      m.save!
+    end
+  end
+
+  def update_shareholders
+    self.shareholders.each do |m|
+      m.name = name
+      m.email = email
+      m.updated_through_user = true
       m.save!
     end
   end

@@ -8,10 +8,12 @@ class Shareholder < ActiveRecord::Base
   has_many   :balance_entries
 
   validates_presence_of :name
-  #validates_presence_of :email
   validates_presence_of :opened_on
+  validate :cannot_change_user_fields
 
-  # before_create :attach_user
+  attr_protected :updated_through_user
+
+  before_create :attach_user
 
   default_value_for :opened_on do
     Date.today
@@ -35,6 +37,14 @@ class Shareholder < ActiveRecord::Base
 
   def status
     active? ? 'Active' : 'Inactive'
+  end
+
+  def updated_through_user=(val)
+    @updated_through_user = !!val
+  end
+
+  def updated_through_user
+    @updated_through_user || false
   end
 
   class << self
@@ -66,8 +76,13 @@ class Shareholder < ActiveRecord::Base
   private
 
   def attach_user
-    self.user = User.find_by_email(email)
+    self.user = User.find_by_email(email) if email.present?
     true
+  end
+
+  def cannot_change_user_fields
+    errors.add(:email, "Field cannot be changed except through associated user") if self.user.present? && self.email_changed? && !updated_through_user
+    errors.add(:name, "Field cannot be changed except through associated user") if self.user.present? && self.name_changed? && !updated_through_user
   end
 
 end
