@@ -2,10 +2,12 @@ require 'csv'
 require 'legacy_helper'
 require 'pp'
 
+# Create the account we'll use for this import
 a = Account.find_or_create_by_name "Imported Account"
 role = Role.find_by_name "User"
 unknown_bill_type = a.bill_types.find_or_create_by_name('Unknown')
 
+# Get the email addresses to associate with each shareholder
 emails = {}
 File.open(File.join(Rails.root,'db','legacy','email.txt')).each_line do |line|
   this_line = line.split(",")
@@ -27,8 +29,8 @@ CSV.foreach(File.join(Rails.root,'db','legacy','lkpPayee.txt'),headers: true) do
   end
 end
 
-ActiveRecord::Base.connection.execute("SELECT setval('payees_id_seq',#{Payee.maximum(:id) + 1000})")
-ActiveRecord::Base.connection.execute("SELECT setval('shareholders_id_seq',#{Shareholder.maximum(:id) + 1000})")
+ActiveRecord::Base.connection.execute("SELECT setval('payees_id_seq',#{Payee.maximum(:id) + 1000})") if Payee.maximum(:id).present?
+ActiveRecord::Base.connection.execute("SELECT setval('shareholders_id_seq',#{Shareholder.maximum(:id) + 1000})") if Shareholder.maximum(:id).present?
 
 CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: true) do |r|
   if r['Payee'].present?
@@ -50,7 +52,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: tr
     bill.save!
   end
 end
-ActiveRecord::Base.connection.execute("SELECT setval('bills_id_seq',#{Bill.maximum(:id) + 1000})")
+ActiveRecord::Base.connection.execute("SELECT setval('bills_id_seq',#{Bill.maximum(:id) + 1000})") if Bill.maximum(:id).present?
 
 AccountEntry.destroy_all
 CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: true) do |r|
@@ -80,7 +82,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: 
     ae.save!
   end
 end
-ActiveRecord::Base.connection.execute("SELECT setval('account_entries_id_seq',#{AccountEntry.maximum(:id) + 1000})")
+ActiveRecord::Base.connection.execute("SELECT setval('account_entries_id_seq',#{AccountEntry.maximum(:id) + 1000})") if AccountEntry.maximum(:id).present?
 
 BalanceEntry.destroy_all
 CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: true) do |r|
@@ -106,7 +108,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillPayment.txt'),headers: tr
     be.save!
   end
 end
-ActiveRecord::Base.connection.execute("SELECT setval('balance_entries_id_seq',#{BalanceEntry.maximum(:id) + 1000})")
+ActiveRecord::Base.connection.execute("SELECT setval('balance_entries_id_seq',#{BalanceEntry.maximum(:id) + 1000})") if BalanceEntry.maximum(:id).present?
 
 PotBalanceEntry.destroy_all
 AccountBill.all.each do |sb|
