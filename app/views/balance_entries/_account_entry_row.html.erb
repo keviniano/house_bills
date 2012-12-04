@@ -5,8 +5,14 @@
   <td class="currency"><%= number_to_currency (account_entry_row.deposit_amount) %></td>
   <td><%= account_entry_row.entry_type %></td>
   <td><%= truncate account_entry_row.note %></td>
-  <td class="currency"><%= number_to_currency account_entry_row.shareholder_amount(@shareholder) %></td>
-  <td class="currency"><%= number_to_currency account_entry_row.balance_for(@shareholder) %></td>
+  <td class="currency"><%= number_to_currency amount %></td>
+  <td class="currency">
+    <% if @can_use_running_total %>
+      <%= number_to_currency running_total %>
+    <% else %>
+      <%= number_to_currency account_entry_row.balance_for(@shareholder) %>
+    <% end %>
+  </td>
   <td><%= link_to('View', [@account,account_entry_row]) %></td>
   <td><%= link_to('Edit', [:edit,@account,account_entry_row]) if can? :edit, account_entry_row %></td>
 </tr>

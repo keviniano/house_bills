@@ -2,7 +2,7 @@ class BalanceEntryQuery
   include ActiveModel::Conversion
   extend ActiveModel::Naming
 
-  attr_reader :start_date, :end_date, :payee_shareholder_id, :with_text, :share_shareholder_id, :bill_type_id 
+  attr_reader :start_date, :end_date, :payee_shareholder_id, :with_text, :share_shareholder_id, :bill_type_id, :can_use_running_total
 
   def self.grouped_shareholders
     # ['Anyone',nil] + Shareholder.order(:name).map{|sh| [sh.name, sh.id]}
@@ -33,17 +33,30 @@ class BalanceEntryQuery
   end
 
   def apply_conditions(balance_entries)
-    balance_entries = balance_entries.with_text(with_text) if with_text
+    @can_use_running_total = true
     balance_entries = balance_entries.starting_on(start_date) if start_date
     balance_entries = balance_entries.ending_on(end_date) if end_date
-    balance_entries = balance_entries.with_payee_shareholder_id(payee_shareholder_id) if payee_shareholder_id 
-    balance_entries = balance_entries.with_share_shareholder_id(share_shareholder_id) if share_shareholder_id 
+    if with_text
+      balance_entries = balance_entries.with_text(with_text) 
+      @can_use_running_total = false
+    end
+    if payee_shareholder_id 
+      balance_entries = balance_entries.with_payee_shareholder_id(payee_shareholder_id) 
+      @can_use_running_total = false
+    end
+    if share_shareholder_id 
+      balance_entries = balance_entries.with_share_shareholder_id(share_shareholder_id) 
+      @can_use_running_total = false
+    end
     if bill_type_id.is_a?(Integer)
       balance_entries = balance_entries.with_bill_type_id(bill_type_id) 
+      @can_use_running_total = false
     elsif bill_type_id == 'Deposit'
       balance_entries = balance_entries.deposits
+      @can_use_running_total = false
     elsif bill_type_id == 'Withdrawal'
       balance_entries = balance_entries.withdrawals
+      @can_use_running_total = false
     end
     balance_entries
   end
@@ -56,9 +69,11 @@ class BalanceEntriesController < ApplicationController
 
   # GET /balance_entries
   def index
+    logger.debug "11111111"
     @query = BalanceEntryQuery.new(params[:query],session,current_user)
     @balance_entries = @query.apply_conditions(@balance_entries)
     @shareholder = current_user.shareholder_for_account(@account)
+    @can_use_running_total = @query.can_use_running_total
     if params[:output] == 'CSV'
       @balance_events = @balance_entries.events
       @shareholders = @balance_entries.unique_shareholders.map{|be| be.shareholder }.sort_by{|sh| sh.name }
