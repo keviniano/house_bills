@@ -65,11 +65,11 @@ end
 class BalanceEntriesController < ApplicationController
   before_filter :authenticate_user!
   load_and_authorize_resource :account
-  load_and_authorize_resource :balance_entry, :through => :account
 
   # GET /balance_entries
   def index
-    logger.debug "11111111"
+    @balance_entries = @account.balance_entries.accessible_by(current_ability)
+    authorize! :show, BalanceEntry
     @query = BalanceEntryQuery.new(params[:query],session,current_user)
     @balance_entries = @query.apply_conditions(@balance_entries)
     @shareholder = current_user.shareholder_for_account(@account)
