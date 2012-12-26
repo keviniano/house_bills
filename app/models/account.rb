@@ -8,6 +8,7 @@ class Account < ActiveRecord::Base
   has_many :shareholder_account_entries
   has_many :unbound_account_entries
   has_many :balance_entries, :dependent => :destroy
+  has_many :balance_events, :dependent => :destroy
   has_many :account_offset_balance_entries
   has_many :bill_offset_balance_entries
   has_many :bill_share_balance_entries

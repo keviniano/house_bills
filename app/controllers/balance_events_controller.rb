@@ -1,4 +1,4 @@
-class BalanceEntryQuery
+class BalanceEventQuery
   include ActiveModel::Conversion
   extend ActiveModel::Naming
 
@@ -19,69 +19,72 @@ class BalanceEntryQuery
 
   def initialize(params,session,user)
     params ||= {}
-
+    @current_user = user
+    @account_id = session[:account_id]
     @with_text = params[:with_text] if params[:with_text].present?
     @start_date = Date.strptime(params[:start_date],'%m-%d-%Y') if params[:start_date].present?
     @end_date = Date.strptime(params[:end_date],'%m-%d-%Y') if params[:end_date].present?
     @share_shareholder_id = params[:share_shareholder_id].to_i if params[:share_shareholder_id].present?
     @payee_shareholder_id = params[:payee_shareholder_id].to_i if params[:payee_shareholder_id].present?
-    @bill_type_id = (params[:bill_type_id] =~/^[0-9]+$/ ? params[:bill_type_id].to_i : params[:bill_type_id]) if params[:bill_type_id].present?
+    @bill_type_id = (params[:bill_type_id] =~ /^[0-9]+$/ ? params[:bill_type_id].to_i : params[:bill_type_id]) if params[:bill_type_id].present?
   end
 
   def persisted?
     false
   end
 
-  def apply_conditions(balance_entries)
+  def apply_conditions(balance_events)
     @can_use_running_total = true
-    balance_entries = balance_entries.starting_on(start_date) if start_date
-    balance_entries = balance_entries.ending_on(end_date) if end_date
+    balance_events = balance_events.starting_on(start_date) if start_date
+    balance_events = balance_events.ending_on(end_date) if end_date
     if with_text
-      balance_entries = balance_entries.with_text(with_text) 
+      balance_events = balance_events.with_text(with_text) 
       @can_use_running_total = false
     end
     if payee_shareholder_id 
-      balance_entries = balance_entries.with_payee_shareholder_id(payee_shareholder_id) 
+      balance_events = balance_events.with_payee_shareholder_id(payee_shareholder_id) 
       @can_use_running_total = false
     end
     if share_shareholder_id 
-      balance_entries = balance_entries.with_share_shareholder_id(share_shareholder_id) 
-      @can_use_running_total = false
+      balance_events = balance_events.with_share_shareholder_id(share_shareholder_id) 
+      @can_use_running_total = false unless Shareholder.find(share_shareholder_id).user == @current_user
     end
     if bill_type_id.is_a?(Integer)
-      balance_entries = balance_entries.with_bill_type_id(bill_type_id) 
+      balance_events = balance_events.with_bill_type_id(bill_type_id) 
       @can_use_running_total = false
     elsif bill_type_id == 'Deposit'
-      balance_entries = balance_entries.deposits
+      balance_events = balance_events.deposits
       @can_use_running_total = false
     elsif bill_type_id == 'Withdrawal'
-      balance_entries = balance_entries.withdrawals
+      balance_events = balance_events.withdrawals
       @can_use_running_total = false
     end
-    balance_entries
+    balance_events
   end
 end
 
-class BalanceEntriesController < ApplicationController
+class BalanceEventsController < ApplicationController
   before_filter :authenticate_user!
   load_and_authorize_resource :account
 
-  # GET /balance_entries
+  # GET /balance_events
   def index
-    @balance_entries = @account.balance_entries.accessible_by(current_ability)
-    authorize! :show, BalanceEntry
-    @query = BalanceEntryQuery.new(params[:query],session,current_user)
-    @balance_entries = @query.apply_conditions(@balance_entries)
+    @balance_events = @account.balance_events.accessible_by(current_ability)
+    authorize! :show, BalanceEvent
+    @query = BalanceEventQuery.new(params[:query],session,current_user)
+    @balance_events = @query.apply_conditions(@balance_events)
     @shareholder = current_user.shareholder_for_account(@account)
-    @can_use_running_total = @query.can_use_running_total
     if params[:output] == 'CSV'
-      @balance_events = @balance_entries.events
-      @shareholders = @balance_entries.unique_shareholders.map{|be| be.shareholder }.sort_by{|sh| sh.name }
-      @filename = "house_bills.csv"
-      render "index.csv" 
-    else
-      total_entries = @balance_entries.group_by_events.to_a.count
-      @balance_events = @balance_entries.events.paginate :page => params[:page], :total_entries => total_entries
+      if @balance_events.count > 250 || (@balance_events.maximum(:date) - @balance_events.minimum(:date)).days > 93.days
+        flash.now[:error] = "Exports cannot be for more than 250 entries or periods longer than 3 months (whichever is less)"
+      else
+        @shareholders = @balance_events.unique_shareholders
+        @balance_events = @balance_events.default_order.all_includes
+        @filename = "house_bills.csv"
+        render "index.csv" 
+      end
     end
+    total_entries = @balance_events.count(:id)
+    @balance_events = @balance_events.default_order.all_includes.paginate :page => params[:page], :total_entries => total_entries
   end
 end

@@ -1,6 +1,6 @@
+//= require twitter/bootstrap
 //= require jquery
 //= require jquery_ujs
-//= require twitter/bootstrap
 //= require_self
 //= require_tree .
 
@@ -10,8 +10,6 @@
 $(document).ready(function(){
 
   $(".datepicker").datepicker({ dateFormat: 'mm-dd-yy' });
-
-  $("#accordion").accordion({ collapsible: true, active: false });
 
 });
 

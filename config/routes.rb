@@ -25,7 +25,7 @@ HouseBills::Application.routes.draw do
     resources :payees, :except => [:index, :show]
     resources :bill_types, :except => [:index, :show]
   
-    resources :balance_entries, :only => [:index]
+    resources :balance_events, :only => [:index]
     resources :shareholder_bills
     resources :account_bills
 
@@ -34,7 +34,6 @@ HouseBills::Application.routes.draw do
     end
     resources :shareholder_account_entries
     resources :unbound_account_entries 
-    
   end
 
   root :to => 'accounts#index'

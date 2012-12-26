@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120308061021) do
+ActiveRecord::Schema.define(:version => 20121212075604) do
 
   create_table "account_entries", :force => true do |t|
     t.string   "type",              :limit => 25
@@ -58,6 +58,20 @@ ActiveRecord::Schema.define(:version => 20120308061021) do
     t.integer  "creator_id"
     t.integer  "updater_id"
   end
+
+  add_index "balance_entries", ["account_entry_id"], :name => "index_balance_entries_on_account_entry_id"
+  add_index "balance_entries", ["bill_id"], :name => "index_balance_entries_on_bill_id"
+
+  create_table "balance_events", :force => true do |t|
+    t.date    "date"
+    t.integer "account_id"
+    t.integer "bill_id"
+    t.integer "account_entry_id"
+  end
+
+  add_index "balance_events", ["account_entry_id"], :name => "index_balance_events_on_account_entry_id"
+  add_index "balance_events", ["bill_id"], :name => "index_balance_events_on_bill_id"
+  add_index "balance_events", ["date"], :name => "index_balance_events_on_date"
 
   create_table "bill_types", :force => true do |t|
     t.integer  "account_id"

@@ -6,6 +6,7 @@ class AccountEntry < ActiveRecord::Base
   belongs_to :shareholder
   belongs_to :account
   has_one    :account_offset_balance_entry, :dependent => :destroy, :autosave => true
+  has_one    :balance_event, :dependent => :destroy, :autosave => true
 
   validates_presence_of     :entry_amount
   validates_presence_of     :entry_type

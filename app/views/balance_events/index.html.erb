@@ -2,7 +2,7 @@
 <h1><%= @account.name %>: Listing Account Events</h1>
 
 <form class="well form-inline">
-  <%= select :query, :bill_type_id, BalanceEntryQuery.bill_types(@account) %>
+  <%= select :query, :bill_type_id, BalanceEventQuery.bill_types(@account) %>
   <%= label :query, :with_text, "entries containing" %>
   <%= text_field :query, :with_text, placeholder: 'any text' %> 
   <br>
@@ -11,9 +11,9 @@
   <%= label :query, :end_date, "to" %>
   <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
   <%= label :query, :payee_shareholder_id, "entered by" %>
-  <%= select :query, :payee_shareholder_id, grouped_options_for_select(BalanceEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
+  <%= select :query, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.payee_shareholder_id) %>
   <%= label :query, :share_shareholder_id, "and shared by" %>
-  <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEntryQuery.grouped_shareholders,@query.share_shareholder_id) %>
+  <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.share_shareholder_id) %>
   <br>
   <button type="submit" class="btn btn-primary">Search</button> 
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
@@ -33,17 +33,23 @@
     <th></th>
   </tr>
   <% balance_events = @balance_events.all %>
-  <% running_total = balance_events.first.bill.balance_for(@shareholder) if @can_use_running_total && balance_events.first.bill.present? %>
-  <% running_total = balance_events.first.account_entry.balance_for(@shareholder) if @can_use_running_total && balance_events.first.account_entry.present? %>
+  <% if balance_events.first.present? %>
+    <% running_total = balance_events.first.bill.balance_for(@shareholder) if @query.can_use_running_total && balance_events.first.bill.present? %>
+    <% running_total = balance_events.first.account_entry.balance_for(@shareholder) if @query.can_use_running_total && balance_events.first.account_entry.present? %>
+  <% else %>
+    <tr>
+      <td colspan="10" class="center">No records to see here, move along...</td>
+    </tr>
+  <% end %>
   <% balance_events.each do |item| %>
     <% if item.bill.present? %>
       <% amount = item.bill.shareholder_amount(@shareholder) %>
-      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill, :amount => amount, :running_total => running_total, :can_use_running_total => @can_use_running_total } %>
+      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill, :amount => amount, :running_total => running_total } %>
     <% else %>
       <% amount = item.account_entry.shareholder_amount(@shareholder) %>
-      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :amount => amount, :running_total => running_total, :can_use_running_total => @can_use_running_total } %>
+      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :amount => amount, :running_total => running_total } %>
     <% end %>
-    <% running_total -= amount if @can_use_running_total %>
+    <% running_total -= amount if @query.can_use_running_total %>
   <% end %>
 </table>
 <%= will_paginate @balance_events %>

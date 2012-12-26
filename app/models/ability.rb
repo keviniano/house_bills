@@ -37,7 +37,7 @@ class Ability
     can    :read,   Shareholder, :account_id => open_account_ids
 
     # Any open user can read
-    can    :read,   BalanceEntry, :account_id => open_account_ids
+    can    :read,   BalanceEvent, :account_id => open_account_ids
 
     # Any open user can read
     can    :read,   AccountEntry, :account_id => open_account_ids

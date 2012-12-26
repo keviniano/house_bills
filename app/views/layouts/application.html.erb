@@ -11,13 +11,16 @@
     <%= render "layouts/menu" %>
     <div class="container">
       <% flash.each do |name, msg| %>
-        <% if name = 'notice' %>
-          <%= content_tag :div, msg, id: "flash-notice", class: "alert alert-success" %>
-        <% elsif name = 'alert' %>
-          <%= content_tag :div, msg, id: "flash-alert", class: "alert alert-error" %>
+        <% if name == 'notice' %>
+          <%= tag :div, id: "flash-notice", class: "alert alert-success" %>
+        <% elsif name == 'alert' %>
+          <%= tag :div, id: "flash-alert", class: "alert alert-alert" %>
         <% else %>
-          <%= content_tag :div, msg, id: "flash-#{name}", class: "alert alert-info" %>
+          <%= tag :div, id: "flash-#{name}", class: "alert alert-#{name}" %>
         <% end %>
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <%= msg %>
+        </div>
       <% end %>
       <%= content_tag :h1, yield(:title) if show_title? %>
       <%= yield %>

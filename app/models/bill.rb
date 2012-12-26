@@ -7,9 +7,10 @@ class Bill < ActiveRecord::Base
   has_one     :bill_offset_balance_entry,  :dependent => :destroy, :autosave => true
   has_one     :pot_balance_entry,          :dependent => :destroy, :autosave => true
   has_one     :bill_account_entry,         :dependent => :destroy, :autosave => true
+  has_one     :balance_event,              :dependent => :destroy, :autosave => true
   
   before_validation :set_amount
-  after_validation  :update_balance_entries
+  after_validation  :update_balance_entries, :update_balance_event
 
   accepts_nested_attributes_for :bill_share_balance_entries, :allow_destroy => true, 
       :reject_if => proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? }
@@ -123,6 +124,12 @@ class Bill < ActiveRecord::Base
       p.amount = remainder
       p.date = self.date
     end
+  end
+
+  def update_balance_event
+    build_balance_event if balance_event.blank?
+    balance_event.account = account
+    balance_event.date = date
   end
 
   def self.calc_shares(share_ratios, bill_amount)
