@@ -14,19 +14,26 @@ class BalanceEventQuery
   end
 
   def self.bill_types(account)
-    [['All types of',nil]] + (AccountEntry.valid_entry_types.each{|item| [item,item] } + BillType.for_account(account).each.map{|row| [row.name,row.id]}).sort{|a,b| a[0] <=> b[0] }
+    [['All types of',nil]] + 
+    (AccountEntry.valid_entry_types.each{|item| [item,item] } + BillType.for_account(account).each.map{|row| [row.name,row.id]}).sort_by{|a| a[0] }
   end
 
   def initialize(params,session,user)
     params ||= {}
     @current_user = user
     @account_id = session[:account_id]
-    @with_text = params[:with_text] if params[:with_text].present?
-    @start_date = Date.strptime(params[:start_date],'%m-%d-%Y') if params[:start_date].present?
-    @end_date = Date.strptime(params[:end_date],'%m-%d-%Y') if params[:end_date].present?
-    @share_shareholder_id = params[:share_shareholder_id].to_i if params[:share_shareholder_id].present?
-    @payee_shareholder_id = params[:payee_shareholder_id].to_i if params[:payee_shareholder_id].present?
-    @bill_type_id = (params[:bill_type_id] =~ /^[0-9]+$/ ? params[:bill_type_id].to_i : params[:bill_type_id]) if params[:bill_type_id].present?
+    if params[:start_date].present?
+      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y') 
+    else
+      @start_date = Date.today - 3.months
+    end
+    unless params[:chart] == true
+      @with_text = params[:with_text] if params[:with_text].present?
+      @end_date = Date.strptime(params[:end_date],'%m-%d-%Y') if params[:end_date].present?
+      @share_shareholder_id = params[:share_shareholder_id].to_i if params[:share_shareholder_id].present?
+      @payee_shareholder_id = params[:payee_shareholder_id].to_i if params[:payee_shareholder_id].present?
+      @bill_type_id = (params[:bill_type_id] =~ /^[0-9]+$/ ? params[:bill_type_id].to_i : params[:bill_type_id]) if params[:bill_type_id].present?
+    end
   end
 
   def persisted?
@@ -86,5 +93,56 @@ class BalanceEventsController < ApplicationController
     end
     total_entries = @balance_events.count(:id)
     @balance_events = @balance_events.default_order.all_includes.paginate :page => params[:page], :total_entries => total_entries
+  end
+
+  def chart
+    balance_entries = @account.balance_entries.accessible_by(current_ability)
+    authorize! :show, BalanceEvent
+    params[:query] ||= {}
+    params[:query][:chart] = true
+    query = BalanceEventQuery.new(params[:query],session,current_user)
+    balance_entries_to_display = query.apply_conditions(balance_entries)
+    @shareholders = Shareholder.find(balance_entries_to_display.uniq.pluck(:shareholder_id)).sort_by{|sh| sh.name }
+
+    @starting_balances = balance_entries.select("shareholder_id, SUM(amount) AS amount").group("shareholder_id").where(:shareholder_id => @shareholders.map{|sh| sh.id }).where("date < ?",query.start_date)
+    balances = {}
+    @starting_balances.each {|sb| balances[sb.shareholder] = sb.amount }
+    
+    @change_entries = balance_entries_to_display.select("date, shareholder_id, SUM(amount) AS amount").group("date, shareholder_id")
+    changes = {}
+    @change_entries.each do |ce|
+      changes[ce.shareholder] ||= {}
+      changes[ce.shareholder][ce.date] = ce.amount
+    end
+
+    end_date = query.end_date || @change_entries.map{|c| c.date }.max
+
+    this_date = query.start_date
+    begin
+      this_date += 1.day
+    end while this_date < end_date
+    
+    columns = [['string','Date']]
+    @shareholders.each {|sh| columns << ['number',sh.name] }
+
+    rows = []
+    this_date = query.start_date
+    begin
+      row = [this_date]
+      @shareholders.each do |sh|
+        balances[sh] += changes[sh][this_date] if changes[sh][this_date].present?
+        row << balances[sh].to_f
+      end
+      rows << row
+      this_date += 1.day
+    end while this_date < end_date
+    render :json => {
+      :type => 'LineChart',
+      :cols => columns,
+      :rows => rows,
+      :options => {
+        :chartArea => { :width => '90%', :height => '75%' }
+      }
+    }
   end
 end

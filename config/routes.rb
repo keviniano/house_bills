@@ -25,7 +25,9 @@ HouseBills::Application.routes.draw do
     resources :payees, :except => [:index, :show]
     resources :bill_types, :except => [:index, :show]
   
-    resources :balance_events, :only => [:index]
+    resources :balance_events, :only => [:index] do
+      get 'chart', :on => :collection
+    end
     resources :shareholder_bills
     resources :account_bills
 
