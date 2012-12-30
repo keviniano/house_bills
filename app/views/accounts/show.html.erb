@@ -24,7 +24,7 @@
       Shareholder Balances
     </h3>
     <div class="grid">
-      <% Shareholder.open_now.for_account(@account).each do |sh| %>
+      <% Shareholder.for_account(@account).sort_by{|sh| [sh.balance == 0 ? 2 : 1, sh.name] }.each do |sh| %>
         <div class="grid-row">
           <div class="grid-cell column-first">
             <%= sh.name %>
