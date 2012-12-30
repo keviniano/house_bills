@@ -87,15 +87,21 @@ class Bill < ActiveRecord::Base
     ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, :precision => 2)
   end
 
-  def shareholder_amount(sh)
-    result = 0
+  def shareholder_balance_amount(sh)
     bill_share_balance_entries.each do |bsbe|
-      result += bsbe.amount if bsbe.shareholder_id == sh.id
+      return bsbe.amount if bsbe.shareholder_id == sh.id
     end
-    result += bill_offset_balance_entry.amount if self.type == "ShareholderBill" and self.shareholder_id == sh.id
-    result
+    return 0
   end
-  
+
+  def shareholder_offset_amount(sh)
+    (self.type == "ShareholderBill" and self.shareholder_id == sh.id) ? bill_offset_balance_entry.amount : 0
+  end
+
+  def shareholder_change_amount(sh)
+    shareholder_balance_amount(sh) + shareholder_offset_amount(sh)
+  end
+
   def build_bill_share_entries!
     if account.present?
       active_shareholders.each do |s|

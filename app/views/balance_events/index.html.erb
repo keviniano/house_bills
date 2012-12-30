@@ -27,7 +27,9 @@
     <th>Credit</th>
     <th>Type</th>
     <th>Note</th>
-    <th>My Part</th>
+    <th>My Credit</th>
+    <th>My Share</th>
+    <th>Net Change</th>
     <th>My Balance</th>
     <th></th>
     <th></th>
@@ -43,11 +45,11 @@
   <% end %>
   <% balance_events.each do |item| %>
     <% if item.bill.present? %>
-      <% amount = item.bill.shareholder_amount(@shareholder) %>
-      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill, :amount => amount, :running_total => running_total } %>
+      <% amount = item.bill.shareholder_change_amount(@shareholder) %>
+      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill, :running_total => running_total, :amount => amount } %>
     <% else %>
-      <% amount = item.account_entry.shareholder_amount(@shareholder) %>
-      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :amount => amount, :running_total => running_total } %>
+      <% amount = item.account_entry.shareholder_offset_amount(@shareholder) %>
+      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :running_total => running_total, :amount => amount } %>
     <% end %>
     <% running_total -= amount if @query.can_use_running_total %>
   <% end %>

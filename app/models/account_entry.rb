@@ -105,7 +105,7 @@ class AccountEntry < ActiveRecord::Base
     @entry_amount = val
   end
 
-  def shareholder_amount(sh)
+  def shareholder_offset_amount(sh)
     shareholder_id == sh.id ? amount : 0
   end
 
