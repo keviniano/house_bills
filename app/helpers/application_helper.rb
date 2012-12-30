@@ -1,8 +1,8 @@
 module ApplicationHelper
-  def chart_tag (params = {})
+  def chart_tag (action, height,params = {})
     params[:format] ||= :json
-    path = chart_account_balance_events_path(params)
-    content_tag(:div, :'data-chart' => path, :style => "height: #{400}px;") do
+    path = charts_path(action, params)
+    content_tag(:div, :'data-chart' => path, :style => "height: #{height}px;") do
     end
   end
 end
