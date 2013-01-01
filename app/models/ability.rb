@@ -63,6 +63,9 @@ class Ability
     can    :update_cleared, AccountEntry, :account_id => open_account_ids
 
     # Any open user can read
+    can    :read,   Bill, :account_id => open_account_ids
+
+    # Any open user can read
     can    :read,   AccountBill, :account_id => open_account_ids
     # Users can manage their own entries
     can    :manage, AccountBill, :account_id => active_account_ids, :creator_id => user.id
