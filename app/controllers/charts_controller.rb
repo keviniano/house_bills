@@ -117,4 +117,45 @@ class ChartsController < ApplicationController
       }
     }
   end
+
+  def bill_types_by_month_for_current_user_line_chart
+    bills = @account.bills.accessible_by(current_ability)
+    authorize! :show, Bill
+    params[:query] ||= {}
+    params[:query][:start_date] = (Date.today - 1.year).strftime('%m-%d-%Y')
+    query = ChartQuery.new(params[:query],session,current_user)
+    bills_to_display = query.apply_conditions(bills).select('bills.bill_type_id, extract(month from bills.date) AS month, extract(year from bills.date) AS year, -sum(balance_entries.amount) as amount').group('bill_type_id, extract(month from bills.date), extract(year from bills.date)').order('extract(year from bills.date), extract(month from bills.date)').joins(:bill_share_balance_entries).where("balance_entries.shareholder_id = ?", current_user.shareholder_for_account(@account).id).includes(:bill_type)
+
+    values = {}
+    months = []
+    bill_types = []
+    bills_to_display.each do |b|
+      values[b.bill_type.name] ||= {}
+      values[b.bill_type.name][[b['year'],b['month']]] = b.amount
+      months << [b['year'],b['month']] unless months.include? [b['year'],b['month']]
+      bill_types << b.bill_type.name unless bill_types.include? b.bill_type.name
+    end
+    bill_types.sort!
+    
+    columns = [['string','Month']]
+    bill_types.each {|bt| columns << ['number', bt] }
+
+    rows = []
+    months.each do |month|
+      row = ["#{month[1]}-#{month[0]}"]
+      bill_types.each {|bt| row << (values[bt][month].to_f || 0) }
+      rows << row
+    end
+
+    render :json => {
+      :type => 'LineChart',
+      :cols => columns,
+      :rows => rows,
+      :options => {
+        :chartArea => { :width => '90%', :height => '90%' },
+        :legend => { :position => :in },
+        :curveType => 'function'
+      }
+    }
+  end
 end
