@@ -129,8 +129,12 @@
       Administrative Actions
     </h3>
     <ul>
-      <li><%= link_to "Edit Account", [:edit,@account] if can? :edit, @account %></li>
-      <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" if can? :delete, @account %></li>
+      <% if can? :edit, @account %>
+        <li><%= link_to "Edit Account", [:edit,@account] %></li>
+      <% end %>
+      <% if can? :delete, @account %>
+        <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
+      <% end %>
     </ul>
   </div>
 </div>
