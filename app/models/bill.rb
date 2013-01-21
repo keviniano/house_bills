@@ -27,11 +27,12 @@ class Bill < ActiveRecord::Base
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) < ?)",self.date,self.date,self.id,self.id).sum(:amount)
   end
   
+  validate                  :date_string_format_must_be_valid
   validates_presence_of     :entry_type
   validates_inclusion_of    :entry_type, :in => valid_entry_types
   validates_numericality_of :entry_amount, :greater_than_or_equal_to => 0
   validates_presence_of     :bill_type_id
-  validates_presence_of     :date
+  validates_presence_of     :date_string
   validates_associated      :bill_share_balance_entries
   validates_presence_of     :entry_amount
 # TODO: Make sure there's always at least one bill share entry
@@ -61,6 +62,17 @@ class Bill < ActiveRecord::Base
     end
   end
   
+  def date_string=(value)
+    @date_string = value
+    self.date = DateTime.strptime(value,'%m-%d-%Y')
+  rescue ArgumentError
+    @date_invalid = true
+  end
+
+  def date_string
+    @date_string || date.strftime('%m-%d-%Y')
+  end
+
   def recipient
     shareholder.present? ? shareholder.name : payee
   end
@@ -114,6 +126,10 @@ class Bill < ActiveRecord::Base
 
   private
     
+  def date_string_format_must_be_valid
+    errors.add(:date_string, "is invalid") if @date_invalid
+  end
+
   def set_amount
     self.amount = (entry_type == 'Credit' ? - @entry_amount.to_d : @entry_amount)
   end

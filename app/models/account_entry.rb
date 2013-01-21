@@ -8,10 +8,11 @@ class AccountEntry < ActiveRecord::Base
   has_one    :account_offset_balance_entry, :dependent => :destroy, :autosave => true
   has_one    :balance_event, :dependent => :destroy, :autosave => true
 
+  validate                  :date_string_format_must_be_valid
   validates_presence_of     :entry_amount
   validates_presence_of     :entry_type
   validates_numericality_of :check_number, :allow_nil => true
-  validates_presence_of     :date
+  validates_presence_of     :date_string
   validates_associated      :account_offset_balance_entry 
 
   scope :with_text, lambda{|text| where("payee ILIKE :text OR note ILIKE :text", text: "%#{text}%")}
@@ -69,6 +70,17 @@ class AccountEntry < ActiveRecord::Base
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id < ?)",self.date,self.date,self.id).sum(:amount)
   end
   
+  def date_string=(value)
+    @date_string = value
+    self.date = DateTime.strptime(value,'%m-%d-%Y')
+  rescue ArgumentError
+    @date_invalid = true
+  end
+
+  def date_string
+    @date_string || date.strftime('%m-%d-%Y')
+  end
+
   def cleared_balance
     AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])
   end
@@ -115,6 +127,10 @@ class AccountEntry < ActiveRecord::Base
   
 private
   
+  def date_string_format_must_be_valid
+    errors.add(:date_string, "is invalid") if @date_invalid
+  end
+
   def set_amount
     if @entry_amount.present?
       self.amount = (entry_type == 'Withdrawal' ? - @entry_amount.to_d : @entry_amount)

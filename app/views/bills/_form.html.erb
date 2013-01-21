@@ -11,7 +11,7 @@
 <%= simple_form_for([@account,bill], :html => {:class => 'form-horizontal' }) do |f| %>
   <%= f.error_notification %>
   <%= f.input :entry_type, :as => :radio_buttons, :collection => Bill.valid_entry_types %>
-  <%= f.input :date, :as => :string, :input_html => {:class => "datepicker"} %>
+  <%= f.input :date_string, :label => 'Date', :required => true, :input_html => {:class => "datepicker"} %>
   <% if bill.type == 'AccountBill' %>
     <%=  f.simple_fields_for :bill_account_entry, bill.bill_account_entry do |bae| %>
       <%= bae.input :check_number, :input_html => {:class => "check-number"} %>
