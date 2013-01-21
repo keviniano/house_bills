@@ -11,6 +11,7 @@ class BalanceEntry < ActiveRecord::Base
   
   scope :unique_shareholders, select(:shareholder_id).where("shareholder_id IS NOT NULL").uniq.includes(:shareholder)
   scope :by_shareholder, lambda{|shareholder| where(:shareholder_id => shareholder.id)}
+  scope :for_shareholders, lambda{|shareholders| where(:shareholder_id => shareholders.map{|s| s.id })}
   scope :starting_on, lambda{|start_date| where("balance_entries.date >= ?", start_date)}
   scope :ending_on, lambda{|end_date| where("balance_entries.date <= ?", end_date)}
 
