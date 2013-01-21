@@ -30,7 +30,9 @@
     <th>My Credit</th>
     <th>My Share</th>
     <th>Net Change</th>
-    <th>My Balance</th>
+    <% if @query.can_use_running_total %>
+      <th>My Balance</th>
+    <% end %>
     <th></th>
     <th></th>
   </tr>

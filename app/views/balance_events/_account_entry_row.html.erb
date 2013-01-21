@@ -8,13 +8,11 @@
   <td class="currency"><%= number_to_currency amount %></td>
   <td class="currency"><%= number_to_currency 0 %></td>
   <td class="currency"><%= number_to_currency amount %></td>
-  <td class="currency">
-    <% if @query.can_use_running_total %>
+  <% if @query.can_use_running_total %>
+    <td class="currency">
       <%= number_to_currency running_total %>
-    <% else %>
-      <%= number_to_currency account_entry_row.balance_for(@shareholder) %>
-    <% end %>
-  </td>
+    </td>
+  <% end %>
   <td><%= link_to('View', [@account,account_entry_row]) %></td>
   <td><%= link_to('Edit', [:edit,@account,account_entry_row]) if can? :edit, account_entry_row %></td>
 </tr>
