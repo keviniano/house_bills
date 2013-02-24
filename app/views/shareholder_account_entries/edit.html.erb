@@ -1,5 +1,5 @@
-<% content_for :title, "#{@account.name}: Edit Shareholder Account Entry" %>
+<% content_for :title, "#{@account.name} Shareholder Account Entry" %>
 
-<h1><%= @account.name %>: Edit Shareholder Account Entry</h1>
+<h1><%= @account.name %> Shareholder Account Entry</h1>
 
 <%= render :partial => 'account_entries/form', :locals => {:account_entry => @shareholder_account_entry} %>

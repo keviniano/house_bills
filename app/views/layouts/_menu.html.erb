@@ -6,7 +6,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="brand" href="#">Shared Bills</a>
+      <%= link_to 'Shared Bills', root_path, class: 'brand' %>
       <div class="nav-collapse">
         <ul class="nav">
           <% if current_user %>
@@ -19,10 +19,6 @@
                 <% current_user.accounts.each do |account| %>
                   <li>
                     <%= link_to account.name, account %>
-                  </li>
-                  <li class="divider"></li>
-                  <li>
-                    <%= link_to "Create a new account", new_account_path %>
                   </li>
                 <% end %>
               </ul>

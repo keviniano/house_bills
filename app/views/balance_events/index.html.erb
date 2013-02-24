@@ -1,5 +1,5 @@
-<% content_for :title, "#{@account.name}: Listing Bills" %>
-<h1><%= @account.name %>: Listing Account Events</h1>
+<% content_for :title, "#{@account.name} Account Events" %>
+<h1><%= @account.name %> Account Events</h1>
 
 <form class="well form-inline">
   <%= select :query, :bill_type_id, BalanceEventQuery.bill_types(@account) %>

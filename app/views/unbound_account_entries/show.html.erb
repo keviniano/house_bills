@@ -1,5 +1,5 @@
-<% content_for :title, "#{@account.name}: View Unbound Account Entry" %>
+<% content_for :title, "#{@account.name} Unbound Account Entry" %>
 
-<h1><%= @account.name %>: View Unbound Account Entry</h1>
+<h1><%= @account.name %> Unbound Account Entry</h1>
 
 <%= render :partial => 'account_entries/show', :locals => {:account_entry => @unbound_account_entry} %>

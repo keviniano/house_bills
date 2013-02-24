@@ -1,5 +1,5 @@
-<% content_for :title, "#{@account.name}: View Shareholder Bill" %>
+<% content_for :title, "#{@account.name} Shareholder Bill" %>
 
-<h1><%= @account.name %>: View Shareholder Bill</h1>
+<h1><%= @account.name %> Shareholder Bill</h1>
 
 <%= render :partial => 'bills/show', :locals => {:bill => @shareholder_bill} %>

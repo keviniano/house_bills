@@ -1,5 +1,5 @@
 <% content_for :title, "#{@account.name}: Listing Account Entries" %>
-<h1>Listing Account Entries</h1>
+<h1><%= @account.name %> Account Entries</h1>
 
 <form class="well form-inline">
   <%= select :query, :cleared_status, AccountEntryQuery.cleared_statuses %>

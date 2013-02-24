@@ -1,5 +1,5 @@
-<% content_for :title, "#{@account.name}: Edit Bill" %>
+<% content_for :title, "#{@account.name} Bill" %>
 
-<h1><%= @account.name %>: Edit Bill</h1>
+<h1><%= @account.name %> Bill</h1>
 
 <%= render :partial => 'bills/form', :locals => {:bill => @account_bill} %>
