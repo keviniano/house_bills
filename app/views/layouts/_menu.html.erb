@@ -50,9 +50,6 @@
                   <%= link_to 'Add an account entry unrelated to bills', new_account_unbound_account_entry_path(@account) if can? :create, UnboundAccountEntry %>
                 </li>
                 <li>
-                  <%= link_to 'Distribute account\'s pot', edit_pot_account_path(@account) %>
-                </li>
-                <li>
                   <%= link_to 'Account details', account_path(@account) %>
                 </li>
               </ul>
