@@ -3,4 +3,5 @@ class BillType < ActiveRecord::Base
   has_many :bills
 
   scope :for_account, lambda{|account| where(account_id: account.id)}
+  scope :default_order, order(:name)
 end

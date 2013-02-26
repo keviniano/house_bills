@@ -21,7 +21,7 @@
     <%= f.association :shareholder, :collection => bill.open_shareholders, :include_blank => false %>
   <% end %>
   <%= f.input :entry_amount, :input_html => {:class => "entry-amount"} %>
-  <%= f.association :bill_type, :collection => @account.bill_types %>
+  <%= f.association :bill_type, :collection => @account.bill_types.default_order %>
   <%= f.input :note, :input_html => {:class => "note"} %>
   <h3>Bill Shares</h3>
   <div class="grid shares">
