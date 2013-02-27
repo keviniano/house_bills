@@ -31,25 +31,27 @@
                 <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
-                <li>
+                <li <%= current_page?(account_balance_events_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                   <%= link_to 'View account activity', account_balance_events_path(@account) %>
                 </li>
-                <li>
-                  <%= link_to 'View account ledger', account_account_entries_path(@account) %>
-                </li>
-                <li>
+                <li <%= current_page?(new_account_shareholder_bill_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                   <%= link_to 'Enter a bill paid for by a housemate', new_account_shareholder_bill_path(@account) if can? :create, ShareholderBill %>
                 </li>
-                <li>
+                <li <%= current_page?(new_account_account_bill_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                   <%= link_to 'Enter a bill paid out of this account', new_account_account_bill_path(@account) if can? :create, AccountBill %>
                 </li>
-                <li>
-                  <%= link_to 'Add an account entry to credit a housemate', new_account_shareholder_account_entry_path(@account) if can? :create, ShareholderAccountEntry %>
+                <li class="divider"></li>
+                <li <%= current_page?(account_account_entries_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
+                  <%= link_to 'View account ledger', account_account_entries_path(@account) %>
                 </li>
-                <li>
-                  <%= link_to 'Add an account entry unrelated to bills', new_account_unbound_account_entry_path(@account) if can? :create, UnboundAccountEntry %>
+                <li <%= current_page?(new_account_shareholder_account_entry_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
+                  <%= link_to 'Add a ledger entry to credit a housemate', new_account_shareholder_account_entry_path(@account) if can? :create, ShareholderAccountEntry %>
                 </li>
-                <li>
+                <li <%= current_page?(new_account_unbound_account_entry_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
+                  <%= link_to 'Add a ledger entry unrelated to bills', new_account_unbound_account_entry_path(@account) if can? :create, UnboundAccountEntry %>
+                </li>
+                <li class="divider"></li>
+                <li <%= current_page?(account_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                   <%= link_to 'Account details', account_path(@account) %>
                 </li>
               </ul>
