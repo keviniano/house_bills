@@ -27,10 +27,13 @@ HouseBills::Application.configure do
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   # Do not compress assets
-  config.assets.compress = false
+  config.assets.compress = false 
+
+  # https://github.com/rails/rails/issues/5145
+  config.serve_static_assets = false
 
   # Expands the lines which load the assets
-  # config.assets.debug = true
+  config.assets.debug = true
   
   # Raise exception on mass assignment protection for Active Record models
   config.active_record.mass_assignment_sanitizer = :strict

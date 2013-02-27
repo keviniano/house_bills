@@ -42,6 +42,16 @@ HouseBills::Application.routes.draw do
 
   root :to => 'accounts#index'
 
+  if Rails.env.development?
+    app = ActionDispatch::Static.new(
+      lambda{ |env| [404, { 'X-Cascade' => 'pass'}, []] },
+      Rails.application.config.paths['public'].first,
+      Rails.application.config.static_cache_control
+    )
+
+    mount app, :at => '/', :as => :public
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

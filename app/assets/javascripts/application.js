@@ -1,5 +1,7 @@
 //= require jquery
 //= require jquery_ujs
+//= require jquery.ui.datepicker
+//= require jquery.ui.autocomplete
 //= require twitter/bootstrap
 //= require_self
 //= require_tree .
@@ -9,7 +11,11 @@
 
 $(document).ready(function(){
 
-  $(".datepicker").datepicker({ dateFormat: 'mm-dd-yy' });
+  $(".datepicker").datepicker({ 
+    dateFormat: 'mm-dd-yy',
+    showOtherMonths: true,
+    selectOtherMonths: true   
+  });
   
   // Load Google visualization library if a chart element exists
   if ($('[data-chart]').length > 0) {
