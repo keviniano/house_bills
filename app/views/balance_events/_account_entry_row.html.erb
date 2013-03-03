@@ -4,7 +4,8 @@
   <td class="currency"><%= number_to_currency (account_entry_row.withdrawal_amount) %></td>
   <td class="currency"><%= number_to_currency (account_entry_row.deposit_amount) %></td>
   <td><%= account_entry_row.entry_type %></td>
-  <td><%= truncate account_entry_row.note %></td>
+  <% truncated_note = truncate(account_entry_row.note, separator: ' ') %>
+  <td title="<%= (account_entry_row.note == truncated_note) ? nil : account_entry_row.note %>"><%= truncated_note %></td>
   <td class="currency"><%= number_to_currency amount %></td>
   <td class="currency"><%= number_to_currency 0 %></td>
   <td class="currency"><%= number_to_currency amount %></td>
