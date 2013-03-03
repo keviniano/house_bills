@@ -6,9 +6,11 @@
   <td><%= bill_row.bill_type.name %></td>
   <% truncated_note = truncate(bill_row.note, separator: ' ') %>
   <td title="<%= (bill_row.note == truncated_note) ? nil : bill_row.note %>"><%= truncated_note %></td>
-  <td class="currency"><%= number_to_currency bill_row.shareholder_offset_amount(@shareholder) %></td>
-  <td class="currency"><%= number_to_currency bill_row.shareholder_balance_amount(@shareholder) %></td>
-  <td class="currency"><%= number_to_currency amount %></td>
+  <% offset_amount = bill_row.shareholder_offset_amount(@shareholder) %>
+  <td class="currency"><%= offset_amount == 0 ? nil : number_to_currency(offset_amount) %></td>
+  <% balance_amount = bill_row.shareholder_balance_amount(@shareholder) %>
+  <td class="currency"><%= balance_amount == 0 ? nil : number_to_currency(balance_amount) %></td>
+  <td class="currency"><%= amount == 0 ? nil : number_to_currency(amount) %></td>
   <% if @query.can_use_running_total %>
     <td class="currency">
       <%= number_to_currency running_total %>
