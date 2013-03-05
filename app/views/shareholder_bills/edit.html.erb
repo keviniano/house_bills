@@ -3,5 +3,3 @@
 <h1><%= @account.name %> Shareholder Bill</h1>
 
 <%= render :partial => 'bills/form', :locals => {:bill => @shareholder_bill} %>
-
-<%= link_to "Enter Another Shareholder Bill", new_account_shareholder_bill_path(@account), class: "btn" %>

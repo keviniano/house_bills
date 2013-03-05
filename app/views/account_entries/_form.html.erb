@@ -21,5 +21,11 @@
   <%= f.input :entry_amount, :input_html => {:class => "entry-amount"} %>
   <%= f.input :note, :input_html => {:class => "note"} %>
   <%= f.input :cleared %>
-  <%= f.button :submit, class: "btn btn-primary" %>
+  <div class="form-actions">
+    <%= f.button :submit, class: "btn btn-primary" %>
+    <% unless account_entry.new_record? %>
+      <%= link_to("Enter Another Shareholder Account Entry", new_account_shareholder_account_entry_path(@account), class: "btn") if account_entry.type == "ShareholderAccountEntry" %>
+      <%= link_to("Enter Another Unbound Account Entry", new_account_unbound_account_entry_path(@account), class: "btn") if account_entry.type == "UnboundAccountEntry" %>
+    <% end %>
+  </div>
 <% end %>
