@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails',                '~> 3.2.10' 
+gem 'thin'
 gem 'pg'
 gem 'devise',               '~> 2.1.2'
 gem 'default_value_for',    '~> 2.0.1'
