@@ -17,14 +17,13 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="balances">
-    <h2>
-      Account Balance: <%= number_to_currency(@account.balance) %>
-    </h2>
     <h3>
       Shareholder Balances
     </h3>
+    <% balance_total = @account.pot_balance %>
     <div class="grid">
       <% Shareholder.for_account(@account).sort_by{|sh| [sh.balance == 0 ? 2 : 1, sh.name] }.each do |sh| %>
+        <% balance_total += sh.balance %>
         <div class="grid-row">
           <div class="grid-cell column-first">
             <%= sh.name %>
@@ -40,6 +39,22 @@
         </div>
         <div class="grid-cell column-second currency">
           <%= number_to_currency(@account.pot_balance) %>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-cell column-first">
+          <strong>Total of Shareholder Balances</strong>
+        </div>
+        <div class="grid-cell column-second currency">
+          <strong><%= number_to_currency(balance_total) %></strong>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-cell column-first">
+          <strong>Account Balance</strong>
+        </div>
+        <div class="grid-cell column-second currency">
+          <strong><%= number_to_currency(@account.balance) %></strong>
         </div>
       </div>
     </div>
