@@ -27,30 +27,7 @@
 </dl>
 
 <h3>Bill Shares</h3>
-<div class="grid shares">
-  <div class="grid-row header">
-    <div class="grid-cell column-first">Name</div>
-    <div class="grid-cell column-second">Share</div>
-    <div class="grid-cell column-third currency">Amount</div>
-    <div class="grid-cell column-third currency">Balance</div>
-  </div>
-  <% balance_entries = bill.bill_share_balance_entries.includes(:shareholder) %>
-  <% balances = bill.balances_for(balance_entries.map{|be| be.shareholder }) %>
-  <% balance_entries.each do |be| %>
-    <div class="grid-row data">
-      <div class="grid-cell column-first"><%= be.shareholder.name %></div>
-      <div class="grid-cell column-second"><%= be.share %></div>
-      <div class="grid-cell column-third currency"><%= number_to_currency(be.amount) %></div>
-      <div class="grid-cell column-third currency"><%= number_to_currency(balances[be.shareholder.id]) %></div>
-    </div>
-  <% end %>
-  <div class="grid-row data">
-    <div class="grid-cell column-first">Pot</div>
-    <div class="grid-cell column-second">&nbsp;</div>
-    <div class="grid-cell column-third currency"><%= number_to_currency(bill.pot_balance_entry.amount) %></div>
-    <div class="grid-cell column-third currency"></div>
-  </div>
-</div>
+<%= render "bills/shares", bill: bill %>
 
 <p><%= link_to('Edit', [:edit,@account,bill], :class => 'btn') if can? :edit, bill %></p>
 <% if can? :delete, bill %>
