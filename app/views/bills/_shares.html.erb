@@ -7,7 +7,7 @@
   </div>
   <% balance_entries = bill.bill_share_balance_entries.includes(:shareholder) %>
   <% balances = bill.balances_for(balance_entries.map{|be| be.shareholder }) %>
-  <% balance_entries.each do |be| %>
+  <% balance_entries.sort_by{|x| x.shareholder.name }.each do |be| %>
     <div class="grid-row data">
       <div class="grid-cell column-first"><%= be.shareholder.name %></div>
       <div class="grid-cell column-second"><%= be.share %></div>
