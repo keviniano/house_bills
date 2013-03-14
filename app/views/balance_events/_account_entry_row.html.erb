@@ -14,6 +14,6 @@
       <%= number_to_currency running_total %>
     </td>
   <% end %>
-  <td><%= link_to('View', [@account,account_entry_row]) %></td>
+  <td><%= link_to('Show Details', [@account,account_entry_row]) %></td>
   <td><%= link_to('Edit', [:edit,@account,account_entry_row]) if can? :edit, account_entry_row %></td>
 </tr>

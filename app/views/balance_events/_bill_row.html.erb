@@ -16,6 +16,10 @@
       <%= number_to_currency running_total %>
     </td>
   <% end %>
-  <td><%= link_to('View', [@account,bill_row]) %></td>
+  <td><%= link_to('Show Details', [@account,bill_row], class: "view-bill", data: { url: url_for(show_shares_account_bill_url(@account,bill_row))}) %></td>
   <td><%= link_to('Edit', [:edit,@account,bill_row]) if can? :edit, bill_row %></td>
+</tr>
+<tr style="display:none">
+  <td colspan="12", class="shares">
+  <td>
 </tr>

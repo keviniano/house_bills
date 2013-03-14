@@ -38,10 +38,15 @@ table tr td.currency, div.currency {
   text-align: right;
   }
 
+td.shares div.grid {
+  margin: auto;
+  }
+
 div.grid {
   max-width: 450px;
   border: 1px solid #DDDDDD;
   border-radius: 5px;
+  text-align: left;
   }
 
 div.grid.shares {

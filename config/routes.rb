@@ -30,6 +30,9 @@ HouseBills::Application.routes.draw do
     end
     resources :shareholder_bills
     resources :account_bills
+    resources :bills, :only => [] do
+      get 'show_shares', :on => :member
+    end
 
     resources :account_entries, :only => [:index] do 
       post 'update_cleared', :on => :collection

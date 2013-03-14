@@ -20,6 +20,36 @@ $(document).ready(function(){
     showOtherMonths: true,
     selectOtherMonths: true   
   });
+
+  $(".view-bill").click(function(event){
+    var t = $(event.target);
+    var row = t.parents("tr").first().next();
+    var cell = row.children().first();
+    var successful = false;
+
+    if (cell.children().length == 0) {
+      $.ajax({
+        url:      t.attr("data-url"),
+        async:    false,
+        success:  function(data){
+          successful = true;
+          cell.html(data);
+        }
+      });
+    } else {
+      successful = true;
+    }
+
+    if (successful == true) {
+      event.preventDefault();
+      row.toggle();
+      if (row.is(":visible")) {
+        t.text("Hide Details");
+      } else {
+        t.text("Show Details");
+      }
+    }
+  });
   
   // Load Google visualization library if a chart element exists
   if ($('[data-chart]').length > 0) {
