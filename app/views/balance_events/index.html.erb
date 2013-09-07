@@ -1,20 +1,45 @@
 <% content_for :title, "#{@account.name} Account Events" %>
 <h1><%= @account.name %> Account Events</h1>
-
-<form class="well form-inline">
-  <%= select :query, :bill_type_id, BalanceEventQuery.bill_types(@account) %>
-  <%= label :query, :with_text, "entries containing" %>
-  <%= text_field :query, :with_text, placeholder: 'any text' %> 
-  <br>
-  <%= label :query, :start_date, "from" %>
-  <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
-  <%= label :query, :end_date, "to" %>
-  <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
-  <%= label :query, :payee_shareholder_id, "entered by" %>
-  <%= select :query, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.payee_shareholder_id) %>
-  <%= label :query, :share_shareholder_id, "and shared by" %>
-  <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.share_shareholder_id) %>
-  <br>
+<button type="button" id="search-toggle" class="btn btn-large pull-right">
+  Search
+</button>
+<form id="search" class="well form-horizontal" style="display:none;">
+  <div class="control-group">
+    <%= label :query, :bill_type_id, "Bill type", class: 'control-label' %>
+    <div class="controls">
+      <%= select :query, :bill_type_id, BalanceEventQuery.bill_types(@account) %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :with_text, "Entries containing", class: 'control-label' %>
+    <div class="controls">
+      <%= text_field :query, :with_text, placeholder: 'any text' %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :start_date, "Start date", class: 'control-label' %>
+    <div class="controls">
+      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :end_date, "End date", class: 'control-label' %>
+    <div class="controls">
+      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :payee_shareholder_id, "Entered by", class: 'control-label' %>
+    <div class="controls">
+      <%= select :query, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.payee_shareholder_id) %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :share_shareholder_id, "Shared by", class: 'control-label' %>
+    <div class="controls">
+      <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.share_shareholder_id) %>
+    </div>
+  </div>
   <button type="submit" class="btn btn-primary">Search</button> 
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>

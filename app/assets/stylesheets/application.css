@@ -8,6 +8,10 @@
  *= require_tree .
 */
 
+button#search-toggle {
+  margin-top: -50px;
+}
+
 form input.check-number {
   width: 75px;
   }

@@ -14,6 +14,10 @@
 // This file is automatically included by javascript_include_tag :defaults
 
 $(document).ready(function(){
+  
+  $("#search-toggle").click(function(event){
+    $("#search").toggle(); 
+  });
 
   $(".datepicker").datepicker({ 
     dateFormat: 'mm-dd-yy',
