@@ -1,20 +1,45 @@
 <% content_for :title, "#{@account.name}: Listing Account Entries" %>
 <h1><%= @account.name %> Account Entries</h1>
-
-<form class="well form-inline">
-  <%= select :query, :cleared_status, AccountEntryQuery.cleared_statuses %>
-  <%= label :query, :cleared_status, "entries," %>
-  <%= select :query, :entry_type, AccountEntryQuery.entry_types %>
-  <%= label :query, :with_text, ", containing" %>
-  <%= text_field :query, :with_text, placeholder: 'any text' %> 
-  <br>
-  <%= label :query, :start_date, "from" %>
-  <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
-  <%= label :query, :end_date, "to" %>
-  <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
-  <%= label :query, :payee_shareholder_id, "entered by" %>
-  <%= select :query, :payee_shareholder_id, grouped_options_for_select(AccountEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
-  <br>
+<button type="button" id="search-toggle" class="btn btn-large pull-right">
+  Search Options
+</button>
+<form id="search" class="well form-horizontal" style="display:none;">
+  <div class="control-group">
+    <%= label :query, :cleared_status, "Status Type", class: 'control-label' %>
+    <div class="controls">
+      <%= select :query, :cleared_status, AccountEntryQuery.cleared_statuses %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :entry_type, "Entries type", class: 'control-label' %>
+    <div class="controls">
+      <%= select :query, :entry_type, AccountEntryQuery.entry_types %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :with_text, "Containing text", class: 'control-label' %>
+    <div class="controls">
+      <%= text_field :query, :with_text, placeholder: 'any text' %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :start_date, "Start date", class: 'control-label' %>
+    <div class="controls">
+      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :end_date, "End date", class: 'control-label' %>
+    <div class="controls">
+      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label :query, :payee_shareholder_id, "Entered by", class: 'control-label' %>
+    <div class="controls">
+      <%= select :query, :payee_shareholder_id, grouped_options_for_select(AccountEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
+    </div>
+  </div>
   <button type="submit" class="btn btn-primary">Search</button> 
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>

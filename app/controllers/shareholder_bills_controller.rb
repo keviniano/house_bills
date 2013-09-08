@@ -41,6 +41,6 @@ class ShareholderBillsController < ApplicationController
   # DELETE /shareholder_bills/1
   def destroy
     @shareholder_bill.destroy
-    redirect_to account_balance_entries_path(@account), notice: 'Bill was successfully deleted.'
+    redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.'
   end
 end

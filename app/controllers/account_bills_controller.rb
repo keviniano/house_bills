@@ -43,6 +43,6 @@ class AccountBillsController < ApplicationController
   # DELETE /account_bills/1
   def destroy
     @account_bill.destroy
-    redirect_to account_balance_entries_path(@account), notice: 'Account entry was successfully deleted.'
+    redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.'
   end
 end

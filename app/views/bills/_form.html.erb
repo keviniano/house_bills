@@ -63,6 +63,9 @@
     <% unless bill.new_record? %>
       <%= link_to("Enter Another Account Bill", new_account_account_bill_path(@account), class: "btn") if bill.type == "AccountBill" %>
       <%= link_to("Enter Another Shareholder Bill", new_account_shareholder_bill_path(@account), class: "btn") if bill.type == "ShareholderBill" %>
+      <% if can? :delete, bill %>
+        <%= button_to "Delete", [@account,bill], {method: :delete, confirm: "Are you sure you want to delete this bill?", class: "btn btn-danger pull-right delete-button"} %> 
+      <% end %>
     <% end %>
   </div>
 <% end %>
