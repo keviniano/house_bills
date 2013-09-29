@@ -13,7 +13,7 @@ button#search-toggle {
 }
 
 .delete-button {
-  margin-top: -30px;
+  margin: -70px 10px 0 0;
 }
 
 form input.check-number {
