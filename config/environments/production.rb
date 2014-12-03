@@ -57,6 +57,6 @@ HouseBills::Application.configure do
   config.assets.digest = true
   
   #devise requirement
-  config.action_mailer.default_url_options = { :host => 'house-bills.heroku.com' }
+  config.action_mailer.default_url_options = { :host => 'house-bills.herokuapp.com' }
     
 end
