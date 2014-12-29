@@ -1,7 +1,7 @@
 //= require jquery
 //= require jquery_ujs
-//= require jquery.ui.datepicker
-//= require jquery.ui.autocomplete
+//= require jquery-ui/datepicker
+//= require jquery-ui/autocomplete
 //= require twitter/bootstrap/dropdown
 //= require twitter/bootstrap/tab
 //= require twitter/bootstrap/alert
