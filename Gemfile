@@ -21,14 +21,14 @@ group :assets do
   gem 'less'
   gem 'less-rails'
   gem 'less-rails-bootstrap'
-  gem 'sass-rails',       '~> 3.2.3'
-  gem 'coffee-rails',     '~> 3.2.1'
-  gem 'uglifier',         '>= 1.0.3'
+  gem 'sass-rails'
+  gem 'coffee-rails'
+  gem 'uglifier'
   gem 'twitter-bootstrap-rails'
 end
 
 group :development, :test do 
-  gem 'debugger'
+  gem 'byebug'
   gem 'nifty-generators'
 end
 
