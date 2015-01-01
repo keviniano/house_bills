@@ -49,8 +49,9 @@ class Bill < ActiveRecord::Base
   end
   default_value_for :amount, 0
 
-  scope :starting_on, lambda{|start_date| where("bills.date >= ?", start_date)}
-  scope :ending_on, lambda{|end_date| where("bills.date <= ?", end_date)}
+  scope :starting_on, -> (start_date) { where("bills.date >= ?", start_date) }
+  scope :ending_on,   -> (end_date) { where("bills.date <= ?", end_date) }
+
   def open_shareholders  
     account.shareholders.open_as_of(date) if account.present?
   end

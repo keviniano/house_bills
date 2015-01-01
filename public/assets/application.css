@@ -13541,9 +13541,3 @@ button.close {
     display: none !important;
   }
 }
-body {
-  padding-top: 60px;
-}
-.navbar-text {
-  line-height: 19px;
-}

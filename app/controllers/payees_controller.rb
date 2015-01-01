@@ -22,19 +22,24 @@ class PayeesController < ApplicationController
     end
   end
 
-  # PUT /payees/1
+  # PATCH /payees/1
   def update
-    if @payee.update_attributes(params[:payee])
+    if @payee.update_attributes(resource_params)
       redirect_to @account, :notice => 'Payee was successfully updated.'
     else
-      render :new
+      render :edit
     end
   end
 
   # DELETE /payees/1
   def destroy
     @payee.destroy
-
     redirect_to @account, :notice => 'Payee was successfully deleted.'
   end
+
+  private
+
+    def resource_params
+      params.require(:payee).permit(:name)
+    end
 end

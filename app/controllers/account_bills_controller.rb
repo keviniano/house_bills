@@ -12,12 +12,12 @@ class AccountBillsController < ApplicationController
   def new
     @account_bill.build_bill_share_entries!
     @account_bill.build_bill_account_entry
-    @payees = @account.payees
+    prep_edit
   end
 
   # GET /account_bills/1/edit
   def edit
-    @payees = @account.payees
+    prep_edit
   end
 
   # POST /account_bills
@@ -25,17 +25,17 @@ class AccountBillsController < ApplicationController
     if @account_bill.save
       redirect_to [:edit,@account,@account_bill], notice: 'Bill was successfully created.'
     else
-      @payees = @account.payees
+      prep_edit
       render :new
     end
   end
 
-  # PUT /account_bills/1
+  # PATCH /account_bills/1
   def update
-    if @account_bill.update_attributes(params[:account_bill])
+    if @account_bill.update_attributes(resource_params)
       redirect_to [:edit,@account,@account_bill], notice: 'Bill was successfully updated.'
     else
-      @payees = @account.payees
+      prep_edit
       render :edit
     end
   end
@@ -45,4 +45,32 @@ class AccountBillsController < ApplicationController
     @account_bill.destroy
     redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.'
   end
+
+  private
+
+    def prep_edit
+      @payees = @account.payees
+    end
+
+    def resource_params
+      params.require(:account_bill).permit(
+        :entry_type,
+        :date_string,
+        :payee,
+        :entry_amount,
+        :bill_type_id,
+        :note,
+        :bill_account_entry_attributes => [
+          :check_number,
+          :cleared
+        ],
+        :bill_share_balance_entries_attributes => [
+          :id,
+          :shareholder_id,
+          :share,
+          :account_id,
+          :_destroy
+        ]
+      )
+    end
 end

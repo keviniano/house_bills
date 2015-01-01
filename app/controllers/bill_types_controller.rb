@@ -22,12 +22,12 @@ class BillTypesController < ApplicationController
     end
   end
 
-  # PUT /bill_types/1
+  # PATCH /bill_types/1
   def update
-    if @bill_type.update_attributes(params[:bill_type])
+    if @bill_type.update_attributes(resource_params)
       redirect_to @account, :notice => 'Bill type was successfully updated.'
     else
-      render :new
+      render :edit
     end
   end
 
@@ -37,4 +37,10 @@ class BillTypesController < ApplicationController
 
     redirect_to @account, :notice => 'Bill type was successfully deleted.'
   end
+
+  private
+
+    def resource_params
+      params.require(:bill_type).permit(:name)
+    end
 end

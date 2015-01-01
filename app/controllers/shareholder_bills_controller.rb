@@ -29,9 +29,9 @@ class ShareholderBillsController < ApplicationController
     end
   end
 
-  # PUT /shareholder_bills/1
+  # PATCH /shareholder_bills/1
   def update
-    if @shareholder_bill.update_attributes(params[:shareholder_bill])
+    if @shareholder_bill.update_attributes(resource_params)
       redirect_to [:edit,@account,@shareholder_bill], :notice => 'Bill was successfully updated.'
     else
       render :edit
@@ -43,4 +43,24 @@ class ShareholderBillsController < ApplicationController
     @shareholder_bill.destroy
     redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.'
   end
+
+  private
+
+    def resource_params
+      params.require(:shareholder_bill).permit(
+        :entry_type,
+        :date_string,
+        :shareholder_id,
+        :entry_amount,
+        :bill_type_id,
+        :note,
+        :bill_share_balance_entries_attributes => [
+          :id,
+          :shareholder_id,
+          :share,
+          :account_id,
+          :_destroy
+        ]
+      )
+    end
 end

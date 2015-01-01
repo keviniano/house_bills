@@ -16,16 +16,16 @@ class ShareholdersController < ApplicationController
   # POST /shareholders
   def create
     if @shareholder.save
-      redirect_to account_path(@account), :notice => "Shareholder '#{@shareholder.name}' was successfully created."
+      redirect_to edit_account_shareholder_path(@account, @shareholder), :notice => "Shareholder '#{@shareholder.name}' was successfully created."
     else
       render :action => "new"
     end
   end
 
-  # PUT /shareholders/1
+  # PATCH /shareholders/1
   def update
-    if @shareholder.update_attributes(params[:shareholder])
-      redirect_to account_path(@account), :notice => "Shareholder '#{@shareholder.name}' was successfully edited."
+    if @shareholder.update_attributes(update_resource_params)
+      redirect_to edit_account_shareholder_path(@account, @shareholder), :notice => "Shareholder '#{@shareholder.name}' was successfully edited."
     else
       render :action => "edit"
     end
@@ -38,4 +38,16 @@ class ShareholdersController < ApplicationController
     redirect_to :accounts, :notice => "Shareholder '#{@shareholder.name}' was successfully deleted"
   end
 
+  private
+
+    def resource_params
+      allowed_params = [:role_id, :name, :email]
+      params.require(:shareholder).permit(allowed_params)
+    end
+
+    def update_resource_params
+      allowed_params = [:role_id, :opened_on, :inactivated_on, :closed_on]
+      allowed_params.concat([:name, :email]) if @shareholder.user.blank?
+      params.require(:shareholder).permit(allowed_params)
+    end
 end

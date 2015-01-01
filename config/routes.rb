@@ -18,8 +18,8 @@ HouseBills::Application.routes.draw do
   devise_for :users
 
   resources :accounts do 
-    get "edit_pot", :on => :member
-    put "update_pot", :on => :member
+    get   "edit_pot",   :on => :member
+    patch "update_pot", :on => :member
 
     resources :shareholders, :except => [:index, :show]
     resources :payees, :except => [:index, :show]
@@ -41,19 +41,19 @@ HouseBills::Application.routes.draw do
     resources :unbound_account_entries 
   end
   
-  match 'charts(/:action)' => 'charts#index', :as => :charts
+  get 'charts(/:action)' => 'charts#index', :as => :charts
 
   root :to => 'accounts#index'
 
-  if Rails.env.development?
-    app = ActionDispatch::Static.new(
-      lambda{ |env| [404, { 'X-Cascade' => 'pass'}, []] },
-      Rails.application.config.paths['public'].first,
-      Rails.application.config.static_cache_control
-    )
+  # if Rails.env.development?
+  #   app = ActionDispatch::Static.new(
+  #     lambda{ |env| [404, { 'X-Cascade' => 'pass'}, []] },
+  #     Rails.application.config.paths['public'].first,
+  #     Rails.application.config.static_cache_control
+  #   )
 
-    mount app, :at => '/', :as => :public
-  end
+  #   mount app, :at => '/', :as => :public
+  # end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

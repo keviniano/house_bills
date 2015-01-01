@@ -15,14 +15,14 @@ class AccountEntry < ActiveRecord::Base
   validates_presence_of     :date_string
   validates_associated      :account_offset_balance_entry 
 
-  scope :with_text, lambda{|text| where("payee ILIKE :text OR note ILIKE :text", text: "%#{text}%")}
-  scope :starting_on, lambda{|start_date| where("date >= ?", start_date)}
-  scope :ending_on, lambda{|end_date| where("date <= ?", end_date)}
-  scope :deposits, where('amount >= 0')
-  scope :withdrawals, where('amount < 0')
-  scope :cleared, where(cleared: true)
-  scope :pending, where(cleared: false)
-  scope :with_payee_shareholder_id, lambda{|shareholder| where(shareholder_id: shareholder)}
+  scope :with_text,    -> (text) { where("payee ILIKE :text OR note ILIKE :text", text: "%#{text}%")}
+  scope :starting_on,  -> (start_date) { where("date >= ?", start_date)}
+  scope :ending_on,    -> (end_date) { where("date <= ?", end_date)}
+  scope :deposits,     -> { where 'amount >= 0' }
+  scope :withdrawals,  -> { where 'amount < 0' }
+  scope :cleared,      -> { where cleared: true }
+  scope :pending,      -> { where cleared: false }
+  scope :with_payee_shareholder_id, -> (shareholder) { where(shareholder_id: shareholder)}
 
   default_value_for :date do
     Date.today

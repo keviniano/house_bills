@@ -7,8 +7,9 @@ HouseBills::Application.configure do
   # and recreated between test runs.  Don't rely on the data there!
   config.cache_classes = true
 
-  # Log error messages when you accidentally call methods on nil.
-  config.whiny_nils = true
+  # Eagerly load all registered config.eager_load_namespaces. 
+  # This includes your application, engines, Rails frameworks and any other registered namespace.
+  config.eager_load = true
 
   # Show full error reports and disable caching
   config.consider_all_requests_local       = true
@@ -36,8 +37,5 @@ HouseBills::Application.configure do
   # Configure static asset server for tests with Cache-Control for performance
   config.serve_static_assets = true
   config.static_cache_control = "public, max-age=3600"
-
-  # Raise exception on mass assignment protection for Active Record models
-  config.active_record.mass_assignment_sanitizer = :strict
 
 end

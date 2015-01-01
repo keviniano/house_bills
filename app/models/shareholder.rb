@@ -7,11 +7,9 @@ class Shareholder < ActiveRecord::Base
   has_many   :account_entries
   has_many   :balance_entries
 
-  validates_presence_of :name
-  validates_presence_of :opened_on
-  validate :cannot_change_user_fields
-
-  attr_protected :updated_through_user
+  validates :name, presence: true, uniqueness: { scope: :account_id }
+  validates :role_id, presence: true
+  validates :opened_on, presence: true
 
   before_create :attach_user
 
@@ -75,14 +73,9 @@ class Shareholder < ActiveRecord::Base
 
   private
 
-  def attach_user
-    self.user = User.find_by_email(email) if email.present?
-    true
-  end
-
-  def cannot_change_user_fields
-    errors.add(:email, "Field cannot be changed except through associated user") if self.user.present? && self.email_changed? && !updated_through_user
-    errors.add(:name, "Field cannot be changed except through associated user") if self.user.present? && self.name_changed? && !updated_through_user
-  end
+    def attach_user
+      self.user = User.find_by_email(email) if email.present?
+      true
+    end
 
 end

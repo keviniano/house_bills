@@ -6,9 +6,6 @@ class User < ActiveRecord::Base
 
   model_stamper
 
-  # Setup accessible (or protected) attributes for your model
-  attr_accessible :name, :email, :password, :password_confirmation, :remember_me
-
   has_many :shareholders
   has_many :accounts, :through => :shareholders
 

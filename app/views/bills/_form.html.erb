@@ -23,6 +23,11 @@
   <%= f.input :entry_amount, :input_html => {:class => "entry-amount"} %>
   <%= f.association :bill_type, :collection => @account.bill_types.default_order %>
   <%= f.input :note, :input_html => {:class => "note"} %>
+  <% if bill.type == 'AccountBill' %>
+    <%=  f.simple_fields_for :bill_account_entry, bill.bill_account_entry do |bae| %>
+      <%= bae.input :cleared %>
+    <% end %>
+  <% end %>
   <h3>Bill Shares</h3>
   <div class="grid shares">
     <div class="grid-row header">

@@ -14,5 +14,4 @@ class BillShareBalanceEntry < BalanceEntry
       where(:shareholder_id == s.id).first
     end
   end
-
 end

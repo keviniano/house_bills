@@ -25,7 +25,7 @@ class ShareholderAccountEntriesController < ApplicationController
   end
 
   def update
-    if @shareholder_account_entry.update_attributes(params[:shareholder_account_entry])
+    if @shareholder_account_entry.update_attributes(resource_params)
       redirect_to [:edit,@account,@shareholder_account_entry], :notice => 'Account entry was successfully updated.'
     else
       render :edit
@@ -37,4 +37,25 @@ class ShareholderAccountEntriesController < ApplicationController
     @shareholder_account_entry.destroy
     redirect_to :action => :index, :controller => :account_entries
   end
+
+  private
+
+    def resource_params
+      params.require(:shareholder_account_entry).permit(
+        :entry_type,
+        :date_string,
+        :check_number,
+        :shareholder_id,
+        :entry_amount,
+        :note,
+        :cleared,
+        :bill_share_balance_entries_attributes => [
+          :id,
+          :shareholder_id,
+          :share,
+          :account_id,
+          :_destroy
+        ]
+      )
+    end
 end

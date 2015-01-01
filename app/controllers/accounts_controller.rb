@@ -28,7 +28,7 @@ class AccountsController < ApplicationController
     m.user = current_user
     m.name = current_user.name
     m.email = current_user.email
-    m.role = Role.find_by_name("Owner")
+    m.role = Role.where(name: "Owner").first
 
     if @account.save
       redirect_to @account, :notice => "Account '#{@account.name}' was successfully created."
@@ -37,7 +37,7 @@ class AccountsController < ApplicationController
     end
   end
 
-  # PUT /accounts/1
+  # PATCH /accounts/1
   def update
     if @account.update_attributes(params[:account])
       redirect_to @account, :notice => "Account '#{@account.name}' was successfully edited."
@@ -60,4 +60,10 @@ class AccountsController < ApplicationController
   def update_pot
 
   end
+
+  private
+
+    def resource_params
+      params.require(:account).permit(:name)
+    end
 end

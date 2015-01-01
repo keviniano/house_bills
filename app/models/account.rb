@@ -18,7 +18,7 @@ class Account < ActiveRecord::Base
   has_many :bill_types, :dependent => :destroy
   has_many :pot_balance_entries
 
-  validates_presence_of :name
+  validates :name, presence: true, uniqueness: true
 
   def pot_balance
     pot_balance_entries.sum(:amount)
