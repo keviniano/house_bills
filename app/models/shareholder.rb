@@ -28,7 +28,7 @@ class Shareholder < ActiveRecord::Base
   def owner?
     role.name == 'Owner'
   end
-  
+
   def active?
     opened_on <= Date.today && (inactivated_on.nil? || inactivated_on > Date.today)
   end
@@ -51,19 +51,19 @@ class Shareholder < ActiveRecord::Base
     end
 
     def open_now
-      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.closed_on,?)",Date.today,Date.today])    
+      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.closed_on,?)",Date.today,Date.today])
     end
 
     def active_now
-      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.inactivated_on,?)",Date.today,Date.today])    
+      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.inactivated_on,?)",Date.today,Date.today])
     end
 
     def open_as_of(date)
-      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.closed_on,?)",date,date])    
+      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.closed_on,?)",date,date])
     end
 
     def active_as_of(date)
-      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.inactivated_on,?)",date,date])    
+      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.inactivated_on,?)",date,date])
     end
 
     def for_account(account)

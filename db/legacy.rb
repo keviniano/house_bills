@@ -39,7 +39,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblBillExpense.txt'),headers: tr
       bill.payee = r['Payee']
     elsif r['BillPmtID'].present?
       bill = a.shareholder_bills.find_or_initialize_by_id(r['ExpenseID'])
-      bill.shareholder = Shareholder.find_by_name(r['Payee']) 
+      bill.shareholder = Shareholder.find_by_name(r['Payee'])
     else
       raise 'What??'
     end
@@ -62,8 +62,8 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: 
     ae.bill_id = r['ExpenseID']
   elsif r['BillPmtID'].present?
     ae = a.shareholder_account_entries.find_or_initialize_by_id(r['LedgerID'])
-    ae.shareholder = Shareholder.find_by_name(r['Payee']) 
-    raise "No shareholder matching name #{r['Payee']} on Ledger ID #{r['LedgerID']}" if ae.shareholder.blank? 
+    ae.shareholder = Shareholder.find_by_name(r['Payee'])
+    raise "No shareholder matching name #{r['Payee']} on Ledger ID #{r['LedgerID']}" if ae.shareholder.blank?
   else
     ae = a.unbound_account_entries.find_or_initialize_by_id(r['LedgerID'])
     ae.payee = r['Payee']
@@ -75,7 +75,7 @@ CSV.foreach(File.join(Rails.root,'db','legacy','tblAccountLedger.txt'),headers: 
   if r['Credit'].present?
     ae.entry_amount = fix_up_currency(r['Credit'])
     ae.entry_type = 'Deposit'
-    ae.save! 
+    ae.save!
   elsif r['Debit'].present?
     ae.entry_amount = fix_up_currency(r['Debit'])
     ae.entry_type = 'Withdrawal'

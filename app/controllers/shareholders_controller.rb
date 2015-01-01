@@ -5,12 +5,12 @@ class ShareholdersController < ApplicationController
 
   # GET /shareholders/new
   def new
-  
+
   end
 
   # GET /shareholders/1/edit
   def edit
-  
+
   end
 
   # POST /shareholders

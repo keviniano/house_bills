@@ -8,18 +8,18 @@ class Bill < ActiveRecord::Base
   has_one     :pot_balance_entry,          :dependent => :destroy, :autosave => true
   has_one     :bill_account_entry,         :dependent => :destroy, :autosave => true
   has_one     :balance_event,              :dependent => :destroy, :autosave => true
-  
+
   before_validation :set_amount
   after_validation  :update_balance_entries, :update_balance_event
 
-  accepts_nested_attributes_for :bill_share_balance_entries, :allow_destroy => true, 
+  accepts_nested_attributes_for :bill_share_balance_entries, :allow_destroy => true,
       :reject_if => proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? }
 
   def self.valid_entry_types
     %w( Bill Credit )
   end
 
-  def balance_for(shareholder) 
+  def balance_for(shareholder)
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).sum(:amount)
   end
 
@@ -29,11 +29,11 @@ class Bill < ActiveRecord::Base
     balance_entries.each {|be| result[be.shareholder_id] = be.amount }
     result
   end
-  
-  def prior_balance_for(shareholder) 
+
+  def prior_balance_for(shareholder)
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) < ?)",self.date,self.date,self.id,self.id).sum(:amount)
   end
-  
+
   validate                  :date_string_format_must_be_valid
   validates_presence_of     :entry_type
   validates_inclusion_of    :entry_type, :in => valid_entry_types
@@ -43,7 +43,7 @@ class Bill < ActiveRecord::Base
   validates_associated      :bill_share_balance_entries
   validates_presence_of     :entry_amount
 # TODO: Make sure there's always at least one bill share entry
-  
+
   default_value_for :date do
     Date.today
   end
@@ -52,7 +52,7 @@ class Bill < ActiveRecord::Base
   scope :starting_on, -> (start_date) { where("bills.date >= ?", start_date) }
   scope :ending_on,   -> (end_date) { where("bills.date <= ?", end_date) }
 
-  def open_shareholders  
+  def open_shareholders
     account.shareholders.open_as_of(date) if account.present?
   end
 
@@ -69,7 +69,7 @@ class Bill < ActiveRecord::Base
       []
     end
   end
-  
+
   def date_string=(value)
     @date_string = value
     self.date = DateTime.strptime(value,'%m-%d-%Y')
@@ -133,7 +133,7 @@ class Bill < ActiveRecord::Base
   end
 
   private
-    
+
   def date_string_format_must_be_valid
     errors.add(:date_string, "is invalid") if @date_invalid
   end
@@ -141,14 +141,14 @@ class Bill < ActiveRecord::Base
   def set_amount
     self.amount = (entry_type == 'Credit' ? - @entry_amount.to_d : @entry_amount)
   end
- 
+
   def update_balance_entries
     s = bill_share_balance_entries.find_all {|e| !e.marked_for_destruction? }
     p = (pot_balance_entry.blank? ? build_pot_balance_entry(:account => account) : pot_balance_entry)
-    if s.size > 0 && self.amount.present? 
+    if s.size > 0 && self.amount.present?
       share_ratios = s.map { |s| s.share }
       base_portion, gcd, remainder = Bill.calc_shares(share_ratios, amount)
-      
+
       s.each do |b|
         b.amount = (b.share == 0) ? 0 : (-b.share/gcd) * base_portion
         b.date = self.date
@@ -170,7 +170,7 @@ class Bill < ActiveRecord::Base
     share_ratios.each do |s|
       gcd = (gcd ||= s).gcd(s) unless s <= 0
     end
-    if total_shares == 0 
+    if total_shares == 0
       base_portion = 0
     else
       if (bill_amount * 100) % (total_shares / gcd) == 0

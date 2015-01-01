@@ -14,7 +14,7 @@ class BalanceEventQuery
   end
 
   def self.bill_types(account)
-    [['All types of',nil]] + 
+    [['All types of',nil]] +
     (AccountEntry.valid_entry_types.each{|item| [item,item] } + BillType.for_account(account).each.map{|row| [row.name,row.id]}).sort_by{|a| a[0] }
   end
 
@@ -23,7 +23,7 @@ class BalanceEventQuery
     @current_user = user
     @account_id = session[:account_id]
     if params[:start_date].present?
-      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y') 
+      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y')
     else
       @start_date = Date.today - 3.months
     end
@@ -45,19 +45,19 @@ class BalanceEventQuery
     balance_events = balance_events.starting_on(start_date) if start_date
     balance_events = balance_events.ending_on(end_date) if end_date
     if with_text
-      balance_events = balance_events.with_text(with_text) 
+      balance_events = balance_events.with_text(with_text)
       @can_use_running_total = false
     end
-    if payee_shareholder_id 
-      balance_events = balance_events.with_payee_shareholder_id(payee_shareholder_id) 
+    if payee_shareholder_id
+      balance_events = balance_events.with_payee_shareholder_id(payee_shareholder_id)
       @can_use_running_total = false
     end
-    if share_shareholder_id 
-      balance_events = balance_events.with_share_shareholder_id(share_shareholder_id) 
+    if share_shareholder_id
+      balance_events = balance_events.with_share_shareholder_id(share_shareholder_id)
       @can_use_running_total = false unless Shareholder.find(share_shareholder_id).user == @current_user
     end
     if bill_type_id.is_a?(Integer)
-      balance_events = balance_events.with_bill_type_id(bill_type_id) 
+      balance_events = balance_events.with_bill_type_id(bill_type_id)
       @can_use_running_total = false
     elsif bill_type_id == 'Deposit'
       balance_events = balance_events.deposits
@@ -88,7 +88,7 @@ class BalanceEventsController < ApplicationController
         @shareholders = @balance_events.unique_shareholders
         @balance_events = @balance_events.default_order.all_includes
         @filename = "house_bills.csv"
-        render "index.csv" 
+        render "index.csv"
       end
     end
     total_entries = @balance_events.count(:id)

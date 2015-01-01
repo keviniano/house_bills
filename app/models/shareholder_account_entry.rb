@@ -6,7 +6,7 @@ class ShareholderAccountEntry < AccountEntry
   private
 
   def update_account_offset
-    build_account_offset_balance_entry if account_offset_balance_entry.blank? 
+    build_account_offset_balance_entry if account_offset_balance_entry.blank?
     %w{ shareholder_id account_id date amount }.each {|attr| account_offset_balance_entry[attr] = self[attr] }
   end
 

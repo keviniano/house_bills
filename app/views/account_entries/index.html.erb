@@ -19,19 +19,19 @@
   <div class="control-group">
     <%= label :query, :with_text, "Containing text", class: 'control-label' %>
     <div class="controls">
-      <%= text_field :query, :with_text, placeholder: 'any text' %> 
+      <%= text_field :query, :with_text, placeholder: 'any text' %>
     </div>
   </div>
   <div class="control-group">
     <%= label :query, :start_date, "Start date", class: 'control-label' %>
     <div class="controls">
-      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
+      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %>
     </div>
   </div>
   <div class="control-group">
     <%= label :query, :end_date, "End date", class: 'control-label' %>
     <div class="controls">
-      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
+      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
     </div>
   </div>
   <div class="control-group">
@@ -40,7 +40,7 @@
       <%= select :query, :payee_shareholder_id, grouped_options_for_select(AccountEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary">Search</button> 
+  <button type="submit" class="btn btn-primary">Search</button>
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
 
@@ -75,7 +75,7 @@
           <% if account_entry.type == 'BillAccountEntry' %>
             <td><%= link_to 'View', [@account,account_entry.bill] %></td>
             <td><%= link_to('Edit', [:edit,@account,account_entry.bill]) if can? :edit, account_entry.bill %></td>
-          <% else %>  
+          <% else %>
             <td><%= link_to 'View', [@account,account_entry] %></td>
             <td><%= link_to('Edit', [:edit,@account,account_entry]) if can? :edit, account_entry %></td>
           <% end %>

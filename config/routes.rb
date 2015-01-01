@@ -17,14 +17,14 @@ HouseBills::Application.routes.draw do
 
   devise_for :users
 
-  resources :accounts do 
+  resources :accounts do
     get   "edit_pot",   :on => :member
     patch "update_pot", :on => :member
 
     resources :shareholders, :except => [:index, :show]
     resources :payees, :except => [:index, :show]
     resources :bill_types, :except => [:index, :show]
-  
+
     resources :balance_events, :only => [:index] do
       get 'chart', :on => :collection
     end
@@ -34,13 +34,13 @@ HouseBills::Application.routes.draw do
       get 'show_shares', :on => :member
     end
 
-    resources :account_entries, :only => [:index] do 
+    resources :account_entries, :only => [:index] do
       post 'update_cleared', :on => :collection
     end
     resources :shareholder_account_entries
-    resources :unbound_account_entries 
+    resources :unbound_account_entries
   end
-  
+
   get 'charts(/:action)' => 'charts#index', :as => :charts
 
   root :to => 'accounts#index'

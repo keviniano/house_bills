@@ -1,7 +1,7 @@
 class AccountEntry < ActiveRecord::Base
   stampable
   before_validation :set_amount
-  
+
   belongs_to :bill
   belongs_to :shareholder
   belongs_to :account
@@ -13,7 +13,7 @@ class AccountEntry < ActiveRecord::Base
   validates_presence_of     :entry_type
   validates_numericality_of :check_number, :allow_nil => true
   validates_presence_of     :date_string
-  validates_associated      :account_offset_balance_entry 
+  validates_associated      :account_offset_balance_entry
 
   scope :with_text,    -> (text) { where("payee ILIKE :text OR note ILIKE :text", text: "%#{text}%")}
   scope :starting_on,  -> (start_date) { where("date >= ?", start_date)}
@@ -30,7 +30,7 @@ class AccountEntry < ActiveRecord::Base
   default_value_for :amount, 0
   default_value_for :cleared, false
 
-  def open_shareholders  
+  def open_shareholders
     account.shareholders.open_as_of(date) if account.present?
   end
 
@@ -41,7 +41,7 @@ class AccountEntry < ActiveRecord::Base
   def self.valid_entry_types
     %w( Deposit Withdrawal )
   end
-  
+
   def self.find_in_date_range(start_date,end_date)
     self.find(:all, :conditions => {:date => start_date..end_date}, :order => "date, check_number, id")
   end
@@ -62,14 +62,14 @@ class AccountEntry < ActiveRecord::Base
     self.sum(:amount, :conditions => ['cleared = ? and date <= ?',true,d]) || 0
   end
 
-  def balance_for(shareholder) 
+  def balance_for(shareholder)
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id <= ?)",self.date,self.date,self.id).sum(:amount)
   end
-  
-  def prior_balance_for(shareholder) 
+
+  def prior_balance_for(shareholder)
     BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id < ?)",self.date,self.date,self.id).sum(:amount)
   end
-  
+
   def date_string=(value)
     @date_string = value
     self.date = DateTime.strptime(value,'%m-%d-%Y')
@@ -84,19 +84,19 @@ class AccountEntry < ActiveRecord::Base
   def cleared_balance
     AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])
   end
-  
+
   def prior_cleared_balance
     AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id < ?)',true,date,date,id])
   end
-  
+
   def balance
     AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id <= ?)',date,date,id])
   end
-  
+
   def prior_balance
     AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id < ?)',date,date,id])
   end
-  
+
   def entry_type
     @entry_type || ( amount < 0 ? 'Withdrawal' : 'Deposit' )
   end
@@ -124,9 +124,9 @@ class AccountEntry < ActiveRecord::Base
   def entry_amount
     ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, :precision => 2) unless @entry_amount.nil? && amount.nil?
   end
-  
+
 private
-  
+
   def date_string_format_must_be_valid
     errors.add(:date_string, "is invalid") if @date_invalid
   end
@@ -136,4 +136,4 @@ private
       self.amount = (entry_type == 'Withdrawal' ? - @entry_amount.to_d : @entry_amount)
     end
   end
-end  
+end

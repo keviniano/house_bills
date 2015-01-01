@@ -16,7 +16,7 @@ def fix_up_date(x)
 
     m, d, y = d.split('/').map{|i| if i.length == 1 then "0#{i}" else i end}
     #puts m, d, y
-    if ti.nil? || ti == '0:00:00' 
+    if ti.nil? || ti == '0:00:00'
       "#{y}-#{m}-#{d}"
     else
       "#{y}-#{m}-#{d} #{ti}"

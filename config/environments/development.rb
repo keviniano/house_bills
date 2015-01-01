@@ -6,7 +6,7 @@ HouseBills::Application.configure do
   # since you don't have to restart the webserver when you make code changes.
   config.cache_classes = false
 
-  # Eagerly load all registered config.eager_load_namespaces. 
+  # Eagerly load all registered config.eager_load_namespaces.
   # This includes your application, engines, Rails frameworks and any other registered namespace.
   config.eager_load = false
 
@@ -28,7 +28,7 @@ HouseBills::Application.configure do
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   # Do not compress assets
-  config.assets.compress = false 
+  config.assets.compress = false
 
   # https://github.com/rails/rails/issues/5145
   config.serve_static_assets = false

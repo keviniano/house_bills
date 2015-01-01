@@ -18,7 +18,7 @@ class AccountEntryQuery
   end
 
   def self.entry_types
-    [['both deposits and withdrawals',nil], ['deposits only', 'Deposit'], ['withdrawals only', 'Withdrawal']] 
+    [['both deposits and withdrawals',nil], ['deposits only', 'Deposit'], ['withdrawals only', 'Withdrawal']]
   end
 
   def initialize(params,session,user)
@@ -40,7 +40,7 @@ class AccountEntryQuery
     account_entries = account_entries.with_text(with_text) if with_text
     account_entries = account_entries.starting_on(start_date) if start_date
     account_entries = account_entries.ending_on(end_date) if end_date
-    account_entries = account_entries.with_payee_shareholder_id(payee_shareholder_id) if payee_shareholder_id 
+    account_entries = account_entries.with_payee_shareholder_id(payee_shareholder_id) if payee_shareholder_id
     if entry_type == 'Deposit'
       account_entries = account_entries.deposits
     elsif entry_type == 'Withdrawal'
@@ -66,7 +66,7 @@ class AccountEntriesController < ApplicationController
     @account_entries = @query.apply_conditions(@account_entries).order('account_entries.date DESC, account_entries.id DESC').includes(:bill)
     if params[:output] == 'CSV'
       @filename = "account_entries.csv"
-      render "index.csv" 
+      render "index.csv"
     else
       @account_entries = @account_entries.paginate :page => params[:page]
     end

@@ -6,7 +6,7 @@
             ];
             $("#unbound_account_entry_payee").autocomplete({ source: availablePayees, delay: 0 });
     });
-  </script>  
+  </script>
 <% end %>
 <%= simple_form_for([@account,account_entry], :html => {:class => 'form-horizontal' }) do |f| %>
   <%= f.error_notification %>

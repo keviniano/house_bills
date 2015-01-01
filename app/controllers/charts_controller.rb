@@ -9,7 +9,7 @@ class ChartQuery
     @current_user = user
     @account_id = session[:account_id]
     if params[:start_date].present?
-      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y') 
+      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y')
     else
       @start_date = Date.today - 3.months
     end
@@ -42,7 +42,7 @@ class ChartsController < ApplicationController
     balances = {}
     @starting_balances.each {|sb| balances[sb.shareholder] = sb.amount }
     @shareholders.each {|sh| balances[sh] ||= 0 }
-    
+
     @change_entries = balance_entries_to_display.select("date, shareholder_id, SUM(amount) AS amount").group("date, shareholder_id").includes(:shareholder)
     changes = {}
     @change_entries.each do |ce|
@@ -95,7 +95,7 @@ class ChartsController < ApplicationController
       bill_types << b.bill_type.name unless bill_types.include? b.bill_type.name
     end
     bill_types.sort!
-    
+
     columns = [['string','Month']]
     bill_types.each {|bt| columns << ['number', bt] }
 
@@ -136,7 +136,7 @@ class ChartsController < ApplicationController
       bill_types << b.bill_type.name unless bill_types.include? b.bill_type.name
     end
     bill_types.sort!
-    
+
     columns = [['string','Month']]
     bill_types.each {|bt| columns << ['number', bt] }
 

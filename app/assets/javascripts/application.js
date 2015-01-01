@@ -14,15 +14,15 @@
 // This file is automatically included by javascript_include_tag :defaults
 
 $(document).ready(function(){
-  
+
   $("#search-toggle").click(function(event){
-    $("#search").toggle(); 
+    $("#search").toggle();
   });
 
-  $(".datepicker").datepicker({ 
+  $(".datepicker").datepicker({
     dateFormat: 'mm-dd-yy',
     showOtherMonths: true,
-    selectOtherMonths: true   
+    selectOtherMonths: true
   });
 
   $(".view-bill").click(function(event){
@@ -54,7 +54,7 @@ $(document).ready(function(){
       }
     }
   });
-  
+
   // Load Google visualization library if a chart element exists
   if ($('[data-chart]').length > 0) {
     $.getScript('https://www.google.com/jsapi', function (data, textStatus) {

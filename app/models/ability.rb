@@ -29,7 +29,7 @@ class Ability
     # Admins can manage
     can    :manage, Payee
 
-    # Admins can manage the shareholder records of others 
+    # Admins can manage the shareholder records of others
     can    :manage, Shareholder, :account_id => admin_account_ids
     # But they can't manage the shareholder records of owners if the user is not an owner themselves
     cannot :manage, Shareholder, :account_id => non_owner_account_ids, :role_id => Role.owner.id
@@ -58,7 +58,7 @@ class Ability
     can    :manage, UnboundAccountEntry, :account_id => active_account_ids, :creator_id => user.id
     # Admins can manage any entry
     can    :manage, UnboundAccountEntry, :account_id => admin_account_ids
-    
+
     # Any open user can mark which account entries have cleared
     can    :update_cleared, AccountEntry, :account_id => open_account_ids
 

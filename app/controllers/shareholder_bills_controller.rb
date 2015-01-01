@@ -11,8 +11,8 @@ class ShareholderBillsController < ApplicationController
   # GET /shareholder_bills/new
   def new
     @shareholder = current_user.shareholder_for_account(@account)
-    @shareholder_bill.shareholder = @shareholder 
-    @shareholder_bill.build_bill_share_entries! 
+    @shareholder_bill.shareholder = @shareholder
+    @shareholder_bill.build_bill_share_entries!
   end
 
   # GET /shareholder_bills/1/edit

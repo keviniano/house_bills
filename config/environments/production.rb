@@ -5,7 +5,7 @@ HouseBills::Application.configure do
   # Code is not reloaded between requests
   config.cache_classes = true
 
-  # Eagerly load all registered config.eager_load_namespaces. 
+  # Eagerly load all registered config.eager_load_namespaces.
   # This includes your application, engines, Rails frameworks and any other registered namespace.
   config.eager_load = true
 
@@ -59,7 +59,7 @@ HouseBills::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
-  
+
   #devise requirement
   config.action_mailer.default_url_options = { :host => 'house-bills.herokuapp.com' }
 end

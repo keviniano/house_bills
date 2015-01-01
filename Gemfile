@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails',                '~> 4.0.0' 
+gem 'rails',                '~> 4.0.0'
 gem 'thin'
 gem 'pg'
 gem 'devise'
@@ -14,7 +14,7 @@ gem 'userstamp',            git: 'git://github.com/keviniano/userstamp.git'
 gem 'csv_builder'
 gem 'validates_timeliness'
 
-group :development, :test do 
+group :development, :test do
   gem 'therubyracer'
   gem 'less'
   gem 'less-rails'

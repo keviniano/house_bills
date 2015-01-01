@@ -13,19 +13,19 @@
   <div class="control-group">
     <%= label :query, :with_text, "Entries containing", class: 'control-label' %>
     <div class="controls">
-      <%= text_field :query, :with_text, placeholder: 'any text' %> 
+      <%= text_field :query, :with_text, placeholder: 'any text' %>
     </div>
   </div>
   <div class="control-group">
     <%= label :query, :start_date, "Start date", class: 'control-label' %>
     <div class="controls">
-      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %> 
+      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %>
     </div>
   </div>
   <div class="control-group">
     <%= label :query, :end_date, "End date", class: 'control-label' %>
     <div class="controls">
-      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %> 
+      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
     </div>
   </div>
   <div class="control-group">
@@ -40,7 +40,7 @@
       <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.share_shareholder_id) %>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary">Search</button> 
+  <button type="submit" class="btn btn-primary">Search</button>
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
 

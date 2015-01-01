@@ -9,7 +9,7 @@ class ShareholderAccountEntriesController < ApplicationController
 
   def new
     @shareholder = current_user.shareholder_for_account(@account)
-    @shareholder_account_entry.shareholder = @shareholder 
+    @shareholder_account_entry.shareholder = @shareholder
   end
 
   def create

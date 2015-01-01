@@ -1,6 +1,6 @@
 class AccountsController < ApplicationController
   before_filter :authenticate_user!
-  load_and_authorize_resource 
+  load_and_authorize_resource
 
   # GET /accounts
   def index
@@ -14,12 +14,12 @@ class AccountsController < ApplicationController
 
   # GET /accounts/new
   def new
-  
+
   end
 
   # GET /accounts/1/edit
   def edit
-  
+
   end
 
   # POST /accounts

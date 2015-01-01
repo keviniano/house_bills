@@ -7,7 +7,7 @@ HouseBills::Application.configure do
   # and recreated between test runs.  Don't rely on the data there!
   config.cache_classes = true
 
-  # Eagerly load all registered config.eager_load_namespaces. 
+  # Eagerly load all registered config.eager_load_namespaces.
   # This includes your application, engines, Rails frameworks and any other registered namespace.
   config.eager_load = true
 
