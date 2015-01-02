@@ -1,5 +1,4 @@
 class BillType < ActiveRecord::Base
-  stampable
   has_many :bills
 
   validates :name, presence: true, uniqueness: { scope: :account_id }

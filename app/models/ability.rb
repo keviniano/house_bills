@@ -3,7 +3,7 @@ class Ability
 
   def initialize(user)
     open_holdings = Shareholder.open_now.where(:user_id => user.id)
-    active_holdings = open_holdings.delete_if {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.today}
+    active_holdings = open_holdings.to_a.delete_if {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.today}
 
     open_account_ids = open_holdings.map{|r| r.account_id}
     active_account_ids = active_holdings.map{|r| r.account_id }

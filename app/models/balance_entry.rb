@@ -1,5 +1,4 @@
 class BalanceEntry < ActiveRecord::Base
-  stampable
   belongs_to :bill
   belongs_to :shareholder
   belongs_to :account

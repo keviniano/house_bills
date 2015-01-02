@@ -1,5 +1,4 @@
 class AccountEntry < ActiveRecord::Base
-  stampable
   before_validation :set_amount
 
   belongs_to :bill

@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails',                '~> 4.0.0'
+gem 'rails',                '~> 4.1.0'
 gem 'thin'
 gem 'pg'
 gem 'devise'
@@ -10,7 +10,6 @@ gem 'jquery-ui-rails'
 gem 'will_paginate'
 gem 'simple_form'
 gem 'cancancan'
-gem 'userstamp',            git: 'git://github.com/keviniano/userstamp.git'
 gem 'csv_builder'
 gem 'validates_timeliness'
 

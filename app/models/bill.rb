@@ -1,5 +1,4 @@
 class Bill < ActiveRecord::Base
-  stampable
   belongs_to  :shareholder
   belongs_to  :account
   belongs_to  :bill_type
