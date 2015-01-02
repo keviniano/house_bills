@@ -28,5 +28,5 @@
 
 <p><%= link_to('Edit', [:edit,@account,account_entry], :class => 'btn') if can? :edit, account_entry %></p>
 <% if can? :delete, account_entry %>
-  <%= button_to "Delete", [@account,account_entry],{method: :delete, confirm: "Are you sure you want to delete this account entry?", class: "btn btn-danger"} %>
+  <%= button_to "Delete", [@account,account_entry],{method: :delete, data: { confirm: "Are you sure you want to delete this account entry?" }, class: "btn btn-danger"} %>
 <% end %>

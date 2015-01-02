@@ -72,5 +72,5 @@
   </div>
 <% end %>
 <% if !bill.new_record? && can?(:delete, bill) %>
-  <%= button_to "Delete Bill", [@account,bill], {method: :delete, confirm: "Are you sure you want to delete this bill?", class: "btn btn-danger pull-right delete-button"} %>
+  <%= button_to "Delete Bill", [@account,bill], {method: :delete, data: { confirm: "Are you sure you want to delete this bill?" }, class: "btn btn-danger pull-right delete-button"} %>
 <% end %>

@@ -107,7 +107,7 @@
             </div>
             <% unless bill_type.bills.exists? %>
               <div class="grid-cell">
-                <%= link_to "Delete", [@account,bill_type], :method => :delete, :confirm => "Delete the bill type \"#{bill_type.name}\"?" %>
+                <%= link_to "Delete", [@account,bill_type], :method => :delete, data: { confirm: "Delete the bill type \"#{bill_type.name}\"?" } %>
               </div>
             <% end %>
           </div>
@@ -131,7 +131,7 @@
               <%= link_to "Rename", [:edit,@account,payee] if can? :edit, payee %>
             </div>
             <div class="grid-cell">
-              <%= link_to "Delete", [@account,payee], :method => :delete, :confirm => "Delete the payee \"#{payee.name}\"?" if can? :delete, payee %>
+              <%= link_to "Delete", [@account,payee], :method => :delete, data: { confirm: "Delete the payee \"#{payee.name}\"?" } if can? :delete, payee %>
             </div>
           </div>
         <% end %>
@@ -148,7 +148,7 @@
         <li><%= link_to "Edit Account", [:edit,@account] %></li>
       <% end %>
       <% if can? :delete, @account %>
-        <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, :confirm => "Are you really really REALLY sure??" %></li>
+        <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, data: { confirm: "Are you really really REALLY sure??" } %></li>
       <% end %>
     </ul>
   </div>

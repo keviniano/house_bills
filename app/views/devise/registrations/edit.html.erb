@@ -29,6 +29,8 @@
   </div>
 </div>
 
-<p>Want to cancel your account for ever and ever? <%= link_to "Click here", registration_path(resource_name), :confirm => "Are you sure?", :method => :delete %>.</p>
+<p>
+  Want to cancel your account for ever and ever? <%= link_to "Click here", registration_path(resource_name), data: { confirm: "Are you sure?" }, :method => :delete %>.
+</p>
 
 <%= link_to "Back", :back %>
