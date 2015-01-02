@@ -88,7 +88,7 @@
           </tr>
         <%  end %>
       </table>
-      <%= link_to "Add new shareholder", new_account_shareholder_path(@account), :class => "btn" if can? :create, Shareholder %>
+      <%= link_to "Add new shareholder", new_account_shareholder_path(@account), :class => "btn btn-default" if can? :create, Shareholder %>
     </div>
   </div>
   <div class="tab-pane" id="bill-types">
@@ -113,7 +113,7 @@
           </div>
         <% end %>
       </div>
-      <%= link_to "Add new bill type", new_account_bill_type_path(@account), :class => 'btn' if can? :create, BillType %>
+      <%= link_to "Add new bill type", new_account_bill_type_path(@account), :class => 'btn btn-default' if can? :create, BillType %>
     </div>
   </div>
   <div class="tab-pane" id="payees">
@@ -136,7 +136,7 @@
           </div>
         <% end %>
       </div>
-      <%= link_to "Add new payee", new_account_payee_path(@account), :class => 'btn' if can? :create, Payee %>
+      <%= link_to "Add new payee", new_account_payee_path(@account), :class => 'btn btn-default' if can? :create, Payee %>
     </div>
   </div>
   <div class="tab-pane" id="admin">

@@ -9,13 +9,25 @@
  *= require_tree .
 */
 
+.navbar ul.nav li a {
+  z-index: 1000;
+  }
+
 button#search-toggle {
   margin-top: -50px;
-}
+  }
+
+div.container {
+  padding-bottom: 30px;
+  }
 
 .delete-button {
-  margin: -70px 10px 0 0;
-}
+  margin: -35px 10px 0 0;
+  }
+
+form.form-horizontal div.form-group {
+  margin-left: 0;
+  }
 
 form input.check-number {
   width: 75px;
@@ -27,19 +39,21 @@ form input.entry-amount {
   }
 
 form input.datepicker {
-  width: 80px;
+  width: 100px;
   }
 
-form input.payee {
-  width: 300px;
+form input,
+form select,
+form textarea {
+  max-width: 300px;
   }
 
 form input.share-ratio {
   width: 35px;
+  height: 25px;
   }
 
 form textarea.note {
-  width: 300px;
   height: 50px;
   }
 
@@ -52,10 +66,11 @@ td.shares div.grid {
   }
 
 div.grid {
-  max-width: 450px;
+  max-width: 400px;
   border: 1px solid #DDDDDD;
   border-radius: 5px;
   text-align: left;
+  margin-bottom: 20px;
   }
 
 div.grid.shares {
@@ -101,12 +116,16 @@ div.grid-cell {
   margin-left: 0;
   }
 
+.grid .grid-row .grid-cell div.checkbox {
+  padding-top: 0; 
+  }
+
 .grid .grid-row .grid-cell input[type="checkbox"] {
   float: none;
   }
 
 .grid .grid-row .grid-cell select {
-  width: 165px;
+  width: 160px;
   padding: 0;
   height: inherit;
   line-height: inherit;
@@ -122,6 +141,12 @@ div.grid-cell div.boolean {
   }
 
 div.grid-cell div.grid-input {
+  margin-bottom: 0;
+  }
+
+div.grid-cell div.form-group {
+  margin-left: 0;
+  margin-right: 0;
   margin-bottom: 0;
   }
 

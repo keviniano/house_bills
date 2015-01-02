@@ -2,11 +2,13 @@
 //= require jquery_ujs
 //= require jquery-ui/datepicker
 //= require jquery-ui/autocomplete
-//= require twitter/bootstrap/dropdown
+//= require twitter/bootstrap
 //= require twitter/bootstrap/tab
 //= require twitter/bootstrap/alert
 //= require twitter/bootstrap/tooltip
 //= require twitter/bootstrap/popover
+//= require twitter/bootstrap/collapse
+//= require twitter/bootstrap/transition
 //= require_self
 //= require_tree .
 
