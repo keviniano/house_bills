@@ -74,7 +74,7 @@ class Shareholder < ActiveRecord::Base
   private
 
     def attach_user
-      self.user = User.find_by_email(email) if email.present?
+      self.user = User.find_by(email: email) if email.present?
       true
     end
 

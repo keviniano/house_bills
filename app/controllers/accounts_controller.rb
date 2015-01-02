@@ -28,7 +28,7 @@ class AccountsController < ApplicationController
     m.user = current_user
     m.name = current_user.name
     m.email = current_user.email
-    m.role = Role.where(name: "Owner").first
+    m.role = Role.owner
 
     if @account.save
       redirect_to @account, :notice => "Account '#{@account.name}' was successfully created."

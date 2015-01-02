@@ -19,9 +19,9 @@
 # BillType.find_or_create_by_name('Misc')
 # BillType.find_or_create_by_name('Supplies')
 
-Role.find_or_create_by_name 'User'
-Role.find_or_create_by_name 'Power User'
-Role.find_or_create_by_name 'Owner'
+# Role.find_or_create_by_name 'User'
+# Role.find_or_create_by_name 'Power User'
+# Role.find_or_create_by_name 'Owner'
 
 # role_id = Role.find_by_name('User').id
 #
