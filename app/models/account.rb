@@ -17,6 +17,8 @@ class Account < ActiveRecord::Base
   has_many :bill_types, :dependent => :destroy
   has_many :pot_balance_entries
 
+  has_paper_trail
+  
   validates :name, presence: true, uniqueness: true
 
   def pot_balance

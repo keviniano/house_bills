@@ -8,6 +8,8 @@ class Bill < ActiveRecord::Base
   has_one     :bill_account_entry,         :dependent => :destroy, :autosave => true
   has_one     :balance_event,              :dependent => :destroy, :autosave => true
 
+  has_paper_trail
+  
   before_validation :set_amount
   after_validation  :update_balance_entries, :update_balance_event
 

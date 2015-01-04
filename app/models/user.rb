@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable, :confirmable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  model_stamper
+  has_paper_trail
 
   has_many :shareholders
   has_many :accounts, :through => :shareholders

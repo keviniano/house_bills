@@ -12,6 +12,7 @@ gem 'simple_form'
 gem 'cancancan'
 gem 'csv_builder'
 gem 'validates_timeliness'
+gem 'paper_trail',          '~> 3.0.6'
 
 group :development, :test do
   gem 'therubyracer'

@@ -46,7 +46,12 @@ class ShareholdersController < ApplicationController
     end
 
     def update_resource_params
-      allowed_params = [:role_id, :opened_on, :inactivated_on, :closed_on]
+      allowed_params = [
+        :role_id, 
+        :opened_on_string, 
+        :inactivated_on_string, 
+        :closed_on_string
+      ]
       allowed_params.concat([:name, :email]) if @shareholder.user.blank?
       params.require(:shareholder).permit(allowed_params)
     end
