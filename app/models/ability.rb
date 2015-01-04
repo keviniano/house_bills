@@ -2,13 +2,13 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    open_holdings = Shareholder.open_now.where(:user_id => user.id)
-    active_holdings = open_holdings.to_a.delete_if {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.today}
+    open_holdings =         Shareholder.open_now.where(user_id: user.id).to_a
+    active_holdings =       Shareholder.open_now.where(user_id: user.id).reject {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.today }
 
-    open_account_ids = open_holdings.map{|r| r.account_id}
-    active_account_ids = active_holdings.map{|r| r.account_id }
-    admin_account_ids = active_holdings.delete_if {|holding| !holding.admin? }.map {|r| r.account_id }
-    non_owner_account_ids = active_holdings.delete_if {|holding| holding.owner? }.map {|r| r.account_id }
+    open_account_ids =      open_holdings.map{|r| r.account_id }
+    active_account_ids =    active_holdings.map{|r| r.account_id }
+    admin_account_ids =     active_holdings.reject {|holding| !holding.admin? }.map {|r| r.account_id }
+    non_owner_account_ids = active_holdings.reject {|holding|  holding.owner? }.map {|r| r.account_id }
 
     # Any user can create a new account
     can    :create, Account
