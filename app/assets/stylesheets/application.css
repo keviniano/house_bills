@@ -57,7 +57,9 @@ form textarea.note {
   height: 50px;
   }
 
-table tr td.currency, div.currency {
+table tr td.currency,
+table tr th.currency,
+div.currency {
   text-align: right;
   }
 
@@ -183,7 +185,8 @@ dl dd {
   padding: 5px 0;
   }
 
-table td.center {
+table td.center,
+table th.center {
   text-align: center;
   }
 

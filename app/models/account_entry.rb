@@ -44,23 +44,23 @@ class AccountEntry < ActiveRecord::Base
   end
 
   def self.find_in_date_range(start_date,end_date)
-    self.find(:all, :conditions => {:date => start_date..end_date}, :order => "date, check_number, id")
+    self.where(date: start_date..end_date).order(:date, :check_number, :id)
   end
 
   def self.balance_before(d)
-    self.sum(:amount, :conditions => ['date < ?',d]) || 0
+    self.where('date < ?',d).sum(:amount) || 0
   end
 
   def self.balance_as_of(d)
-    self.sum(:amount, :conditions => ['date <= ?',d]) || 0
+    self.where('date <= ?',d).sum(:amount) || 0
   end
 
   def self.cleared_balance_before(d)
-    self.sum(:amount, :conditions => ['cleared = ? and date < ?',true,d]) || 0
+    self.where('cleared = ? and date < ?',true,d).sum(:amount) || 0
   end
 
   def self.cleared_balance_as_of(d)
-    self.sum(:amount, :conditions => ['cleared = ? and date <= ?',true,d]) || 0
+    self.where('cleared = ? and date <= ?',true,d).sum(:amount) || 0
   end
 
   def balance_for(shareholder)
@@ -83,19 +83,19 @@ class AccountEntry < ActiveRecord::Base
   end
 
   def cleared_balance
-    AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id])
+    AccountEntry.where('cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id).sum(:amount)
   end
 
   def prior_cleared_balance
-    AccountEntry.sum(:amount, :conditions => ['cleared = ? and date < ? or (date = ? and id < ?)',true,date,date,id])
+    AccountEntry.where('cleared = ? and date < ? or (date = ? and id < ?)',true,date,date,id).sum(:amount)
   end
 
-  def balance
-    AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id <= ?)',date,date,id])
+  def this_balance
+    AccountEntry.where('date < ? or (date = ? and id <= ?)',date,date,id).sum(:amount)
   end
 
   def prior_balance
-    AccountEntry.sum(:amount, :conditions => ['date < ? or (date = ? and id < ?)',date,date,id])
+    AccountEntry.where('date < ? or (date = ? and id < ?)',date,date,id).sum(:amount)
   end
 
   def entry_type

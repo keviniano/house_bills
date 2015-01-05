@@ -20,7 +20,7 @@
             <ul class="dropdown-menu" role="menu">
               <% current_user.accounts.each do |account| %>
                 <li>
-                  <%= link_to account.name, account_balance_events_path(account) %>
+                  <%= link_to "#{account.name}: #{number_to_currency(account.balance)}", account_balance_events_path(account) %>
                 </li>
               <% end %>
             </ul>
@@ -29,7 +29,7 @@
         <% if @account.present? && !@account.new_record? %>
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" href="#">
-              <%= @account.name %>
+              <%= @account.name %>: <%= number_to_currency(@account.balance) %>
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
@@ -52,7 +52,8 @@
               <li <%= current_page?(new_account_unbound_account_entry_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                 <%= link_to 'Add a ledger entry unrelated to bills', new_account_unbound_account_entry_path(@account) if can? :create, UnboundAccountEntry %>
               </li>
-              <li class="divider"></li>
+              <li class="divider">
+              </li>
               <li <%= current_page?(account_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                 <%= link_to 'Account overview', account_path(@account) %>
               </li>
@@ -62,7 +63,9 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <% if user_signed_in? %>
-          <li><%= link_to "Signed in as #{current_user.name}.", edit_user_registration_path %></li>
+          <li>
+            <%= link_to "Signed in as #{current_user.name}: #{number_to_currency(Shareholder.by_user(current_user).balance)}", edit_user_registration_path %>
+          </li>
           <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
         <% else %>
           <% unless request.original_fullpath == new_user_registration_path %>

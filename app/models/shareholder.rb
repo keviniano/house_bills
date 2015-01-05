@@ -84,7 +84,7 @@ class Shareholder < ActiveRecord::Base
 
   class << self
     def by_user(user)
-      where(:user_id => user.id)
+      find_by(user_id: user.id)
     end
 
     def open_now

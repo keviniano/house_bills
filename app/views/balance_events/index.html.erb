@@ -48,15 +48,12 @@
   <tr>
     <th>Date</th>
     <th>Payee</th>
-    <th>Bill</th>
-    <th>Credit</th>
+    <th class="currency">Amount</th>
     <th>Type</th>
     <th>Note</th>
-    <th>My Credit</th>
-    <th>My Share</th>
-    <th>Net Change</th>
+    <th class="currency">Net Change</th>
     <% if @query.can_use_running_total %>
-      <th>My Balance</th>
+      <th class="currency">My Balance</th>
     <% end %>
     <th></th>
     <th></th>

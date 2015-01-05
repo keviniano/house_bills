@@ -4,57 +4,56 @@
   Search Options
 </button>
 <form id="search" class="well form-horizontal" style="display:none;">
-  <div class="control-group">
-    <%= label :query, :cleared_status, "Status Type", class: 'control-label' %>
-    <div class="controls">
+  <div class="form-group">
+    <%= label :query, :cleared_status, "Status Type", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
       <%= select :query, :cleared_status, AccountEntryQuery.cleared_statuses %>
     </div>
   </div>
-  <div class="control-group">
-    <%= label :query, :entry_type, "Entries type", class: 'control-label' %>
-    <div class="controls">
+  <div class="form-group">
+    <%= label :query, :entry_type, "Entries type", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
       <%= select :query, :entry_type, AccountEntryQuery.entry_types %>
     </div>
   </div>
-  <div class="control-group">
-    <%= label :query, :with_text, "Containing text", class: 'control-label' %>
-    <div class="controls">
+  <div class="form-group">
+    <%= label :query, :with_text, "Containing text", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
       <%= text_field :query, :with_text, placeholder: 'any text' %>
     </div>
   </div>
-  <div class="control-group">
-    <%= label :query, :start_date, "Start date", class: 'control-label' %>
-    <div class="controls">
+  <div class="form-group">
+    <%= label :query, :start_date, "Start date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
       <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %>
     </div>
   </div>
-  <div class="control-group">
-    <%= label :query, :end_date, "End date", class: 'control-label' %>
-    <div class="controls">
+  <div class="form-group">
+    <%= label :query, :end_date, "End date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
       <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
     </div>
   </div>
-  <div class="control-group">
-    <%= label :query, :payee_shareholder_id, "Entered by", class: 'control-label' %>
-    <div class="controls">
+  <div class="form-group">
+    <%= label :query, :payee_shareholder_id, "Entered by", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
       <%= select :query, :payee_shareholder_id, grouped_options_for_select(AccountEntryQuery.grouped_shareholders,@query.payee_shareholder_id) %>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary">Search</button>
+  <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
 
 <%= form_tag update_cleared_account_account_entries_path do |f| %>
-  <table class="table-striped table-bordered table-condensed">
+  <table class="table table-hover table-condensed">
     <tr>
       <th>Date</th>
       <th>Check #</th>
       <th>Payee</th>
-      <th>Deposit</th>
-      <th>Withdrawal</th>
-      <th>Cleared</th>
-      <th>Balance</th>
-      <th>Cleared Balance</th>
+      <th class="currency">Amount</th>
+      <th class="center">Cleared</th>
+      <th class="currency">Balance</th>
+      <th class="currency">Cleared Balance</th>
       <th></th>
       <th></th>
     </tr>
@@ -65,12 +64,11 @@
           <td><%= account_entry.date %></td>
           <td><%= account_entry.check_number %></td>
           <td><%= account_entry.recipient %></td>
-          <td class="currency"><%= number_to_currency account_entry.deposit_amount %></td>
-          <td class="currency"><%= number_to_currency account_entry.withdrawal_amount %></td>
+          <td class="currency"><%= number_to_currency account_entry.amount %></td>
           <td class="center">
             <%= account_entry_fields.check_box :cleared %>
           </td>
-          <td class="currency"><%= number_to_currency account_entry.balance %></td>
+          <td class="currency"><%= number_to_currency account_entry.this_balance %></td>
           <td class="currency"><%= account_entry.cleared ? number_to_currency(account_entry.cleared_balance) : nil %></td>
           <% if account_entry.type == 'BillAccountEntry' %>
             <td><%= link_to 'View', [@account,account_entry.bill] %></td>
