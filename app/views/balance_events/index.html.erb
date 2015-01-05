@@ -40,7 +40,7 @@
       <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.share_shareholder_id) %>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary">Search</button>
+  <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
 
