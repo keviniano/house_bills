@@ -31,7 +31,7 @@ HouseBills::Application.configure do
   config.assets.compress = false
 
   # https://github.com/rails/rails/issues/5145
-  config.serve_static_assets = false
+  config.serve_static_files = false
 
   # Expands the lines which load the assets
   config.assets.debug = true

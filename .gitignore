@@ -11,3 +11,6 @@ db/legacy
 .DS_Store
 tags
 .sass-cache/
+
+# Ignore application configuration
+/config/application.yml

@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails',                '~> 4.1.0'
+gem 'rails',                '~> 4.2.0'
 gem 'thin'
 gem 'pg'
 gem 'devise'
@@ -13,6 +13,7 @@ gem 'cancancan'
 gem 'csv_builder'
 gem 'validates_timeliness'
 gem 'paper_trail',          '~> 3.0.6'
+gem 'figaro'
 
 group :development, :test do
   gem 'therubyracer'
