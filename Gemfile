@@ -14,6 +14,7 @@ gem 'csv_builder'
 gem 'validates_timeliness'
 gem 'paper_trail',          '~> 3.0.6'
 gem 'figaro'
+gem 'will_paginate-bootstrap'
 
 group :development, :test do
   gem 'therubyracer'
@@ -27,4 +28,3 @@ group :development, :test do
   gem 'byebug'
   gem 'nifty-generators'
 end
-
