@@ -43,37 +43,41 @@ class AccountEntry < ActiveRecord::Base
     %w( Deposit Withdrawal )
   end
 
-  def self.find_in_date_range(start_date,end_date)
+  def self.find_in_date_range(start_date, end_date)
     self.where(date: start_date..end_date).order(:date, :check_number, :id)
   end
 
   def self.balance_before(d)
-    self.where('date < ?',d).sum(:amount) || 0
+    self.where('date < ?', d).sum(:amount) || 0
   end
 
   def self.balance_as_of(d)
-    self.where('date <= ?',d).sum(:amount) || 0
+    self.where('date <= ?', d).sum(:amount) || 0
   end
 
   def self.cleared_balance_before(d)
-    self.where('cleared = ? and date < ?',true,d).sum(:amount) || 0
+    self.where('cleared = ? and date < ?', true, d).sum(:amount) || 0
   end
 
   def self.cleared_balance_as_of(d)
-    self.where('cleared = ? and date <= ?',true,d).sum(:amount) || 0
+    self.where('cleared = ? and date <= ?', true, d).sum(:amount) || 0
   end
 
   def balance_for(shareholder)
-    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id <= ?)",self.date,self.date,self.id).sum(:amount)
+    BalanceEntry.by_shareholder(shareholder).
+      where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id <= ?)", date, date, id).
+      sum(:amount)
   end
 
   def prior_balance_for(shareholder)
-    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id < ?)",self.date,self.date,self.id).sum(:amount)
+    BalanceEntry.by_shareholder(shareholder).
+      where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id < ?)", date, date, id).
+      sum(:amount)
   end
 
   def date_string=(value)
     @date_string = value
-    self.date = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
+    self.date = (value.blank? ? nil : DateTime.strptime(value, '%m-%d-%Y'))
   rescue ArgumentError
     @date_invalid = true
   end
@@ -83,19 +87,19 @@ class AccountEntry < ActiveRecord::Base
   end
 
   def cleared_balance
-    AccountEntry.where('cleared = ? and date < ? or (date = ? and id <= ?)',true,date,date,id).sum(:amount)
+    AccountEntry.where('cleared = ? and date < ? or (date = ? and id <= ?)', true, date, date, id).sum(:amount)
   end
 
   def prior_cleared_balance
-    AccountEntry.where('cleared = ? and date < ? or (date = ? and id < ?)',true,date,date,id).sum(:amount)
+    AccountEntry.where('cleared = ? and date < ? or (date = ? and id < ?)', true, date, date, id).sum(:amount)
   end
 
   def this_balance
-    AccountEntry.where('date < ? or (date = ? and id <= ?)',date,date,id).sum(:amount)
+    AccountEntry.where('date < ? or (date = ? and id <= ?)', date, date, id).sum(:amount)
   end
 
   def prior_balance
-    AccountEntry.where('date < ? or (date = ? and id < ?)',date,date,id).sum(:amount)
+    AccountEntry.where('date < ? or (date = ? and id < ?)', date, date, id).sum(:amount)
   end
 
   def entry_type
