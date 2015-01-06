@@ -15,6 +15,10 @@ gem 'validates_timeliness'
 gem 'paper_trail',          '~> 3.0.6'
 gem 'figaro'
 gem 'will_paginate-bootstrap'
+gem 'newrelic_rpm'
+
+group :production do
+end
 
 group :development, :test do
   gem 'therubyracer'
