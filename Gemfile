@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails',                '~> 4.2.0'
-gem 'thin'
+gem 'unicorn'
 gem 'pg'
 gem 'devise'
 gem 'default_value_for'
