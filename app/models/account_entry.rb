@@ -8,7 +8,7 @@ class AccountEntry < ActiveRecord::Base
   has_one    :balance_event, :dependent => :destroy, :autosave => true
 
   has_paper_trail
-  
+
   validate                  :date_string_format_must_be_valid
   validates_presence_of     :entry_amount
   validates_presence_of     :entry_type
