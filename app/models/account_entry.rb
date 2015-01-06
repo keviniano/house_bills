@@ -73,7 +73,7 @@ class AccountEntry < ActiveRecord::Base
 
   def date_string=(value)
     @date_string = value
-    self.date = DateTime.strptime(value,'%m-%d-%Y')
+    self.date = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
   rescue ArgumentError
     @date_invalid = true
   end
