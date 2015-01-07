@@ -87,7 +87,7 @@ class Bill < ActiveRecord::Base
   end
 
   def entry_type
-    @entry_type || ( amount < 0 ? 'Credit' : 'Bill' )
+    @entry_type || (amount < 0 ? 'Credit' : 'Bill')
   end
 
   def entry_type=(val)

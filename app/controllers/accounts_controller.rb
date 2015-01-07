@@ -31,26 +31,25 @@ class AccountsController < ApplicationController
     m.role = Role.owner
 
     if @account.save
-      redirect_to @account, :notice => "Account '#{@account.name}' was successfully created."
+      redirect_to @account, notice: "Account '#{@account.name}' was successfully created."
     else
-      render :action => "new"
+      render action: "new"
     end
   end
 
   # PATCH /accounts/1
   def update
-    if @account.update_attributes(params[:account])
-      redirect_to @account, :notice => "Account '#{@account.name}' was successfully edited."
+    if @account.update_attributes(resource_params)
+      redirect_to account_path(@account, anchor: "admin-tab"), notice: "Account '#{@account.name}' was successfully edited."
     else
-      render :action => "edit"
+      render action: "edit"
     end
   end
 
   # DELETE /accounts/1
   def destroy
     @account.destroy
-
-    redirect_to :accounts, :notice => "Account '#{@account.name}' was successfully deleted"
+    redirect_to :accounts, notice: "Account '#{@account.name}' was successfully deleted"
   end
 
   def edit_pot

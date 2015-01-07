@@ -7,12 +7,22 @@
 
 
 
-<ul class="nav nav-tabs" id="myTab">
-  <li class="active"><a href="#balances">Balances</a></li>
-  <li><a href="#shareholders">Shareholders</a></li>
-  <li><a href="#bill-types">Bill Types</a></li>
-  <li><a href="#payees">Payees</a></li>
-  <li><a href="#admin">Admin</a></li>
+<ul class="nav nav-tabs" id="account-tab">
+  <li class="active">
+    <a href="#balances">Balances</a>
+  </li>
+  <li>
+    <a href="#shareholders">Shareholders</a>
+  </li>
+  <li>
+    <a href="#bill-types">Bill Types</a>
+  </li>
+  <li>
+    <a href="#payees">Payees</a>
+  </li>
+  <li>
+    <a href="#admin">Admin</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -156,12 +166,22 @@
 
 <script>
   $(function () {
-    $('#myTab a:first').tab('show');
-  })
+    var hash = document.location.hash;
+    var tabSuffix = "-tab";
+    if (hash) {
+      $('#account-tab a[href=' + hash.replace(tabSuffix,"") + ']').tab('show');
+    } else {
+      $('#account-tab a:first').tab('show');
+    }
 
-  $('#myTab a').click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
+    // Change hash for page-reload
+    $('.nav-tabs a').on('shown.bs.tab', function (e) {
+      window.location.hash = e.target.hash + tabSuffix;
+    });
+
+    $('#account-tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    })
   })
 </script>
-

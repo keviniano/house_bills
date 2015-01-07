@@ -1,7 +1,7 @@
 class PayeesController < ApplicationController
   before_filter :authenticate_user!
   load_and_authorize_resource :account
-  load_and_authorize_resource :payee, :through => :account
+  load_and_authorize_resource :payee, through: :account
 
   # GET /payees/new
   def new
@@ -16,7 +16,7 @@ class PayeesController < ApplicationController
   # POST /payees
   def create
     if @payee.save
-      redirect_to @account, :notice => 'Payee was successfully created.'
+      redirect_to account_path(@account, anchor: "payees-tab"), notice: 'Payee was successfully created.'
     else
       render :new
     end
@@ -25,7 +25,7 @@ class PayeesController < ApplicationController
   # PATCH /payees/1
   def update
     if @payee.update_attributes(resource_params)
-      redirect_to @account, :notice => 'Payee was successfully updated.'
+      redirect_to account_path(@account, anchor: "payees-tab"), notice: 'Payee was successfully updated.'
     else
       render :edit
     end
@@ -34,7 +34,7 @@ class PayeesController < ApplicationController
   # DELETE /payees/1
   def destroy
     @payee.destroy
-    redirect_to @account, :notice => 'Payee was successfully deleted.'
+    redirect_to account_path(@account, anchor: "payees-tab"), notice: 'Payee was successfully deleted.'
   end
 
   private

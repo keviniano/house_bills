@@ -1,7 +1,7 @@
 class BillTypesController < ApplicationController
   before_filter :authenticate_user!
   load_and_authorize_resource :account
-  load_and_authorize_resource :bill_type, :through => :account
+  load_and_authorize_resource :bill_type, through: :account
 
   # GET /bill_types/new
   def new
@@ -16,7 +16,7 @@ class BillTypesController < ApplicationController
   # POST /bill_types
   def create
     if @bill_type.save
-      redirect_to @account, :notice => 'Bill type was successfully created.'
+      redirect_to account_path(@account, anchor: "bill-types-tab"), notice: 'Bill type was successfully created.'
     else
       render :new
     end
@@ -25,7 +25,7 @@ class BillTypesController < ApplicationController
   # PATCH /bill_types/1
   def update
     if @bill_type.update_attributes(resource_params)
-      redirect_to @account, :notice => 'Bill type was successfully updated.'
+      redirect_to account_path(@account, anchor: "bill-types-tab"), notice: 'Bill type was successfully updated.'
     else
       render :edit
     end
@@ -34,8 +34,7 @@ class BillTypesController < ApplicationController
   # DELETE /bill_types/1
   def destroy
     @bill_type.destroy
-
-    redirect_to @account, :notice => 'Bill type was successfully deleted.'
+    redirect_to account_path(@account, anchor: "bill-types-tab"), notice: 'Bill type was successfully deleted.'
   end
 
   private
