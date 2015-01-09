@@ -1,5 +1,7 @@
 source 'http://rubygems.org'
 
+ruby '2.1.5'
+
 gem 'rails',                '~> 4.2.0'
 gem 'unicorn'
 gem 'pg'
@@ -23,6 +25,10 @@ gem 'less-rails-bootstrap'
 gem 'sass-rails'
 gem 'coffee-rails'
 gem 'uglifier'
+
+group :production do
+  gem 'rails_12factor'
+end
 
 group :development, :test do
   gem 'byebug'
