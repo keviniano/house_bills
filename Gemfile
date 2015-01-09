@@ -16,19 +16,15 @@ gem 'paper_trail',          '~> 3.0.6'
 gem 'figaro'
 gem 'will_paginate-bootstrap'
 gem 'newrelic_rpm'
-
-group :production do
-end
+gem 'therubyracer'
+gem 'less-rails'
+gem 'twitter-bootstrap-rails'
+gem 'less'
+gem 'less-rails-bootstrap'
+gem 'sass-rails'
+gem 'coffee-rails'
+gem 'uglifier'
 
 group :development, :test do
-  gem 'therubyracer'
-  gem 'less'
-  gem 'less-rails'
-  gem 'less-rails-bootstrap'
-  gem 'sass-rails'
-  gem 'coffee-rails'
-  gem 'uglifier'
-  gem 'twitter-bootstrap-rails'
   gem 'byebug'
-  gem 'nifty-generators'
 end
