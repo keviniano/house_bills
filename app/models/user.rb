@@ -22,7 +22,7 @@ class User < ActiveRecord::Base
   private
 
   def attach_shareholders
-    shareholders = Shareholder.find_all_by_email(email)
+    shareholders = Shareholder.where(email: email)
     shareholders.each do |m|
       m.user = self
       m.name = name
