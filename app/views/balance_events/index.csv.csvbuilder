@@ -45,7 +45,7 @@ csv << line
       event.account_entry.entry_type,
       event.account_entry.note,
     ]
-    @shareholders.each{|sh| line << number_to_currency(event.account_entry.shareholder_change_amount(sh)) }
+    @shareholders.each{|sh| line << number_to_currency(event.account_entry.shareholder_offset_amount(sh)) }
     csv << line
   end
 end

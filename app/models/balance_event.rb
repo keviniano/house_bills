@@ -44,9 +44,4 @@ class BalanceEvent < ActiveRecord::Base
                                                       FROM account_entries
                                                       WHERE payee ILIKE :text OR note ILIKE :text
                                                     )", text: "%#{text}%") }
-
-  def self.unique_shareholders
-    ids = joins("INNER JOIN balance_entries ON balance_events.bill_id = balance_entries.bill_id OR balance_events.account_entry_id = balance_entries.account_entry_id").where("shareholder_id IS NOT NULL").reorder(:shareholder_id).uniq.pluck(:shareholder_id).map{|id| id.to_i}
-    Shareholder.where(:id => ids).order(:name)
-  end
 end

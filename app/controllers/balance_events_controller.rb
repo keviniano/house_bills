@@ -85,8 +85,11 @@ class BalanceEventsController < ApplicationController
       if @balance_events.count > 250 || (@balance_events.maximum(:date) - @balance_events.minimum(:date)).days > 93.days
         flash.now[:error] = "Exports cannot be for more than 250 entries or periods longer than 3 months (whichever is less)"
       else
-        @shareholders = @balance_events.unique_shareholders
         @balance_events = @balance_events.default_order.all_includes
+        bill_ids = @balance_events.map{|be| be.bill_id }.compact
+        account_entry_ids = @balance_events.map{|be| be.account_entry_id }.compact
+        shareholder_ids = BalanceEntry.where("bill_id IN (?) OR account_entry_id IN (?)",bill_ids, account_entry_ids).pluck("DISTINCT shareholder_id").compact
+        @shareholders = Shareholder.order(:name).find(shareholder_ids)
         @filename = "house_bills.csv"
         render "index.csv"
       end
