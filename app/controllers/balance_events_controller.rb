@@ -82,8 +82,8 @@ class BalanceEventsController < ApplicationController
     @balance_events = @query.apply_conditions(@balance_events)
     @shareholder = current_user.shareholder_for_account(@account)
     if params[:output] == 'CSV'
-      if @balance_events.count > 250 || (@balance_events.maximum(:date) - @balance_events.minimum(:date)).days > 93.days
-        flash.now[:error] = "Exports cannot be for more than 250 entries or periods longer than 3 months (whichever is less)"
+      if @balance_events.count > 250
+        flash.now[:error] = "Exports cannot be for more than 250 entries"
       else
         @balance_events = @balance_events.default_order.all_includes
         bill_ids = @balance_events.map{|be| be.bill_id }.compact
