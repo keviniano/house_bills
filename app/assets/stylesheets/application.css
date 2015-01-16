@@ -17,6 +17,10 @@ button#search-toggle {
   margin-top: -45px;
   }
 
+form#search {
+  margin-bottom: 0;
+  }
+
 div.container {
   padding-bottom: 30px;
   }

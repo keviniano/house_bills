@@ -12,7 +12,13 @@
 $(document).ready(function(){
 
   $("#search-toggle").click(function(event){
-    $("#search").toggle();
+    $("#search").slideToggle(600, function() {
+      if ($("#search").is(":visible")) {
+        $.cookie("show_search", true);
+      } else {
+        $.removeCookie("show_search");
+      }
+    });
   });
 
   $(".datepicker").datepicker({

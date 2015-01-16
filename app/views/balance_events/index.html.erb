@@ -1,9 +1,9 @@
 <% content_for :title, "#{@account.name} Account Events" %>
 <h1><%= @account.name %> Account Events</h1>
 <button type="button" id="search-toggle" class="btn btn-large pull-right">
-  Search
+  Search Options
 </button>
-<form id="search" class="well form-horizontal" style="display:none;">
+<form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search] ? "block" : "none" %>;">
   <div class="form-group">
     <%= label :query, :bill_type_id, "Bill type", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
