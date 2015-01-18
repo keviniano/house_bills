@@ -3,7 +3,7 @@
 <button type="button" id="search-toggle-account-entries" class="search-toggle btn btn-large pull-right">
   Search Options
 </button>
-<form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search] ? "block" : "none" %>;">
+<form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search_account_entries] ? "block" : "none" %>;">
   <div class="form-group">
     <%= label :query, :cleared_status, "Status Type", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
