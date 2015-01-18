@@ -11,15 +11,23 @@
 
 $(document).ready(function(){
 
-  $("#search-toggle").click(function(event){
-    $("#search").slideToggle(600, function() {
+  $("#search-toggle-bills").click(function(event){
+    toggleSearchForm("show_search_bills");
+  });
+
+  $("#search-toggle-account-entries").click(function(event){
+    toggleSearchForm("show_search_account_entries");
+  });
+
+  function toggleSearchForm(cookieName){
+    $("#search").slideToggle(600, function(){
       if ($("#search").is(":visible")) {
-        $.cookie("show_search", true);
+        $.cookie(cookieName, true);
       } else {
-        $.removeCookie("show_search");
+        $.removeCookie(cookieName);
       }
     });
-  });
+  }
 
   $(".datepicker").datepicker({
     dateFormat: 'mm-dd-yy',

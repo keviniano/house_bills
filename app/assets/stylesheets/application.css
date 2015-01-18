@@ -13,7 +13,7 @@
   z-index: 1000;
   }
 
-button#search-toggle {
+button.search-toggle {
   margin-top: -45px;
   }
 

@@ -1,6 +1,6 @@
 <% content_for :title, "#{@account.name}: Listing Account Entries" %>
 <h1><%= @account.name %> Account Entries</h1>
-<button type="button" id="search-toggle" class="btn btn-large pull-right">
+<button type="button" id="search-toggle-account-entries" class="search-toggle btn btn-large pull-right">
   Search Options
 </button>
 <form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search] ? "block" : "none" %>;">
