@@ -2,6 +2,11 @@
 <h1><%= @account.name %> Account Entries</h1>
 <button type="button" id="search-toggle-account-entries" class="search-toggle btn btn-large pull-right">
   Search Options
+  <% if cookies[:show_search_account_entries] %>
+    <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+  <% else %>
+    <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+  <% end %>
 </button>
 <form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search_account_entries] ? "block" : "none" %>;">
   <div class="form-group">
