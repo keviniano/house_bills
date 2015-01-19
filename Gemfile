@@ -18,11 +18,11 @@ gem 'paper_trail',          '~> 3.0.6'
 gem 'figaro'
 gem 'will_paginate-bootstrap'
 gem 'therubyracer'
-gem 'less-rails'
-gem 'twitter-bootstrap-rails'
-gem 'less'
-gem 'less-rails-bootstrap'
+
+gem 'bootstrap-sass'
 gem 'sass-rails'
+gem 'autoprefixer-rails'
+
 gem 'coffee-rails'
 gem 'uglifier'
 

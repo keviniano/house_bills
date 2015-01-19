@@ -1,6 +1,6 @@
 //= require jquery
 //= require jquery_ujs
-//= require twitter/bootstrap
+//= require bootstrap-sprockets
 //= require jquery-ui/datepicker
 //= require jquery-ui/autocomplete
 //= require_self
@@ -12,19 +12,22 @@
 $(document).ready(function(){
 
   $("#search-toggle-bills").click(function(event){
-    toggleSearchForm("show_search_bills");
+    that = this
+    toggleSearchForm(that,"bills");
   });
 
   $("#search-toggle-account-entries").click(function(event){
-    toggleSearchForm("show_search_account_entries");
+    that = this
+    toggleSearchForm(that,"account_entries");
   });
 
-  function toggleSearchForm(cookieName){
+  function toggleSearchForm(that,suffix){
+    $(that).children("span").first().toggleClass("glyphicon-chevron-up").toggleClass("glyphicon-chevron-down");
     $("#search").slideToggle(600, function(){
       if ($("#search").is(":visible")) {
-        $.cookie(cookieName, true);
+        $.cookie("show_search_" + suffix, true);
       } else {
-        $.removeCookie(cookieName);
+        $.removeCookie("show_search_" + suffix);
       }
     });
   }
