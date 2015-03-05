@@ -2,7 +2,6 @@
 db/*.sqlite3
 log/*.log
 tmp/**/*
-config/database.yml
 *~
 public/system
 *.swp
@@ -13,5 +12,7 @@ tags
 .sass-cache/
 
 # Ignore application configuration
-/config/application.yml
+config/application.yml
+config/database.yml
+config/secrets.yml
 .env
