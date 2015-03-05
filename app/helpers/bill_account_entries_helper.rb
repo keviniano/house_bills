@@ -1,2 +1,0 @@
-module BillAccountEntriesHelper
-end
