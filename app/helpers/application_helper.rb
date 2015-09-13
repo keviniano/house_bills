@@ -5,4 +5,12 @@ module ApplicationHelper
     content_tag(:div, :'data-chart' => path, :style => "height: #{height}px;") do
     end
   end
+
+  def bill_description(bill)
+    if bill.type == 'AccountBill'
+      'Account Bill'
+    else
+      'Shareholder Bill'
+    end
+  end
 end

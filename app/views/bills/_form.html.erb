@@ -65,10 +65,6 @@
   </div>
   <div class="form-actions">
     <%= f.button :submit, class: "btn btn-primary" %>
-    <% unless bill.new_record? %>
-      <%= link_to("Enter Another Account Bill", new_account_account_bill_path(@account), class: "btn btn-default") if bill.type == "AccountBill" %>
-      <%= link_to("Enter Another Shareholder Bill", new_account_shareholder_bill_path(@account), class: "btn btn-default") if bill.type == "ShareholderBill" %>
-    <% end %>
   </div>
 <% end %>
 <% if !bill.new_record? && can?(:delete, bill) %>

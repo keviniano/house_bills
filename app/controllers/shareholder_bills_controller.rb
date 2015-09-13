@@ -23,7 +23,7 @@ class ShareholderBillsController < ApplicationController
   # POST /shareholder_bills
   def create
     if @shareholder_bill.save
-      redirect_to [:edit,@account,@shareholder_bill], :notice => 'Bill was successfully created.'
+      redirect_to [@account,@shareholder_bill], :notice => 'Bill was successfully created.'
     else
       render :new
     end
@@ -32,7 +32,7 @@ class ShareholderBillsController < ApplicationController
   # PATCH /shareholder_bills/1
   def update
     if @shareholder_bill.update_attributes(resource_params)
-      redirect_to [:edit,@account,@shareholder_bill], :notice => 'Bill was successfully updated.'
+      redirect_to [@account,@shareholder_bill], :notice => 'Bill was successfully updated.'
     else
       render :edit
     end
