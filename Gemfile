@@ -1,8 +1,8 @@
 source 'http://rubygems.org'
 
-ruby '2.1.5'
+ruby '2.2.3'
 
-gem 'rails',                '~> 4.2.0'
+gem 'rails',                '~> 4.2.4'
 gem 'unicorn'
 gem 'pg'
 gem 'devise'
