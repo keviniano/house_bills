@@ -23,7 +23,7 @@ class AccountBillsController < ApplicationController
   # POST /account_bills
   def create
     if @account_bill.save
-      redirect_to [:edit,@account,@account_bill], notice: 'Bill was successfully created.'
+      redirect_to [@account,@account_bill], notice: 'Bill was successfully created.'
     else
       prep_edit
       render :new
@@ -33,7 +33,7 @@ class AccountBillsController < ApplicationController
   # PATCH /account_bills/1
   def update
     if @account_bill.update_attributes(resource_params)
-      redirect_to [:edit,@account,@account_bill], notice: 'Bill was successfully updated.'
+      redirect_to [@account,@account_bill], notice: 'Bill was successfully updated.'
     else
       prep_edit
       render :edit
