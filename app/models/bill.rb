@@ -14,7 +14,7 @@ class Bill < ActiveRecord::Base
   after_validation  :update_balance_entries, :update_balance_event
 
   accepts_nested_attributes_for :bill_share_balance_entries, :allow_destroy => true,
-      :reject_if => proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? }
+      :reject_if => proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? || attrs['share'] == '0' }
 
   def self.valid_entry_types
     %w( Bill Credit )
