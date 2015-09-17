@@ -39,9 +39,11 @@ HouseBills::Application.routes.draw do
     end
     resources :shareholder_account_entries
     resources :unbound_account_entries
+
+    get 'charts(/:action)' => 'charts#:action', :as => :charts
   end
 
-  get 'charts(/:action)' => 'charts#index', :as => :charts
+  get 'charts(/:action)' => 'charts#:action', :as => :charts
 
   root :to => 'accounts#index'
 

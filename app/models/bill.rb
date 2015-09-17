@@ -2,22 +2,31 @@ class Bill < ActiveRecord::Base
   belongs_to  :shareholder
   belongs_to  :account
   belongs_to  :bill_type
-  has_many    :bill_share_balance_entries, :dependent => :destroy, :autosave => true
-  has_one     :bill_offset_balance_entry,  :dependent => :destroy, :autosave => true
-  has_one     :pot_balance_entry,          :dependent => :destroy, :autosave => true
-  has_one     :bill_account_entry,         :dependent => :destroy, :autosave => true
-  has_one     :balance_event,              :dependent => :destroy, :autosave => true
+  has_many    :bill_share_balance_entries, dependent: :destroy, autosave: true
+  has_one     :bill_offset_balance_entry,  dependent: :destroy, autosave: true
+  has_one     :pot_balance_entry,          dependent: :destroy, autosave: true
+  has_one     :bill_account_entry,         dependent: :destroy, autosave: true
+  has_one     :balance_event,              dependent: :destroy, autosave: true
 
   has_paper_trail
   
   before_validation :set_amount
   after_validation  :update_balance_entries, :update_balance_event
 
-  accepts_nested_attributes_for :bill_share_balance_entries, :allow_destroy => true,
-      :reject_if => proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? || attrs['share'] == '0' }
+  accepts_nested_attributes_for :bill_share_balance_entries, allow_destroy: true,
+      reject_if: proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? || attrs['share'] == '0' }
 
   def self.valid_entry_types
     %w( Bill Credit )
+  end
+
+  def self.sum_of_bills_by_type_and_month_for_shareholder(shareholder)
+    select('bills.bill_type_id, extract(month from bills.date) AS month, extract(year from bills.date) AS year, -sum(balance_entries.amount) as amount').
+    joins(:bill_share_balance_entries).
+    where("balance_entries.shareholder_id = ?", shareholder.id).
+    group('bill_type_id, extract(month from bills.date), extract(year from bills.date)').
+    order('bill_type_id, extract(year from bills.date), extract(month from bills.date)').
+    includes(:bill_type)
   end
 
   def balance_for(shareholder)
@@ -37,8 +46,8 @@ class Bill < ActiveRecord::Base
 
   validate                  :date_string_format_must_be_valid
   validates_presence_of     :entry_type
-  validates_inclusion_of    :entry_type, :in => valid_entry_types
-  validates_numericality_of :entry_amount, :greater_than_or_equal_to => 0
+  validates_inclusion_of    :entry_type, in: valid_entry_types
+  validates_numericality_of :entry_amount, greater_than_or_equal_to: 0
   validates_presence_of     :bill_type_id
   validates_presence_of     :date_string
   validates_associated      :bill_share_balance_entries
@@ -107,7 +116,7 @@ class Bill < ActiveRecord::Base
   end
 
   def entry_amount
-    ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, :precision => 2)
+    ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, precision: 2)
   end
 
   def shareholder_balance_amount(sh)
@@ -128,7 +137,7 @@ class Bill < ActiveRecord::Base
   def build_bill_share_entries!
     if account.present?
       active_shareholders.each do |s|
-        bill_share_balance_entries.build :shareholder => s, :account => account, :date => date
+        bill_share_balance_entries.build shareholder: s, account: account, date: date
       end
     end
   end
@@ -145,7 +154,7 @@ class Bill < ActiveRecord::Base
 
   def update_balance_entries
     s = bill_share_balance_entries.find_all {|e| !e.marked_for_destruction? }
-    p = (pot_balance_entry.blank? ? build_pot_balance_entry(:account => account) : pot_balance_entry)
+    p = (pot_balance_entry.blank? ? build_pot_balance_entry(account: account) : pot_balance_entry)
     if s.size > 0 && self.amount.present?
       share_ratios = s.map { |s| s.share }
       base_portion, gcd, remainder = Bill.calc_shares(share_ratios, amount)

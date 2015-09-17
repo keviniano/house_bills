@@ -57,6 +57,9 @@
               <li <%= current_page?(account_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
                 <%= link_to 'Account overview', account_path(@account) %>
               </li>
+              <li <%= current_page?(account_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
+                <%= link_to 'Bill types by month', account_charts_path(action: :bill_types_by_month) %>
+              </li>
             </ul>
           </li>
         <% end %>
