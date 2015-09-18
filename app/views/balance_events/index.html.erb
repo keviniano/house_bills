@@ -63,7 +63,7 @@
     <th></th>
     <th></th>
   </tr>
-  <% balance_events = @balance_events.all %>
+  <% balance_events = @paginated_balance_events.all %>
   <% if balance_events.first.present? %>
     <% running_total = balance_events.first.bill.balance_for(@shareholder) if @query.can_use_running_total && balance_events.first.bill.present? %>
     <% running_total = balance_events.first.account_entry.balance_for(@shareholder) if @query.can_use_running_total && balance_events.first.account_entry.present? %>
@@ -72,15 +72,51 @@
       <td colspan="10" class="center">No records to see here, move along...</td>
     </tr>
   <% end %>
+  <% sum_of_shareholder_change_amounts_this_page = 0 %>
+  <% sum_of_item_amounts_this_page = 0 %>
   <% balance_events.each do |item| %>
     <% if item.bill.present? %>
       <% amount = item.bill.shareholder_change_amount(@shareholder) %>
+      <% sum_of_shareholder_change_amounts_this_page += amount %>
+      <% sum_of_item_amounts_this_page += item.bill.amount %>
       <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill, :running_total => running_total, :amount => amount } %>
     <% else %>
       <% amount = item.account_entry.shareholder_offset_amount(@shareholder) %>
+      <% sum_of_shareholder_change_amounts_this_page += amount %>
+      <% sum_of_item_amounts_this_page += item.account_entry.amount %>
       <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :running_total => running_total, :amount => amount } %>
     <% end %>
     <% running_total -= amount if @query.can_use_running_total %>
   <% end %>
+  <tr>
+    <% if @paginated_balance_events.total_pages > 1 %>
+      <th colspan="2">Total this page</th>
+    <% else %>
+      <th colspan="2">Total</th>
+    <% end %>
+    <th class="currency"><%= number_to_currency sum_of_item_amounts_this_page %></th>
+    <th></th>
+    <th></th>
+    <th class="currency"><%= number_to_currency sum_of_shareholder_change_amounts_this_page %></th>
+    <% if @query.can_use_running_total %>
+      <th class="currency"></th>
+    <% end %>
+    <th></th>
+    <th></th>
+  </tr>
+  <% if @paginated_balance_events.total_pages > 1 %>
+    <tr>
+      <th colspan="2">Total all pages</th>
+      <th class="currency"><%= number_to_currency @sum_of_item_amounts %></th>
+      <th></th>
+      <th></th>
+      <th class="currency"><%= number_to_currency @sum_of_shareholder_change_amounts %></th>
+      <% if @query.can_use_running_total %>
+        <th class="currency"></th>
+      <% end %>
+      <th></th>
+      <th></th>
+    </tr>
+  <% end %>
 </table>
-<%= will_paginate @balance_events %>
+<%= will_paginate @paginated_balance_events %>

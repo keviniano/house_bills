@@ -93,9 +93,14 @@ class BalanceEventsController < ApplicationController
         @filename = "house_bills.csv"
         render "index.csv"
       end
+    else
+      total_entries = @balance_events.count(:id)
+      @paginated_balance_events = @balance_events.default_order.all_includes.paginate :page => params[:page], :total_entries => total_entries
+      if @paginated_balance_events.total_pages > 1
+        @sum_of_item_amounts = @balance_events.sum_of_amounts
+        @sum_of_shareholder_change_amounts = @balance_events.sum_of_shareholder_change_amounts(@shareholder.id)
+      end
     end
-    total_entries = @balance_events.count(:id)
-    @balance_events = @balance_events.default_order.all_includes.paginate :page => params[:page], :total_entries => total_entries
   end
 
 end

@@ -44,4 +44,19 @@ class BalanceEvent < ActiveRecord::Base
                                                       FROM account_entries
                                                       WHERE payee ILIKE :text OR note ILIKE :text
                                                     )", text: "%#{text}%") }
+
+  def self.sum_of_amounts
+    select("SUM(COALESCE(account_entries.amount, bills.amount)) AS sum_of_amount").
+      joins("LEFT OUTER JOIN account_entries ON balance_events.account_entry_id = account_entries.id").
+      joins("LEFT OUTER JOIN bills ON balance_events.bill_id = bills.id").
+      reorder('').first.attributes['sum_of_amount']
+  end
+
+  def self.sum_of_shareholder_change_amounts(shareholder)
+    select("SUM(COALESCE(account_entry_balance_entries.amount, bill_balance_entries.amount)) AS sum_of_amount").
+      joins("LEFT OUTER JOIN balance_entries AS account_entry_balance_entries ON balance_events.account_entry_id = account_entry_balance_entries.account_entry_id").
+      joins("LEFT OUTER JOIN balance_entries AS bill_balance_entries ON balance_events.bill_id = bill_balance_entries.bill_id").
+      where("COALESCE(account_entry_balance_entries.shareholder_id, bill_balance_entries.shareholder_id) = ?", shareholder).
+      reorder('').first.attributes['sum_of_amount']
+  end
 end
