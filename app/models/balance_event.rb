@@ -34,7 +34,7 @@ class BalanceEvent < ActiveRecord::Base
                                                       FROM balance_entries
                                                       WHERE shareholder_id = ?
                                                     ))',shareholder, shareholder) }
-  scope :with_text,                 -> (shareholder) {
+  scope :with_text,                 -> (text) {
                                             where("balance_events.bill_id IN (
                                                   SELECT id
                                                   FROM bills
