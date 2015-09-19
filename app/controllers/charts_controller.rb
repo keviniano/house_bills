@@ -31,7 +31,20 @@ class ChartsController < ApplicationController
   load_and_authorize_resource :account
 
   def bill_types_by_month
-
+    bills = @account.bills.accessible_by(current_ability)
+    authorize! :show, Bill
+    params[:query] ||= {}
+    params[:query][:start_date] = (Date.today.at_beginning_of_month - 1.year).strftime('%m-%d-%Y')
+    query = ChartQuery.new(params[:query],session,current_user)
+    bills_to_display = query.apply_conditions(bills).sum_of_bills_by_type_and_month_for_shareholder(current_user.shareholder_for_account(@account))
+    @values = {}
+    @months = Hash.new(0)
+    @bill_types = Hash.new(0)
+    bills_to_display.each do |b|
+      @values[[b.bill_type.name, [b['year'].to_i ,b['month'].to_i]]] = b.amount
+      @months[[b['year'].to_i,b['month'].to_i]] += b.amount
+      @bill_types[b.bill_type.name] += b.amount
+    end
   end
 
   def balance_line_chart

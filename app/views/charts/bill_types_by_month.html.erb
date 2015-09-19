@@ -1,1 +1,43 @@
 <%= chart_tag('bill_types_by_month_for_current_user_line_chart',400,params) %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th/>
+      <% @bill_types.keys.sort.each do |bill_type| %>
+        <th class="currency"><%= bill_type %></th>
+      <% end %>
+      <th class="currency">Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @months.keys.sort.each do |month| %>
+      <tr>
+        <th class="currency">
+          <%= "#{month[1]}-#{month[0]}" %>
+        </th>
+        <% @bill_types.keys.sort.each do |bill_type| %>
+          <td class="currency">
+            <%= number_to_currency @values[[bill_type, month]] %>
+          </td>
+        <% end %>
+        <th class="currency">
+          <%= number_to_currency @months[month] %>
+        </th>
+      </tr>
+    <% end %>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>
+        Total
+      </th>
+      <% @bill_types.keys.sort.each do |bill_type| %>
+        <th class="currency"><%= number_to_currency @bill_types[bill_type] %></th>
+      <% end %>
+      <th class="currency">
+        <%= number_to_currency @bill_types.values.reduce(:+) %>
+      </th>
+    </tr>
+  </tfoot>
+</table>
