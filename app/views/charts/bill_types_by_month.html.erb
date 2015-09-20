@@ -3,8 +3,10 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th/>
-      <% @bill_types.keys.sort.each do |bill_type| %>
+      <th class="currency">
+        Month
+      </th>
+      <% @bill_types.keys.sort_by{ |a| a.name}.each do |bill_type| %>
         <th class="currency"><%= bill_type.name %></th>
       <% end %>
       <th class="currency">Total</th>
@@ -16,7 +18,7 @@
         <th class="currency">
           <%= "#{month[1]}-#{month[0]}" %>
         </th>
-        <% @bill_types.keys.sort.each do |bill_type| %>
+        <% @bill_types.keys.sort_by{ |a| a.name}.each do |bill_type| %>
           <td class="currency">
             <%= link_to_unless(@values[[bill_type, month]].nil?,
                                number_to_currency(@values[[bill_type, month]]),
@@ -43,7 +45,7 @@
   </tbody>
   <tfoot>
     <tr>
-      <th>
+      <th class="currency">
         Total
       </th>
       <% @bill_types.keys.sort.each do |bill_type| %>
