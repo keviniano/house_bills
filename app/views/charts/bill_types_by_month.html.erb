@@ -5,7 +5,7 @@
     <tr>
       <th/>
       <% @bill_types.keys.sort.each do |bill_type| %>
-        <th class="currency"><%= bill_type %></th>
+        <th class="currency"><%= bill_type.name %></th>
       <% end %>
       <th class="currency">Total</th>
     </tr>
@@ -18,11 +18,25 @@
         </th>
         <% @bill_types.keys.sort.each do |bill_type| %>
           <td class="currency">
-            <%= number_to_currency @values[[bill_type, month]] %>
+            <%= link_to_unless(@values[[bill_type, month]].nil?,
+                               number_to_currency(@values[[bill_type, month]]),
+                               account_balance_events_path(@account,
+                                                           "q[bill_type_id]"         => bill_type.id,
+                                                           "q[start_date]"           => Date.new(month[0], month[1]),
+                                                           "q[end_date]"             => Date.new(month[0], month[1], -1),
+                                                           "q[share_shareholder_id]" => @q.shareholder_id
+                                                          )
+                              ) %>
           </td>
         <% end %>
         <th class="currency">
-          <%= number_to_currency @months[month] %>
+          <%= link_to(number_to_currency(@months[month]),
+                      account_balance_events_path(@account,
+                                                  "q[start_date]"           => Date.new(month[0], month[1]),
+                                                  "q[end_date]"             => Date.new(month[0], month[1], -1),
+                                                  "q[share_shareholder_id]" => @q.shareholder_id
+                                                 )
+                     ) %>
         </th>
       </tr>
     <% end %>
@@ -33,10 +47,25 @@
         Total
       </th>
       <% @bill_types.keys.sort.each do |bill_type| %>
-        <th class="currency"><%= number_to_currency @bill_types[bill_type] %></th>
+        <th class="currency">
+          <%= link_to(number_to_currency(@bill_types[bill_type]),
+                      account_balance_events_path(@account,
+                                                  "q[bill_type_id]"         => bill_type.id,
+                                                  "q[start_date]"           => @q.start_date,
+                                                  "q[end_date]"             => @q.end_date,
+                                                  "q[share_shareholder_id]" => @q.shareholder_id
+                                                 )
+                     ) %>
+        </th>
       <% end %>
       <th class="currency">
-        <%= number_to_currency @bill_types.values.reduce(:+) %>
+        <%= link_to(number_to_currency(@bill_types.values.reduce(:+)),
+                    account_balance_events_path(@account,
+                                                "q[start_date]"           => @q.start_date,
+                                                "q[end_date]"             => @q.end_date,
+                                                "q[share_shareholder_id]" => @q.shareholder_id
+                                               )
+                   ) %>
       </th>
     </tr>
   </tfoot>

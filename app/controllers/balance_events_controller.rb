@@ -78,8 +78,8 @@ class BalanceEventsController < ApplicationController
   def index
     @balance_events = @account.balance_events.accessible_by(current_ability)
     authorize! :show, BalanceEvent
-    @query = BalanceEventQuery.new(params[:query],session,current_user)
-    @balance_events = @query.apply_conditions(@balance_events)
+    @q = BalanceEventQuery.new(params[:q], session, current_user)
+    @balance_events = @q.apply_conditions(@balance_events)
     @shareholder = current_user.shareholder_for_account(@account)
     if params[:output] == 'CSV'
       if @balance_events.count > 250

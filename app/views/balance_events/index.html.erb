@@ -10,39 +10,39 @@
 </button>
 <form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search_bills] ? "block" : "none" %>;">
   <div class="form-group">
-    <%= label :query, :bill_type_id, "Bill type", class: 'col-sm-2 control-label' %>
+    <%= label :q, :bill_type_id, "Bill type", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :query, :bill_type_id, BalanceEventQuery.bill_types(@account) %>
+      <%= select :q, :bill_type_id, BalanceEventQuery.bill_types(@account) %>
     </div>
   </div>
   <div class="form-group">
-    <%= label :query, :with_text, "Entries containing", class: 'col-sm-2 control-label' %>
+    <%= label :q, :with_text, "Entries containing", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :query, :with_text, placeholder: 'any text' %>
+      <%= text_field :q, :with_text, placeholder: 'any text' %>
     </div>
   </div>
   <div class="form-group">
-    <%= label :query, :start_date, "Start date", class: 'col-sm-2 control-label' %>
+    <%= label :q, :start_date, "Start date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :query, :start_date, class: 'datepicker', placeholder: 'the very start' %>
+      <%= text_field :q, :start_date, class: 'datepicker', placeholder: 'the very start' %>
     </div>
   </div>
   <div class="form-group">
-    <%= label :query, :end_date, "End date", class: 'col-sm-2 control-label' %>
+    <%= label :q, :end_date, "End date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :query, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
+      <%= text_field :q, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
     </div>
   </div>
   <div class="form-group">
-    <%= label :query, :payee_shareholder_id, "Entered by", class: 'col-sm-2 control-label' %>
+    <%= label :q, :payee_shareholder_id, "Entered by", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :query, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.payee_shareholder_id) %>
+      <%= select :q, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.payee_shareholder_id) %>
     </div>
   </div>
   <div class="form-group">
-    <%= label :query, :share_shareholder_id, "Shared by", class: 'col-sm-2 control-label' %>
+    <%= label :q, :share_shareholder_id, "Shared by", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :query, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@query.share_shareholder_id) %>
+      <%= select :q, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.share_shareholder_id) %>
     </div>
   </div>
   <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
@@ -57,7 +57,7 @@
     <th>Type</th>
     <th>Note</th>
     <th class="currency">Net Change</th>
-    <% if @query.can_use_running_total %>
+    <% if @q.can_use_running_total %>
       <th class="currency">My Balance</th>
     <% end %>
     <th></th>
@@ -65,8 +65,8 @@
   </tr>
   <% balance_events = @paginated_balance_events.all %>
   <% if balance_events.first.present? %>
-    <% running_total = balance_events.first.bill.balance_for(@shareholder) if @query.can_use_running_total && balance_events.first.bill.present? %>
-    <% running_total = balance_events.first.account_entry.balance_for(@shareholder) if @query.can_use_running_total && balance_events.first.account_entry.present? %>
+    <% running_total = balance_events.first.bill.balance_for(@shareholder) if @q.can_use_running_total && balance_events.first.bill.present? %>
+    <% running_total = balance_events.first.account_entry.balance_for(@shareholder) if @q.can_use_running_total && balance_events.first.account_entry.present? %>
   <% else %>
     <tr>
       <td colspan="10" class="center">No records to see here, move along...</td>
@@ -86,7 +86,7 @@
       <% sum_of_item_amounts_this_page += item.account_entry.amount %>
       <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :running_total => running_total, :amount => amount } %>
     <% end %>
-    <% running_total -= amount if @query.can_use_running_total %>
+    <% running_total -= amount if @q.can_use_running_total %>
   <% end %>
   <tr>
     <% if @paginated_balance_events.total_pages > 1 %>
@@ -98,7 +98,7 @@
     <th></th>
     <th></th>
     <th class="currency"><%= number_to_currency sum_of_shareholder_change_amounts_this_page %></th>
-    <% if @query.can_use_running_total %>
+    <% if @q.can_use_running_total %>
       <th class="currency"></th>
     <% end %>
     <th></th>
@@ -111,7 +111,7 @@
       <th></th>
       <th></th>
       <th class="currency"><%= number_to_currency @sum_of_shareholder_change_amounts %></th>
-      <% if @query.can_use_running_total %>
+      <% if @q.can_use_running_total %>
         <th class="currency"></th>
       <% end %>
       <th></th>

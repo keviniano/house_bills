@@ -6,7 +6,7 @@
   <% truncated_note = truncate(account_entry_row.note, separator: ' ') %>
   <td title="<%= (account_entry_row.note == truncated_note) ? nil : account_entry_row.note %>"><%= truncated_note %></td>
   <td class="currency"><%= amount == 0 ? nil : number_to_currency(amount) %></td>
-  <% if @query.can_use_running_total %>
+  <% if @q.can_use_running_total %>
     <td class="currency"><%= number_to_currency running_total %></td>
   <% end %>
   <td><%= link_to('Show Details', [@account,account_entry_row]) %></td>
