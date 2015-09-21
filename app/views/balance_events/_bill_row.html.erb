@@ -1,7 +1,7 @@
 <tr>
   <td><%= bill_row.date %></td>
   <td><%= bill_row.recipient %></td>
-  <td class="currency"><%= number_to_currency(-bill_row.amount) %></td>
+  <td class="currency"><%= number_to_currency(bill_row.amount) %></td>
   <td><%= bill_row.bill_type.name %></td>
   <% truncated_note = truncate(bill_row.note, separator: ' ') %>
   <td title="<%= (bill_row.note == truncated_note) ? nil : bill_row.note %>"><%= truncated_note %></td>
