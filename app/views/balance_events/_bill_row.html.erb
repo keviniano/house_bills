@@ -1,17 +1,19 @@
 <tr>
   <td><%= bill_row.date %></td>
   <td><%= bill_row.recipient %></td>
-  <td class="currency"><%= number_to_currency (bill_row.amount) %></td>
+  <td class="currency"><%= number_to_currency(-bill_row.amount) %></td>
   <td><%= bill_row.bill_type.name %></td>
   <% truncated_note = truncate(bill_row.note, separator: ' ') %>
   <td title="<%= (bill_row.note == truncated_note) ? nil : bill_row.note %>"><%= truncated_note %></td>
-  <td class="currency"><%= amount == 0 ? nil : number_to_currency(amount) %></td>
+  <td class="currency"><%= share_amount  == 0 ? nil : number_to_currency(share_amount)  %></td>
+  <td class="currency"><%= offset_amount == 0 ? nil : number_to_currency(offset_amount) %></td>
+  <td class="currency"><%= change_amount == 0 ? nil : number_to_currency(change_amount) %></td>
   <% if @q.can_use_running_total %>
     <td class="currency">
       <%= number_to_currency running_total %>
     </td>
   <% end %>
-  <td><%= link_to('Show Details', [@account,bill_row], class: "view-bill", data: { url: url_for(show_shares_account_bill_url(@account,bill_row))}) %></td>
+  <td><%= link_to('Details', [@account,bill_row], class: "view-bill", data: { url: url_for(show_shares_account_bill_url(@account,bill_row))}) %></td>
   <td><%= link_to('Edit', [:edit,@account,bill_row]) if can? :edit, bill_row %></td>
 </tr>
 <tr style="display:none">

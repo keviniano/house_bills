@@ -22,13 +22,13 @@
     </div>
   </div>
   <div class="form-group">
-    <%= label :q, :start_date, "Start date", class: 'col-sm-2 control-label' %>
+    <%= label :q, :start_date, "Entry start date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
       <%= text_field :q, :start_date, class: 'datepicker', placeholder: 'the very start' %>
     </div>
   </div>
   <div class="form-group">
-    <%= label :q, :end_date, "End date", class: 'col-sm-2 control-label' %>
+    <%= label :q, :end_date, "Entry end date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
       <%= text_field :q, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
     </div>
@@ -45,6 +45,30 @@
       <%= select :q, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.share_shareholder_id) %>
     </div>
   </div>
+  <div class="form-group">
+    <%= label :q, :created_at_start_date, "Created at start date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= text_field :q, :created_at_start_date, class: 'datepicker', placeholder: 'the very start' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= label :q, :created_at_end_date, "Created at end date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= text_field :q, :created_at_end_date, :class => 'datepicker', placeholder: 'the very end' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= label :q, :updated_at_start_date, "Updated at start date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= text_field :q, :updated_at_start_date, class: 'datepicker', placeholder: 'the very start' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= label :q, :updated_at_end_date, "Updated at end date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= text_field :q, :updated_at_end_date, :class => 'datepicker', placeholder: 'the very end' %>
+    </div>
+  </div>
   <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
   <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
 </form>
@@ -56,37 +80,60 @@
     <th class="currency">Amount</th>
     <th>Type</th>
     <th>Note</th>
-    <th class="currency">Net Change</th>
+    <th class="currency">Share</th>
+    <th class="currency">Offset</th>
+    <th class="currency">Change</th>
     <% if @q.can_use_running_total %>
-      <th class="currency">My Balance</th>
+      <th class="currency">Balance</th>
     <% end %>
     <th></th>
     <th></th>
   </tr>
-  <% balance_events = @paginated_balance_events.all %>
+  <% balance_events = @paginated_balance_events.to_a %>
+  <% running_total = 0 %>
   <% if balance_events.first.present? %>
-    <% running_total = balance_events.first.bill.balance_for(@shareholder) if @q.can_use_running_total && balance_events.first.bill.present? %>
-    <% running_total = balance_events.first.account_entry.balance_for(@shareholder) if @q.can_use_running_total && balance_events.first.account_entry.present? %>
+    <% if @q.can_use_running_total %>
+      <% if balance_events.first.bill.present? %>
+        <% running_total = balance_events.first.bill.balance_for(@shareholder) %>
+      <% elsif balance_events.first.account_entry.present? %>
+        <% running_total = balance_events.first.account_entry.balance_for(@shareholder) %>
+      <% end %>
+    <% end %>
   <% else %>
     <tr>
-      <td colspan="10" class="center">No records to see here, move along...</td>
+      <td colspan="12" class="center">Nothing to see here, move along...</td>
     </tr>
   <% end %>
-  <% sum_of_shareholder_change_amounts_this_page = 0 %>
-  <% sum_of_item_amounts_this_page = 0 %>
+  <% sum_of_item_amounts_this_page   = 0 %>
+  <% sum_of_share_amounts_this_page  = 0 %>
+  <% sum_of_offset_amounts_this_page = 0 %>
+  <% sum_of_change_amounts_this_page = 0 %>
   <% balance_events.each do |item| %>
     <% if item.bill.present? %>
-      <% amount = item.bill.shareholder_change_amount(@shareholder) %>
-      <% sum_of_shareholder_change_amounts_this_page += amount %>
-      <% sum_of_item_amounts_this_page += item.bill.amount %>
-      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill, :running_total => running_total, :amount => amount } %>
+      <% share_amount  = item.bill.shareholder_share_amount(@shareholder)  %>
+      <% offset_amount = item.bill.shareholder_offset_amount(@shareholder) %>
+      <% change_amount = share_amount + offset_amount %>
+      <% sum_of_share_amounts_this_page  += share_amount  %>
+      <% sum_of_offset_amounts_this_page += offset_amount %>
+      <% sum_of_change_amounts_this_page += change_amount %>
+      <% sum_of_item_amounts_this_page   += item.bill.amount %>
+      <%= render :partial => 'bill_row', :locals => { :bill_row => item.bill,
+                                                      :running_total => running_total,
+                                                      :share_amount => share_amount,
+                                                      :offset_amount => offset_amount,
+                                                      :change_amount => change_amount
+                                                    } %>
     <% else %>
-      <% amount = item.account_entry.shareholder_offset_amount(@shareholder) %>
-      <% sum_of_shareholder_change_amounts_this_page += amount %>
+      <% offset_amount = item.account_entry.shareholder_offset_amount(@shareholder) %>
+      <% change_amount = offset_amount %>
+      <% sum_of_change_amounts_this_page += offset_amount %>
       <% sum_of_item_amounts_this_page += item.account_entry.amount %>
-      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry, :running_total => running_total, :amount => amount } %>
+      <%= render :partial => 'account_entry_row', :locals => { :account_entry_row => item.account_entry,
+                                                               :running_total => running_total,
+                                                               :offset_amount => offset_amount,
+                                                             } %>
     <% end %>
-    <% running_total -= amount if @q.can_use_running_total %>
+    <% running_total -= change_amount if @q.can_use_running_total %>
   <% end %>
   <tr>
     <% if @paginated_balance_events.total_pages > 1 %>
@@ -94,28 +141,48 @@
     <% else %>
       <th colspan="2">Total</th>
     <% end %>
-    <th class="currency"><%= number_to_currency sum_of_item_amounts_this_page %></th>
-    <th></th>
-    <th></th>
-    <th class="currency"><%= number_to_currency sum_of_shareholder_change_amounts_this_page %></th>
+    <th class="currency">
+      <%= number_to_currency sum_of_item_amounts_this_page %>
+    </th>
+    <th/>
+    <th/>
+    <th class="currency">
+      <%= number_to_currency sum_of_share_amounts_this_page %>
+    </th>
+    <th class="currency">
+      <%= number_to_currency sum_of_offset_amounts_this_page %>
+    </th>
+    <th class="currency">
+      <%= number_to_currency sum_of_change_amounts_this_page %>
+    </th>
     <% if @q.can_use_running_total %>
       <th class="currency"></th>
     <% end %>
-    <th></th>
-    <th></th>
+    <th/>
+    <th/>
   </tr>
   <% if @paginated_balance_events.total_pages > 1 %>
     <tr>
       <th colspan="2">Total all pages</th>
-      <th class="currency"><%= number_to_currency @sum_of_item_amounts %></th>
-      <th></th>
-      <th></th>
-      <th class="currency"><%= number_to_currency @sum_of_shareholder_change_amounts %></th>
+      <th class="currency">
+        <%= number_to_currency @sum_of_item_amounts %>
+      </th>
+      <th/>
+      <th/>
+      <th class="currency">
+        <%= number_to_currency @sum_of_share_amounts %>
+      </th>
+      <th class="currency">
+        <%= number_to_currency @sum_of_offset_amounts %>
+      </th>
+      <th class="currency">
+        <%= number_to_currency(@sum_of_share_amounts + @sum_of_offset_amounts) %>
+      </th>
       <% if @q.can_use_running_total %>
-        <th class="currency"></th>
+        <th/>
       <% end %>
-      <th></th>
-      <th></th>
+      <th/>
+      <th/>
     </tr>
   <% end %>
 </table>

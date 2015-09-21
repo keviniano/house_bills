@@ -126,6 +126,11 @@ class Bill < ActiveRecord::Base
     return 0
   end
 
+  def shareholder_share_amount(sh)
+    # TODO get ride of shareholder_balance_amount
+    shareholder_balance_amount(sh)
+  end
+
   def shareholder_offset_amount(sh)
     (self.type == "ShareholderBill" and self.shareholder_id == sh.id) ? bill_offset_balance_entry.amount : 0
   end
