@@ -4,7 +4,15 @@ class ChartQuery
 
   attr_reader :start_date, :end_date, :shareholder_id
 
-  def initialize(params,session,user,account)
+  def self.grouped_shareholders
+    result = {'All' => [['Anyone',nil]],'Active' => [], 'Inactive' => []}
+    Shareholder.order(:name).each do |sh|
+      result[sh.status].push([sh.name, sh.id])
+    end
+    [['All',result['All']], ['Active', result['Active']], ['Inactive', result['Inactive']]]
+  end
+
+  def initialize(params, session, user, account)
     params ||= {}
     if params[:start_date].present?
       @start_date = Date.strptime(params[:start_date],'%m-%d-%Y')
@@ -21,7 +29,7 @@ class ChartQuery
     if params[:shareholder_id].present?
       @shareholder_id = params[:shareholder_id].to_i
     else
-      @shareholder_id = user.shareholder_for_account(account)
+      @shareholder_id = user.shareholder_for_account(account).id
     end
   end
 
@@ -43,10 +51,10 @@ class ChartsController < ApplicationController
   def bill_types_by_month
     bills = @account.bills.accessible_by(current_ability)
     authorize! :show, Bill
-    @q = ChartQuery.new(params[:q],session,current_user,@account)
+    @q = ChartQuery.new(params[:q], session, current_user, @account)
     bills_to_display = @q.apply_conditions(bills).sum_of_bills_by_type_and_month_for_shareholder(@q.shareholder_id)
-    @values = {}
-    @months = Hash.new(0)
+    @values =     Hash.new
+    @months =     Hash.new(0)
     @bill_types = Hash.new(0)
     bills_to_display.each do |b|
       @values[[b.bill_type, [b['year'].to_i ,b['month'].to_i]]] = b.amount

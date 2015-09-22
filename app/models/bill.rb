@@ -20,10 +20,10 @@ class Bill < ActiveRecord::Base
     %w( Bill Credit )
   end
 
-  def self.sum_of_bills_by_type_and_month_for_shareholder(shareholder)
+  def self.sum_of_bills_by_type_and_month_for_shareholder(shareholder_id)
     select('bills.bill_type_id, extract(month from bills.date) AS month, extract(year from bills.date) AS year, -sum(balance_entries.amount) as amount').
     joins(:bill_share_balance_entries).
-    where("balance_entries.shareholder_id = ?", shareholder.id).
+    where("balance_entries.shareholder_id = ?", shareholder_id).
     group('bill_type_id, extract(month from bills.date), extract(year from bills.date)').
     order('bill_type_id, extract(year from bills.date), extract(month from bills.date)').
     includes(:bill_type)

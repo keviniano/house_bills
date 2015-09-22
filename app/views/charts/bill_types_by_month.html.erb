@@ -1,3 +1,25 @@
+<form id="search" class="well form-horizontal">
+  <div class="form-group">
+    <%= label :q, :start_date, "Entry start date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= text_field :q, :start_date, class: 'datepicker', placeholder: 'the very start' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= label :q, :end_date, "Entry end date", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= text_field :q, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= label :q, :shareholder_id, "Shared by", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= select :q, :shareholder_id, grouped_options_for_select(ChartQuery.grouped_shareholders,@q.shareholder_id) %>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
+</form>
+
 <%= chart_tag('bill_types_by_month_for_current_user_line_chart',400,params) %>
 
 <table class="table table-striped">
@@ -48,7 +70,7 @@
       <th class="currency">
         Total
       </th>
-      <% @bill_types.keys.sort.each do |bill_type| %>
+      <% @bill_types.keys.sort_by{ |a| a.name}.each do |bill_type| %>
         <th class="currency">
           <%= link_to(number_to_currency(@bill_types[bill_type]),
                       account_balance_events_path(@account,
