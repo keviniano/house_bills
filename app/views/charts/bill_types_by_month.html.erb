@@ -12,12 +12,12 @@
     </div>
   </div>
   <div class="form-group">
-    <%= label :q, :shareholder_id, "Shared by", class: 'col-sm-2 control-label' %>
+    <%= label :q, :shareholder_id, "Show costs for", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
       <%= select :q, :shareholder_id, grouped_options_for_select(ChartQuery.grouped_shareholders,@q.shareholder_id) %>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
+  <button type="submit" class="btn btn-primary col-sm-offset-2">Filter</button>
 </form>
 
 <%= chart_tag('bill_types_by_month_for_current_user_line_chart', 400, params) %>
@@ -45,11 +45,13 @@
             <%= link_to_unless(@values[[bill_type, month]].nil?,
                                number_to_currency(@values[[bill_type, month]]),
                                account_balance_events_path(@account,
-                                                           "q[bill_type_id]"         => bill_type.id,
-                                                           "q[start_date]"           => Date.new(month[0], month[1]),
-                                                           "q[end_date]"             => Date.new(month[0], month[1], -1),
-                                                           "q[share_shareholder_id]" => @q.shareholder_id
-                                                          )
+                                                           "q[bill_type_id]"           => bill_type.id,
+                                                           "q[start_date]"             => Date.new(month[0], month[1]),
+                                                           "q[end_date]"               => Date.new(month[0], month[1], -1),
+                                                           "q[share_shareholder_id]"   => @q.shareholder_id,
+                                                           "q[balance_shareholder_id]" => @q.shareholder_id
+                                                           ),
+                               { target: "_blank" }
                               ) %>
           </td>
         <% end %>
@@ -58,8 +60,10 @@
                       account_balance_events_path(@account,
                                                   "q[start_date]"           => Date.new(month[0], month[1]),
                                                   "q[end_date]"             => Date.new(month[0], month[1], -1),
-                                                  "q[share_shareholder_id]" => @q.shareholder_id
-                                                 )
+                                                  "q[share_shareholder_id]" => @q.shareholder_id,
+                                                  "q[balance_shareholder_id]" => @q.shareholder_id
+                                                 ),
+                      { target: "_blank" }
                      ) %>
         </th>
       </tr>
@@ -77,8 +81,10 @@
                                                   "q[bill_type_id]"         => bill_type.id,
                                                   "q[start_date]"           => @q.start_date,
                                                   "q[end_date]"             => @q.end_date,
-                                                  "q[share_shareholder_id]" => @q.shareholder_id
-                                                 )
+                                                  "q[share_shareholder_id]" => @q.shareholder_id,
+                                                  "q[balance_shareholder_id]" => @q.shareholder_id
+                                                 ),
+                      { target: "_blank" }
                      ) %>
         </th>
       <% end %>
@@ -87,8 +93,10 @@
                     account_balance_events_path(@account,
                                                 "q[start_date]"           => @q.start_date,
                                                 "q[end_date]"             => @q.end_date,
-                                                "q[share_shareholder_id]" => @q.shareholder_id
-                                               )
+                                                "q[share_shareholder_id]" => @q.shareholder_id,
+                                                "q[balance_shareholder_id]" => @q.shareholder_id
+                                               ),
+                    { target: "_blank" }
                    ) %>
       </th>
     </tr>

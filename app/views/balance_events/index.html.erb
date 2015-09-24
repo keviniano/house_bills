@@ -10,6 +10,12 @@
 </button>
 <form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search_bills] ? "block" : "none" %>;">
   <div class="form-group">
+    <%= label :q, :balance_shareholder_id, "Show costs for", class: 'col-sm-2 control-label' %>
+    <div class="col-sm-10">
+      <%= select :q, :balance_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.balance_shareholder_id) %>
+    </div>
+  </div>
+  <div class="form-group">
     <%= label :q, :bill_type_id, "Bill type", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
       <%= select :q, :bill_type_id, BalanceEventQuery.bill_types(@account) %>
@@ -36,13 +42,13 @@
   <div class="form-group">
     <%= label :q, :payee_shareholder_id, "Entered by", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :q, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.payee_shareholder_id) %>
+      <%= select :q, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders_plus_all,@q.payee_shareholder_id) %>
     </div>
   </div>
   <div class="form-group">
     <%= label :q, :share_shareholder_id, "Shared by", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :q, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.share_shareholder_id) %>
+      <%= select :q, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders_plus_all,@q.share_shareholder_id) %>
     </div>
   </div>
   <div class="form-group">
@@ -75,19 +81,22 @@
 
 <table class="table table-hover table-condensed">
   <tr>
-    <th>Date</th>
-    <th>Payee</th>
-    <th class="currency">Amount</th>
-    <th>Type</th>
-    <th>Note</th>
+    <th rowspan="2" class="bottom">Date</th>
+    <th rowspan="2" class="bottom">Payee</th>
+    <th rowspan="2" class="currency bottom">Amount</th>
+    <th rowspan="2" class="bottom">Type</th>
+    <th rowspan="2" class="bottom">Note</th>
+    <th colspan="3" class="center">Costs for <%= @shareholder.name %><th>
+    <% if @q.can_use_running_total %>
+      <th class="currency bottom" rowspan="2">Balance</th>
+    <% end %>
+    <th rowspan="2" class="bottom"></th>
+    <th rowspan="2" class="bottom"></th>
+  </tr>
+  <tr>
     <th class="currency">Share</th>
     <th class="currency">Offset</th>
     <th class="currency">Change</th>
-    <% if @q.can_use_running_total %>
-      <th class="currency">Balance</th>
-    <% end %>
-    <th></th>
-    <th></th>
   </tr>
   <% balance_events = @paginated_balance_events.to_a %>
   <% running_total = 0 %>

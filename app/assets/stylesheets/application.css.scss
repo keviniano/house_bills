@@ -59,10 +59,18 @@ form textarea.note {
   height: 50px;
   }
 
+table tr th.bottom {
+  vertical-align: bottom;
+  }
+
 table tr td.currency,
 table tr th.currency,
 div.currency {
   text-align: right;
+  }
+
+table tr th.center {
+  text-align: center;
   }
 
 td.shares div.grid {

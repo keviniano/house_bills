@@ -2,11 +2,18 @@ class BalanceEventQuery
   include ActiveModel::Conversion
   extend ActiveModel::Naming
 
-  attr_reader :start_date, :end_date, :payee_shareholder_id, :with_text, :share_shareholder_id, :bill_type_id, :can_use_running_total,
-    :created_at_start_date, :created_at_end_date, :updated_at_start_date, :updated_at_end_date
+  attr_reader :start_date, :end_date, :payee_shareholder_id, :share_shareholder_id, :balance_shareholder_id, :with_text, 
+    :bill_type_id, :can_use_running_total, :created_at_start_date, :created_at_end_date, :updated_at_start_date, :updated_at_end_date,
 
   def self.grouped_shareholders
-    # ['Anyone',nil] + Shareholder.order(:name).map{|sh| [sh.name, sh.id]}
+    result = {'Active' => [], 'Inactive' => []}
+    Shareholder.order(:name).each do |sh|
+      result[sh.status].push([sh.name, sh.id])
+    end
+    [['Active', result['Active']], ['Inactive', result['Inactive']]]
+  end
+
+  def self.grouped_shareholders_plus_all
     result = {'All' => [['Anyone',nil]],'Active' => [], 'Inactive' => []}
     Shareholder.order(:name).each do |sh|
       result[sh.status].push([sh.name, sh.id])
@@ -19,7 +26,7 @@ class BalanceEventQuery
     (AccountEntry.valid_entry_types.each{|item| [item,item] } + BillType.for_account(account).each.map{|row| [row.name,row.id]}).sort_by{|a| a[0] }
   end
 
-  def initialize(params, session, user)
+  def initialize(params, session, user, account)
     @current_user = user
     params ||= {}
     if params[:start_date].present?
@@ -37,6 +44,11 @@ class BalanceEventQuery
     @created_at_end_date   = params[:created_at_end_date]       if params[:created_at_end_date].present?
     @updated_at_start_date = params[:updated_at_start_date]     if params[:updated_at_start_date].present?
     @updated_at_end_date   = params[:updated_at_end_date]       if params[:updated_at_end_date].present?
+    if params[:balance_shareholder_id].present?
+      @balance_shareholder_id = params[:balance_shareholder_id].to_i
+    else
+      @balance_shareholder_id = user.shareholder_for_account(account).id
+    end
   end
 
   def persisted?
@@ -88,9 +100,9 @@ class BalanceEventsController < ApplicationController
   def index
     @balance_events = @account.balance_events.accessible_by(current_ability)
     authorize! :show, BalanceEvent
-    @q = BalanceEventQuery.new(params[:q], session, current_user)
+    @q = BalanceEventQuery.new(params[:q], session, current_user, @account)
     @balance_events = @q.apply_conditions(@balance_events)
-    @shareholder = current_user.shareholder_for_account(@account)
+    @shareholder = Shareholder.find(@q.balance_shareholder_id)
     if params[:output] == 'CSV'
       if @balance_events.count > 250
         flash.now[:error] = "Exports cannot be for more than 250 entries"
@@ -98,7 +110,9 @@ class BalanceEventsController < ApplicationController
         @balance_events = @balance_events.default_order.all_includes
         bill_ids = @balance_events.map{|be| be.bill_id }.compact
         account_entry_ids = @balance_events.map{|be| be.account_entry_id }.compact
-        shareholder_ids = BalanceEntry.where("bill_id IN (?) OR account_entry_id IN (?)",bill_ids, account_entry_ids).pluck("DISTINCT shareholder_id").compact
+        shareholder_ids = BalanceEntry.
+          where("bill_id IN (?) OR account_entry_id IN (?)",bill_ids, account_entry_ids).
+          pluck("DISTINCT shareholder_id").compact
         @shareholders = Shareholder.order(:name).find(shareholder_ids)
         @filename = "house_bills.csv"
         render "index.csv"
@@ -113,5 +127,4 @@ class BalanceEventsController < ApplicationController
       end
     end
   end
-
 end
