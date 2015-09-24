@@ -162,7 +162,7 @@ class ChartsController < ApplicationController
   def bill_types_by_month_for_current_user_line_chart
     bills = @account.bills.accessible_by(current_ability)
     authorize! :show, Bill
-    @q = ChartQuery.new(params[:query],session,current_user,@account)
+    @q = ChartQuery.new(params[:q],session,current_user,@account)
     bills_to_display = @q.apply_conditions(bills).sum_of_bills_by_type_and_month_for_shareholder(@q.shareholder_id)
     values = {}
     months = []
