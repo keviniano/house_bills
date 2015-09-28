@@ -30,6 +30,14 @@
 <h3>Bill Shares</h3>
 <%= render "bills/shares", bill: bill %>
 
+<dl>
+  <dt>Created</dt>
+  <dd><%= bill.created_at %></dd>
+
+  <dt>Updated</dt>
+  <dd><%= bill.updated_at %></dd>
+</dl>
+
 <p>
 <%= link_to("Edit This #{bill_description(bill)}", [:edit,@account,bill], :class => 'btn btn-default') if can? :edit, bill %>
 <%= link_to("Enter a New Account Bill", new_account_account_bill_path(@account), class: "btn btn-primary") if bill.type == "AccountBill" %>

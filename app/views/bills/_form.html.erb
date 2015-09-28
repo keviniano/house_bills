@@ -28,6 +28,7 @@
       <%= bae.input :cleared %>
     <% end %>
   <% end %>
+
   <h3>Bill Shares</h3>
   <div class="grid shares">
     <div class="grid-row header">
@@ -63,6 +64,17 @@
       </div>
     <% end %>
   </div>
+
+  <% unless bill.new_record? %>
+    <dl>
+      <dt>Created</dt>
+      <dd><%= bill.created_at %></dd>
+
+      <dt>Updated</dt>
+      <dd><%= bill.updated_at %></dd>
+    </dl>
+  <% end %>
+
   <div class="form-actions">
     <%= f.button :submit, class: "btn btn-primary" %>
   </div>
