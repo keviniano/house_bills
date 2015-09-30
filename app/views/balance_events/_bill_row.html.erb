@@ -13,6 +13,10 @@
       <%= number_to_currency running_total %>
     </td>
   <% end %>
+  <% if @q.show_change_date_fields %>
+    <td><%= bill_row.created_at %></td>
+    <td><%= bill_row.updated_at %></td>
+  <% end %>
   <td><%= link_to('Details', [@account,bill_row], class: "view-bill", data: { url: url_for(show_shares_account_bill_url(@account,bill_row))}) %></td>
   <td><%= link_to('Edit', [:edit,@account,bill_row]) if can? :edit, bill_row %></td>
 </tr>

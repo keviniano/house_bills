@@ -3,7 +3,7 @@ class BalanceEventQuery
   extend ActiveModel::Naming
 
   attr_reader :start_date, :end_date, :payee_shareholder_id, :share_shareholder_id, :balance_shareholder_id, :with_text, 
-    :bill_type_id, :can_use_running_total, :created_at_start_date, :created_at_end_date, :updated_at_start_date, :updated_at_end_date,
+    :bill_type_id, :can_use_running_total, :changed_at_start_date, :changed_at_end_date, :show_change_date_fields
 
   def self.grouped_shareholders
     result = {'Active' => [], 'Inactive' => []}
@@ -40,10 +40,11 @@ class BalanceEventQuery
     @with_text             = params[:with_text] if params[:with_text].present?
     @share_shareholder_id  = params[:share_shareholder_id].to_i if params[:share_shareholder_id].present?
     @payee_shareholder_id  = params[:payee_shareholder_id].to_i if params[:payee_shareholder_id].present?
-    @created_at_start_date = params[:created_at_start_date]     if params[:created_at_start_date].present?
-    @created_at_end_date   = params[:created_at_end_date]       if params[:created_at_end_date].present?
-    @updated_at_start_date = params[:updated_at_start_date]     if params[:updated_at_start_date].present?
-    @updated_at_end_date   = params[:updated_at_end_date]       if params[:updated_at_end_date].present?
+
+    @changed_at_start_date = Date.strptime(params[:changed_at_start_date],'%m-%d-%Y') if params[:changed_at_start_date].present?
+    @changed_at_end_date   = Date.strptime(params[:changed_at_end_date],'%m-%d-%Y')   if params[:changed_at_end_date].present?
+    @show_change_date_fields = @changed_at_start_date.present? || @changed_at_end_date.present?
+
     if params[:balance_shareholder_id].present?
       @balance_shareholder_id = params[:balance_shareholder_id].to_i
     else
@@ -56,37 +57,42 @@ class BalanceEventQuery
   end
 
   def apply_conditions(balance_events)
-    can_use_running_total = true
+    @can_use_running_total = true
     balance_events = balance_events.starting_on(start_date) if start_date
     balance_events = balance_events.ending_on(end_date)     if end_date
-    balance_events = balance_events.created_at_start_date(created_at_start_date) if created_at_start_date
-    balance_events = balance_events.created_at_end_date(created_at_end_date)     if created_at_end_date
-    balance_events = balance_events.updated_at_start_date(updated_at_start_date) if updated_at_start_date
-    balance_events = balance_events.updated_at_end_date(updated_at_end_date)     if updated_at_end_date
-    if [created_at_start_date, created_at_end_date, updated_at_start_date, updated_at_start_date].any?
+
+    if changed_at_start_date
+      balance_events = balance_events.changed_at_start_date(changed_at_start_date)
+      @can_use_running_total = false
+    end
+    if changed_at_end_date
+      balance_events = balance_events.changed_at_end_date(changed_at_end_date)     if changed_at_end_date
+      @can_use_running_total = false
+    end
+    if [changed_at_start_date, changed_at_end_date].any?
       balance_events = balance_events.join_bills_and_account_entries
     end
     if with_text
       balance_events = balance_events.with_text(with_text)
-      can_use_running_total = false
+      @can_use_running_total = false
     end
     if payee_shareholder_id
       balance_events = balance_events.with_payee_shareholder_id(payee_shareholder_id)
-      can_use_running_total = false
+      @can_use_running_total = false
     end
     if share_shareholder_id
       balance_events = balance_events.with_share_shareholder_id(share_shareholder_id)
-      can_use_running_total = false unless Shareholder.find(share_shareholder_id).user == @current_user
+      @can_use_running_total = false unless Shareholder.find(share_shareholder_id).user == @current_user
     end
     if bill_type_id.is_a?(Integer)
       balance_events = balance_events.with_bill_type_id(bill_type_id)
-      can_use_running_total = false
+      @can_use_running_total = false
     elsif bill_type_id == 'Deposit'
       balance_events = balance_events.deposits
-      can_use_running_total = false
+      @can_use_running_total = false
     elsif bill_type_id == 'Withdrawal'
       balance_events = balance_events.withdrawals
-      can_use_running_total = false
+      @can_use_running_total = false
     end
     balance_events
   end
