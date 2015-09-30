@@ -15,6 +15,6 @@
     <td><%= account_entry_row.created_at %></td>
     <td><%= account_entry_row.updated_at %></td>
   <% end %>
-  <td><%= link_to('Details', [@account,account_entry_row]) %></td>
-  <td><%= link_to('Edit', [:edit,@account,account_entry_row]) if can? :edit, account_entry_row %></td>
+  <td></td>
+  <td><%= link_to('Details', [@account,account_entry_row]) if can? :read, account_entry_row %></td>
 </tr>

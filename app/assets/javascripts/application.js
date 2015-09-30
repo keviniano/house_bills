@@ -61,9 +61,9 @@ $(document).ready(function(){
       event.preventDefault();
       row.toggle();
       if (row.is(":visible")) {
-        t.text("Hide Details");
+        t.text("Collapse");
       } else {
-        t.text("Show Details");
+        t.text("Expand");
       }
     }
   });
