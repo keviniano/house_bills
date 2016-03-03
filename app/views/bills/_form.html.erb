@@ -1,13 +1,16 @@
-<% if bill.type == 'AccountBill' %>
-  <script>
-    $(function() {
+<script>
+  $(function() {
+    <% if bill.type == 'AccountBill' %>
             var availablePayees = [
               <%= @payees.map{|p| "\"#{p.name}\""}.join(',').html_safe %>
             ];
             $("#account_bill_payee").autocomplete({ source: availablePayees, delay: 0 });
-    });
-  </script>
-<% end %>
+    <% end %>
+    <% if @account.lock_records_before.present? %>
+      $(".datepicker").datepicker("option", "minDate", new Date("<%= (@account.lock_records_before.to_date + 1.day).to_s(:db) %>"));
+    <% end %>
+  });
+</script>
 <%= simple_form_for([@account,bill], html: {class: 'form-horizontal' }) do |f| %>
   <%= f.error_notification %>
   <%= f.input :entry_type, as: :radio_buttons, collection: Bill.valid_entry_types %>
