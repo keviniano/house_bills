@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150102214049) do
+ActiveRecord::Schema.define(version: 20160301233252) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,13 +37,14 @@ ActiveRecord::Schema.define(version: 20150102214049) do
   end
 
   create_table "accounts", force: :cascade do |t|
-    t.string   "name",         limit: 255
+    t.string   "name",                limit: 255
     t.integer  "owner_id"
-    t.integer  "lock_version",             default: 0
+    t.integer  "lock_version",                    default: 0
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "creator_id"
     t.integer  "updater_id"
+    t.date     "lock_records_before"
   end
 
   create_table "balance_entries", force: :cascade do |t|

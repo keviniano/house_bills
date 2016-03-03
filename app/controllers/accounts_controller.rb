@@ -63,6 +63,6 @@ class AccountsController < ApplicationController
   private
 
     def resource_params
-      params.require(:account).permit(:name)
+      params.require(:account).permit(:name, :lock_records_before_string)
     end
 end

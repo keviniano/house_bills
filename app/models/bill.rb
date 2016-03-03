@@ -147,6 +147,18 @@ class Bill < ActiveRecord::Base
     end
   end
 
+  def locked?
+    if account.present?
+      if account.lock_records_before.present?
+        date < account.lock_records_before
+      else
+        false
+      end
+    else
+      true
+    end
+  end
+
   private
 
   def date_string_format_must_be_valid

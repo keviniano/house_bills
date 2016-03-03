@@ -20,6 +20,7 @@ class Account < ActiveRecord::Base
   has_paper_trail
   
   validates :name, presence: true, uniqueness: true
+  validate  :lock_records_before_string_format_must_be_valid
 
   def pot_balance
     pot_balance_entries.sum(:amount)
@@ -28,4 +29,22 @@ class Account < ActiveRecord::Base
   def balance
     account_entries.sum(:amount)
   end
+
+  def lock_records_before_string=(value)
+    @lock_records_before_string = value
+    self.lock_records_before = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
+  rescue ArgumentError
+    @lock_records_before_invalid = true
+  end
+
+  def lock_records_before_string
+    @lock_records_before_string || lock_records_before.try(:strftime,'%m-%d-%Y')
+  end
+
+  private
+
+  def lock_records_before_string_format_must_be_valid
+    errors.add(:lock_records_before_string, "is invalid") if @lock_records_before_invalid
+  end
+
 end

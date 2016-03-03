@@ -1,5 +1,6 @@
 <%= simple_form_for(@account, :html => {:class => 'form-horizontal' }) do |f| %>
   <%= f.error_notification %>
   <%= f.input :name, :label => "Account Name" %>
+  <%= f.input :lock_records_before_string, label: 'Lock Entries Before', input_html: {class: "datepicker"} %>
   <%= f.button :submit %>
 <% end %>

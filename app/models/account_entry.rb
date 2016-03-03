@@ -130,6 +130,18 @@ class AccountEntry < ActiveRecord::Base
     ApplicationController.helpers.number_with_precision(@entry_amount || amount.abs, :precision => 2) unless @entry_amount.nil? && amount.nil?
   end
 
+  def locked?
+    if account.present?
+      if account.lock_records_before.present?
+        date < account.lock_records_before
+      else
+        false
+      end
+    else
+      true
+    end
+  end
+
 private
 
   def date_string_format_must_be_valid
