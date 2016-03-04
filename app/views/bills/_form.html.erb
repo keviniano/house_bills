@@ -1,10 +1,10 @@
 <script>
   $(function() {
     <% if bill.type == 'AccountBill' %>
-            var availablePayees = [
-              <%= @payees.map{|p| "\"#{p.name}\""}.join(',').html_safe %>
-            ];
-            $("#account_bill_payee").autocomplete({ source: availablePayees, delay: 0 });
+      var availablePayees = [
+        <%= @payees.map{|p| "\"#{p.name}\""}.join(',').html_safe %>
+      ];
+      $("#account_bill_payee").autocomplete({ source: availablePayees, delay: 0 });
     <% end %>
     <% if @account.lock_records_before.present? %>
       $(".datepicker").datepicker("option", "minDate", new Date("<%= (@account.lock_records_before.to_date + 1.day).to_s(:db) %>"));
