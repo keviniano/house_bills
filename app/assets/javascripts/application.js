@@ -1,8 +1,8 @@
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap-sprockets
-//= require jquery-ui/datepicker
-//= require jquery-ui/autocomplete
+//= require jquery-ui/widgets/datepicker
+//= require jquery-ui/widgets/autocomplete
 //= require_self
 //= require_tree .
 
