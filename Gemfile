@@ -16,7 +16,7 @@ gem 'csv_builder'
 gem 'validates_timeliness'
 gem 'paper_trail'
 gem 'figaro'
-gem 'will_paginate-bootstrap'
+gem 'bootstrap-will_paginate'
 gem 'therubyracer'
 
 gem 'bootstrap-sass'

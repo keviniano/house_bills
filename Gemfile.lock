@@ -45,6 +45,8 @@ GEM
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bootstrap-will_paginate (1.0.0)
+      will_paginate
     builder (3.2.3)
     byebug (9.1.0)
     cancancan (2.0.0)
@@ -185,8 +187,6 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
     will_paginate (3.1.6)
-    will_paginate-bootstrap (1.0.1)
-      will_paginate (>= 3.0.3)
 
 PLATFORMS
   ruby
@@ -194,6 +194,7 @@ PLATFORMS
 DEPENDENCIES
   autoprefixer-rails
   bootstrap-sass
+  bootstrap-will_paginate
   byebug
   cancancan
   coffee-rails
@@ -214,7 +215,6 @@ DEPENDENCIES
   unicorn
   validates_timeliness
   will_paginate
-  will_paginate-bootstrap
 
 RUBY VERSION
    ruby 2.4.2p198
