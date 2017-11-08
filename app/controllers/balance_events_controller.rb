@@ -99,7 +99,7 @@ class BalanceEventQuery
 end
 
 class BalanceEventsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
 
   # GET /balance_events

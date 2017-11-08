@@ -45,7 +45,7 @@ class ChartQuery
 end
 
 class ChartsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
 
   def bill_types_by_month
