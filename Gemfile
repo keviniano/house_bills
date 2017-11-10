@@ -26,10 +26,6 @@ gem 'autoprefixer-rails'
 gem 'coffee-rails'
 gem 'uglifier'
 
-group :production do
-  gem 'rails_12factor'
-end
-
 group :development, :test do
   gem 'byebug'
 end
