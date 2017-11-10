@@ -1,4 +1,4 @@
-HouseBills::Application.routes.draw do
+Rails.application.routes.draw do
   get "bill_account_entries/show"
 
   get "shareholder_account_entries/new"
