@@ -1,4 +1,4 @@
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   has_many :bills, :dependent => :destroy
   has_many :shareholder_bills
   has_many :account_bills

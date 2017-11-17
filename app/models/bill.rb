@@ -1,4 +1,4 @@
-class Bill < ActiveRecord::Base
+class Bill < ApplicationRecord
   belongs_to  :shareholder
   belongs_to  :account
   belongs_to  :bill_type

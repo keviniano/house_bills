@@ -1,4 +1,4 @@
-class AccountEntry < ActiveRecord::Base
+class AccountEntry < ApplicationRecord
   before_validation :set_amount
 
   belongs_to :bill

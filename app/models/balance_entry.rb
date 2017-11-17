@@ -1,4 +1,4 @@
-class BalanceEntry < ActiveRecord::Base
+class BalanceEntry < ApplicationRecord
   belongs_to :bill
   belongs_to :shareholder
   belongs_to :account

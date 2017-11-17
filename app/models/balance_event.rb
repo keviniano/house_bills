@@ -1,4 +1,4 @@
-class BalanceEvent < ActiveRecord::Base
+class BalanceEvent < ApplicationRecord
   belongs_to :account
   belongs_to :bill
   belongs_to :account_entry
@@ -18,9 +18,9 @@ class BalanceEvent < ActiveRecord::Base
   scope :created_at_end_date,       -> (end_date)       { where("COALESCE(x_bills.created_at, x_account_entries.created_at) <  ?", end_date + 1.day) }
   scope :updated_at_start_date,     -> (start_date)     { where("COALESCE(x_bills.updated_at, x_account_entries.updated_at) >= ?", start_date) }
   scope :updated_at_end_date,       -> (end_date)       { where("COALESCE(x_bills.updated_at, x_account_entries.updated_at) <  ?", end_date + 1.day) }
-  scope :changed_at_start_date,     -> (start_date)     { where("COALESCE(x_bills.created_at, x_account_entries.created_at) >= :start_date OR " + 
+  scope :changed_at_start_date,     -> (start_date)     { where("COALESCE(x_bills.created_at, x_account_entries.created_at) >= :start_date OR " +
                                                                 "COALESCE(x_bills.updated_at, x_account_entries.updated_at) >= :start_date", start_date: start_date) }
-  scope :changed_at_end_date,       -> (end_date)       { where("COALESCE(x_bills.created_at, x_account_entries.created_at) <  :end_date OR " + 
+  scope :changed_at_end_date,       -> (end_date)       { where("COALESCE(x_bills.created_at, x_account_entries.created_at) <  :end_date OR " +
                                                                 "COALESCE(x_bills.updated_at, x_account_entries.updated_at) <  :end_date", end_date: end_date + 1.day) }
   scope :join_bills_and_account_entries, -> { joins("LEFT OUTER JOIN bills AS x_bills ON balance_events.bill_id = x_bills.id").
                                               joins("LEFT OUTER JOIN account_entries AS x_account_entries ON balance_events.account_entry_id = x_account_entries.id") }

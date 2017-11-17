@@ -1,4 +1,4 @@
-class Payee < ActiveRecord::Base
+class Payee < ApplicationRecord
   belongs_to :account
 
   has_paper_trail
