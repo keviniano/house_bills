@@ -1,9 +1,9 @@
 class AccountEntry < ApplicationRecord
   before_validation :set_amount
 
-  belongs_to :bill
-  belongs_to :shareholder
   belongs_to :account
+  belongs_to :bill, optional: true
+  belongs_to :shareholder, optional: true
   has_one    :account_offset_balance_entry, :dependent => :destroy, :autosave => true
   has_one    :balance_event, :dependent => :destroy, :autosave => true
 

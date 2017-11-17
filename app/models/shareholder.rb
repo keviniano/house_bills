@@ -1,6 +1,6 @@
 class Shareholder < ApplicationRecord
   belongs_to :account
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :role
   has_many   :bills
   has_many   :account_entries

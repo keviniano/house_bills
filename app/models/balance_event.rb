@@ -1,7 +1,7 @@
 class BalanceEvent < ApplicationRecord
   belongs_to :account
-  belongs_to :bill
-  belongs_to :account_entry
+  belongs_to :bill, optional: true
+  belongs_to :account_entry, optional: true
   has_many   :bill_share_balance_entries, primary_key: :bill_id, foreign_key: :bill_id
   has_one    :bill_offset_balance_entry, primary_key: :bill_id, foreign_key: :bill_id
   has_one    :pot_balance_entry, primary_key: :bill_id, foreign_key: :bill_id

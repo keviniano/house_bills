@@ -1,6 +1,6 @@
 class BillShareBalanceEntry < BalanceEntry
-  belongs_to :bill
   belongs_to :account
+  belongs_to :bill
   belongs_to :balance_event
 
   after_update :touch_parent_bill

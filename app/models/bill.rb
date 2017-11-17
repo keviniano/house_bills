@@ -1,6 +1,6 @@
 class Bill < ApplicationRecord
-  belongs_to  :shareholder
   belongs_to  :account
+  belongs_to  :shareholder, optional: true
   belongs_to  :bill_type
   has_many    :bill_share_balance_entries, dependent: :destroy, autosave: true
   has_one     :bill_offset_balance_entry,  dependent: :destroy, autosave: true

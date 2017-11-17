@@ -1,11 +1,11 @@
 class BalanceEntry < ApplicationRecord
-  belongs_to :bill
-  belongs_to :shareholder
   belongs_to :account
-  belongs_to :account_entry
+  belongs_to :bill, optional: true
+  belongs_to :shareholder, optional: true
+  belongs_to :account_entry, optional: true
 
   has_paper_trail
-  
+
   validates_presence_of :account_id
   validates_presence_of :amount
   validates_presence_of :date
