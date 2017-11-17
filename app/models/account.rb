@@ -18,7 +18,7 @@ class Account < ApplicationRecord
   has_many :pot_balance_entries
 
   has_paper_trail
-  
+
   validates :name, presence: true, uniqueness: true
   validate  :lock_records_before_string_format_must_be_valid
 

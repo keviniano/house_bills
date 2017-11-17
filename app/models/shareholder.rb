@@ -112,7 +112,6 @@ class Shareholder < ApplicationRecord
 
     def attach_user
       self.user = User.find_by(email: email) if email.present?
-      true
     end
 
     def opened_on_string_format_must_be_valid
