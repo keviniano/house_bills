@@ -1,5 +1,5 @@
 class AccountOffsetBalanceEntry < BalanceEntry
   belongs_to :account
   belongs_to :account_entry
-  belongs_to :balance_event
+  belongs_to :balance_event, optional: true
 end
