@@ -1,33 +1,16 @@
-<!doctype html>
-<html lang="en" dir="ltr">
+<!DOCTYPE html>
+<html>
   <head>
-    <title><%= content_for?(:title) ? yield(:title) : "Shared Bills" %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <%= javascript_include_tag "application" %>
-    <%= stylesheet_link_tag "application" %>
-    <%= csrf_meta_tag %>
-    <%= yield(:head) %>
+    <title>HouseBills</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
+
   <body>
-  <%= render "layouts/menu" %>
-    <div class="container">
-      <% flash.each do |name, msg| %>
-        <% if name == 'notice' || name == :notice %>
-          <%= tag :div, id: "flash-notice", class: "alert alert-success" %>
-        <% elsif name == 'alert' || name == :alert %>
-          <%= tag :div, id: "flash-alert", class: "alert alert-warning" %>
-        <% else %>
-          <%= tag :div, id: "flash-#{name}", class: "alert alert-#{name}" %>
-        <% end %>
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <%= msg %>
-        </div>
-      <% end %>
-      <%= content_tag :h1, yield(:title) if show_title? %>
-      <%= yield %>
-    </div>
+    <%= yield %>
   </body>
 </html>
