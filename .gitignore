@@ -16,3 +16,9 @@ config/application.yml
 config/database.yml
 config/secrets.yml
 .env
+
+# Rails credentials key
+/config/master.key
+
+# JavaScript dependencies
+/node_modules/
