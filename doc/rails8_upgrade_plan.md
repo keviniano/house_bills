@@ -33,7 +33,7 @@ Goals, in order:
 
 ## Phase 0: Preparation (about 1 evening)
 
-- [ ] Create a branch `rails8` so all of the existing git history is kept.
+- [x] Create a branch `rails8` so all of the existing git history is kept.
 - [ ] Restore the pre-decommission dump into a local Postgres 17 (`pg_restore --no-owner`).
 - [ ] **Record the reference figures** straight from the dump with SQL, so the old app
       doesn't need to run:
@@ -53,16 +53,16 @@ Goals, in order:
 Generating a new Rails 8.1 skeleton and moving the app code into it is faster than upgrading
 through every version from 4.2 to 8.1, given there are no meaningful tests.
 
-- [ ] Generate in the scratch directory:
+- [x] Generate in the scratch directory:
       `rails _8.1_ new house_bills --database=sqlite3 --javascript=importmap --css=` (no CSS bundler)
-- [ ] Copy into the repo, replacing the old files: `Gemfile`, `bin/`, `config/` (the new
+- [x] Copy into the repo, replacing the old files: `Gemfile`, `bin/`, `config/` (the new
       files, then reapply `time_zone = 'Pacific Time (US & Canada)'` and the locales),
       `Dockerfile`, `.kamal/`, `config/deploy.yml`, `.ruby-version`, `public/` error pages.
-- [ ] Delete files that are no longer used: `.ruby-gemset`, `Procfile`, `config/unicorn.rb`,
+- [x] Delete files that are no longer used: `.ruby-gemset`, `Procfile`, `config/unicorn.rb`,
       `config/newrelic.yml`, `config/initializers/mail.rb` (SendGrid), `vendor/plugins`,
       `script/`, `test/performance`, `lib/legacy_helper.rb`, `lib/tasks/legacy.rake`,
       `db/legacy.rb`, `db/migrate/*`.
-- [ ] Gem changes:
+- [x] Gem changes:
 
 | Remove | Replace with |
 |---|---|
