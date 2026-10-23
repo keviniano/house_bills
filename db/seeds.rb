@@ -1,44 +1,23 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
-#   Mayor.create(:name => 'Daley', :city => cities.first)
+# Roles are reference data the app needs in every environment. Safe to re-run.
+%w[User Power\ User Owner].each { |name| Role.find_or_create_by!(name: name) }
 
-Role.create! name: 'User'
-Role.create! name: 'Power User'
-Role.create! name: 'Owner'
+# Sample data for local development. Sign in with Google as the seeded email
+# (set SEED_EMAIL to your own Google address) to be linked to this member.
+if Rails.env.development? && !Account.exists?
+  email = ENV.fetch("SEED_EMAIL", "test@example.com")
+  user = User.find_or_create_by!(email: email) { |u| u.name = "Test User" }
 
-u = User.new(
-    name:                   'Test User',
-    email:                  'test@tester.com',
-    password:               '123456',
-    password_confirmation:  '123456'
-    )
-u.skip_confirmation!
-u.save!
+  account = Account.create!(name: "Seed Account", owner_id: user.id)
 
-a = Account.create!(
-    name:                   'Seed Account',
-    owner_id:               u.id
-    )
+  Shareholder.create!(
+    name:       "Test User",
+    email:      email,
+    account_id: account.id,
+    user_id:    user.id,
+    role_id:    Role.owner.id,
+    opened_on:  Date.current
+  )
 
-Shareholder.create!(
-    name:                   'Kevin Chambers',
-    email:                  'test@tester.com',
-    account_id:             a.id,
-    user_id:                u.id,
-    role_id:                Role.owner.id,
-    opened_on:              Date.today
-    )
-
-BillType.create!(
-    name:                   'Seed Bill Type',
-    account_id:             a.id
-    )
-
-Payee.create!(
-    name:                   'Seed Payee',
-    account_id:             a.id
-    )
+  BillType.create!(name: "Seed Bill Type", account_id: account.id)
+  Payee.create!(name: "Seed Payee", account_id: account.id)
+end

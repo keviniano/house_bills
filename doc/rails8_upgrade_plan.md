@@ -80,18 +80,18 @@ through every version from 4.2 to 8.1, given there are no meaningful tests.
 
 Write one new migration, `db/migrate/…_create_house_bills.rb`, based on the old `db/schema.rb`, with these changes:
 
-- [ ] Remove `enable_extension "plpgsql"` / `"fuzzystrmatch"`. Neither is used.
-- [ ] `decimal :amount` → `integer :amount_cents, null: false, default: 0` on `bills`,
+- [x] Remove `enable_extension "plpgsql"` / `"fuzzystrmatch"`. Neither is used.
+- [x] `decimal :amount` → `integer :amount_cents, null: false, default: 0` on `bills`,
       `account_entries` and `balance_entries`.
-- [ ] Add foreign keys and indexes for every `*_id` column. Replace the payee index, which
+- [x] Add foreign keys and indexes for every `*_id` column. Replace the payee index, which
       is currently unique on `name` across all accounts, with a unique index on `[account_id, name]`.
-- [ ] Keep the STI `type` columns (each holds the subclass name), `lock_version`, `creator_id`/`updater_id`,
+- [x] Keep the STI `type` columns (each holds the subclass name), `lock_version`, `creator_id`/`updater_id`,
       and the timestamps as they are.
-- [ ] Keep the `versions` table (PaperTrail) and the `roles` seed data.
-- [ ] `users`: add `provider` and `uid` (unique index on the pair). Drop the password,
+- [x] Keep the `versions` table (PaperTrail) and the `roles` seed data.
+- [x] `users`: add `provider` and `uid` (unique index on the pair). Drop the password,
       confirmation, password-reset, account-lock and `authentication_token` columns.
       Keep `name`, `email`, the sign-in tracking columns and the timestamps.
-- [ ] Add a `MoneyColumn` concern (`money_attribute :amount`). It exposes `amount` /
+- [x] Add a `MoneyColumn` concern (`money_attribute :amount`). It exposes `amount` /
       `amount=` as `BigDecimal`, backed by `amount_cents`. Views, forms, and the
       reconstruction of old PaperTrail versions (their YAML contains `amount`) then keep working.
 
@@ -144,6 +144,25 @@ Changes required by moving from Rails 4.2 to 8.1:
   - `ChartQuery`/`BalanceEventQuery.grouped_shareholders` list members from every account.
   - Remove `bill_account_entries/show` and the six `shareholder_account_entries/*` `GET`
     routes in `config/routes.rb`. They're left over from code generators, and one of them is a GET `destroy`.
+  - **`creator_id`/`updater_id` haven't been set since January 2015**, when the Rails 4.1 upgrade
+    removed the `userstamp` gem. `Ability` still uses `creator_id` to let members edit their own
+    entries, so ordinary members can't edit anything they've entered since then. Set both
+    columns from the signed-in user again (e.g. `Current.user` plus a `before_save` concern),
+    and backfill the legacy rows during the import (Phase 6).
+- [ ] Money (D4), found while writing the schema:
+  - `include MoneyColumn` + `money_attribute :amount` in `Bill`, `AccountEntry` and `BalanceEntry`.
+  - `ShareholderBill` and `ShareholderAccountEntry` copy `amount` into their offset entries
+    with `self[attr]`, which reads the column directly and bypasses `MoneyColumn`. Copy
+    `amount_cents` instead.
+  - SQL sums (`sum(:amount)`, `SUM(amount)`, `sum("bills.amount")`, the `amount >= 0` scopes)
+    must use `amount_cents`, and the Ruby side divides by 100.
+- [ ] The `BillShareBalanceEntry`, `BillOffsetBalanceEntry`, `PotBalanceEntry` and
+      `AccountOffsetBalanceEntry` subclasses declare `belongs_to :balance_event`, but
+      `balance_entries` has no `balance_event_id` column. Remove those associations.
+- [ ] With foreign keys in place, destroying a member or bill type that still has entries now
+      fails instead of leaving orphaned rows. Add `dependent: :restrict_with_error` to
+      `Shareholder#bills`/`#account_entries`/`#balance_entries` and `BillType#bills`, and show
+      the error on the page.
 
 ## Phase 4: Controllers, views, JS (about 2–3 evenings)
 
@@ -209,9 +228,16 @@ The current test suite is essentially empty. Add the minimum needed to be confid
 
 - [ ] `bin/rails import:legacy_dump[postgres://localhost/house_bills_2016]`, safe to re-run:
   - copy tables in dependency order, keeping the original IDs
-  - convert `amount` to `amount_cents`
+  - convert `amount` to `amount_cents`. `balance_entries.amount` was nullable, so report
+    any NULLs instead of silently storing 0
   - copy `versions` with `item_type` unchanged
   - turn off PaperTrail during the import
+  - turn off foreign-key enforcement while copying, then run `PRAGMA foreign_key_check`
+    and report any orphaned references (for example a `creator_id` pointing at a deleted user)
+  - backfill missing `creator_id`/`updater_id` on 2015–2016 rows from the `whodunnit` of
+    their PaperTrail `create`/`update` versions (see Phase 3)
+  - check whether `account_entries.balance_offset_id` or `balance_entries.is_pot_entry`
+    hold any data. The 2017 code never reads them; if they're empty, drop both columns
 - [ ] Run the golden test against the imported database.
 - [ ] Run `ledger:verify` against the import. Review each difference, then save the
       reviewed ones to `config/ledger_known_differences.yml`.
