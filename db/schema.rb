@@ -14,7 +14,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
   create_table "account_entries", force: :cascade do |t|
     t.string "type"
     t.integer "bill_id"
-    t.integer "balance_offset_id"
     t.integer "shareholder_id"
     t.integer "account_id"
     t.integer "check_number"
@@ -57,7 +56,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
     t.integer "shareholder_id"
     t.integer "share"
     t.integer "amount_cents", default: 0, null: false
-    t.boolean "is_pot_entry", default: false
     t.date "date"
     t.integer "lock_version", default: 0
     t.datetime "created_at"

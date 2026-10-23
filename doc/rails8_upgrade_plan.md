@@ -293,7 +293,7 @@ The current test suite is essentially empty. Add the minimum needed to be confid
 
 ## Phase 6: Data import (about 2 evenings; spreadsheet work is separate)
 
-- [ ] `bin/rails import:legacy_dump[postgres://localhost/house_bills_2016]`, safe to re-run:
+- [x] `bin/rails import:legacy_dump[postgres://localhost/house_bills_2016]`, safe to re-run:
   - copy tables in dependency order, keeping the original IDs
   - convert `amount` to `amount_cents`. `balance_entries.amount` was nullable, so report
     any NULLs instead of silently storing 0
@@ -305,11 +305,33 @@ The current test suite is essentially empty. Add the minimum needed to be confid
     their PaperTrail `create`/`update` versions (see Phase 3)
   - check whether `account_entries.balance_offset_id` or `balance_entries.is_pot_entry`
     hold any data. The 2017 code never reads them; if they're empty, drop both columns
-- [ ] Run the golden test against the imported database.
-- [ ] Run `ledger:verify` against the import. Review each difference, then save the
-      reviewed ones to `config/ledger_known_differences.yml`.
-- [ ] Find the date where the dump ends and the spreadsheet begins. Record each member's
+- [x] Notes from doing the import (`LegacyImport`, `lib/tasks/import.rake`):
+  - Reads through `psql \copy … TO STDOUT CSV`, so no `pg` gem; Postgres converts money to
+    cents exactly with `ROUND(amount * 100)`. Rows go in with `insert_all!` (no callbacks, so
+    PaperTrail records nothing) inside one transaction with foreign keys deferred; any failed
+    check rolls the whole import back. It refuses to touch a non-empty database without `REPLACE=1`.
+  - Prechecks, all 0 in the dump: money that isn't whole cents, NULL `balance_entries.amount`,
+    any use of `balance_offset_id`/`is_pot_entry`. Both columns are dropped from the migration.
+  - No orphaned references, and no duplicate emails, payee names or member names.
+  - Users keep name, email and sign-in history; the Devise password, confirmation and lock
+    columns aren't copied. `provider`/`uid` are filled on each person's first Google sign-in.
+  - Legacy timestamps are zone-less UTC and are read as UTC (not the app's Pacific zone).
+  - Userstamps backfilled from versions: 13,201 balance entries, 425 account entries,
+    4 members and 1 payee got a creator; 2,109 bills and others got an updater. Bills from
+    the 2013 conversion into this app have no versions and stay without a creator.
+  - Two bills had the year typed as 0017 (#6112 and #6116, entered 2017-11-01 among September
+    2017 bills). `LegacyImport::DATE_FIXES` corrects them to 2017-09-04 and 2017-09-30, with
+    their balance entries and events; amounts are untouched and the import reports the fix.
+  - All pages render against the imported data; the slowest is the full ledger CSV (~0.4 s).
+- [x] Run the golden test against the imported database. *All figures match.*
+- [x] Run `ledger:verify` against the import. Review each difference, then save the
+      reviewed ones to `config/ledger_known_differences.yml`. *0 differences across 5,989 bills
+      and 513 member entries, so the file stays empty. The 17¢ between the register and the balance
+      rows is the net of the 203 unbound entries (three 2018 interest deposits), as designed.*
+- [x] Find the date where the dump ends and the spreadsheet begins. Record each member's
       final balance in the dump, ready for reconciling with the spreadsheet.
+      *The data ends 2020-12-16 (last edit 2020-12-07). The import writes each member's balance
+      and last activity date to `test/fixtures/golden/final_balances.csv` (gitignored).*
 - [ ] Spreadsheet import: a separate plan, to be written once the spreadsheet's structure is known.
       It's a separate task because its share-ratio mapping, opening-balance adjustments and second
       balance check are independent of this upgrade. Notes for that plan:

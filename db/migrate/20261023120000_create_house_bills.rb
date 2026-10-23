@@ -88,8 +88,6 @@ class CreateHouseBills < ActiveRecord::Migration[8.1]
     create_table :account_entries do |t|
       t.string     :type
       t.references :bill, foreign_key: true
-      # Unused by the 2017 code; kept so the legacy import loses nothing.
-      t.integer    :balance_offset_id
       t.references :shareholder, foreign_key: true
       t.references :account, foreign_key: true
       t.integer    :check_number
@@ -112,8 +110,6 @@ class CreateHouseBills < ActiveRecord::Migration[8.1]
       t.references :shareholder, foreign_key: true
       t.integer    :share
       t.integer    :amount_cents, null: false, default: 0
-      # Unused by the 2017 code (PotBalanceEntry is the STI type); kept for the legacy import.
-      t.boolean    :is_pot_entry, default: false
       t.date       :date
       t.integer    :lock_version, default: 0
       t.timestamps null: true
