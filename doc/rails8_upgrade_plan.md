@@ -1,7 +1,7 @@
-# House Bills: Rails 8 + SQLite on GCP
+# House Bills: Rails 8.1 + SQLite on GCP
 
 Plan for bringing House Bills back from Rails 4.2 / Ruby 2.2 / Heroku Postgres
-(untouched since Oct 2017) to Rails 8 / Ruby 3.4 / SQLite on a single GCP
+(untouched since Oct 2017) to Rails 8.1 / Ruby 4.0 / SQLite on a single GCP
 e2-micro VM, deployed with Kamal and backed up to Cloud Storage. All hosting
 stays with Google. Expected cost is about $3.65/month, which is the VM's external IPv4 address.
 
@@ -12,7 +12,8 @@ Goals, in order:
 2. **Every balance correct to the cent.** Each member's balance from the original dump
    must match exactly once it's in the new app.
 3. **Familiar screens and workflows.** Nostalgia is part of the point, so pages and
-   workflows should work the same, even though the styling moves to Bootstrap 5.
+   workflows should look and work the same. The views keep their Bootstrap 3 markup for
+   the port; moving to Bootstrap 5 is a later, optional phase (Phase 12).
 4. **One continuous dataset.** Load the old dump (2011 to about 2016), then the
    replacement spreadsheet (about 2016 to 2026).
 
@@ -23,7 +24,7 @@ Goals, in order:
 | # | Decision | Status |
 |---|---|---|
 | D1 | **Login** | **Decided: Google sign-in only.** Use Devise with only the `:omniauthable` (Google OAuth), `:rememberable` and `:trackable` modules. No passwords, no confirmation emails, no password resets, so the app needs no email service. |
-| D2 | **Styling** | **Decided: Bootstrap 5.** Port all views. Pages and workflows stay the same; only the markup and styling change (see Phase 4). |
+| D2 | **Styling** | **Decided: stay on Bootstrap 3 for the port.** Load the precompiled Bootstrap 3.4.1 CSS, JS and Glyphicons fonts from `vendor/` (3.4.1 is the final 3.x release and a drop-in replacement for the current 3.3.7, with XSS fixes). The views and their markup stay as they are, which keeps the port smaller and the screens identical. jQuery stays, because Bootstrap 3's navbar collapse and dropdowns need it. Porting to Bootstrap 5 is optional, after launch (Phase 12). |
 | D3 | **Domain** for HTTPS and the Google sign-in redirect | **Deferred until Phase 7.** Two things depend on it: kamal-proxy needs a hostname to get a Let's Encrypt certificate, and **Google sign-in only accepts redirect URLs on a real domain** (or `localhost` in development). Development and testing can go ahead without it, but production sign-in can't work until it's chosen. |
 | D4 | **Money storage** | **Decided: integer cents** (`amount_cents`). |
 | D5 | Keep the precomputed `balance_entries` and `balance_events` tables? | **Decided: keep both for the port.** The amounts stored in `balance_entries` are the record of what each member was actually charged. Copy them unchanged and never recalculate them. Add `bin/rails ledger:verify` to catch the stored rows drifting away from the bills (Phase 3). Optionally, once the port is done, replace `balance_events` with a `UNION ALL` query over bills and member payments (Phase 11). |
@@ -49,11 +50,11 @@ Goals, in order:
 
 ## Phase 1: New skeleton in the same repo (about 1 evening)
 
-Generating a new Rails 8 skeleton and moving the app code into it is faster than upgrading
-through every version from 4.2 to 8.0, given there are no meaningful tests.
+Generating a new Rails 8.1 skeleton and moving the app code into it is faster than upgrading
+through every version from 4.2 to 8.1, given there are no meaningful tests.
 
 - [ ] Generate in the scratch directory:
-      `rails new house_bills --database=sqlite3 --javascript=importmap --css=` (no CSS bundler)
+      `rails _8.1_ new house_bills --database=sqlite3 --javascript=importmap --css=` (no CSS bundler)
 - [ ] Copy into the repo, replacing the old files: `Gemfile`, `bin/`, `config/` (the new
       files, then reapply `time_zone = 'Pacific Time (US & Canada)'` and the locales),
       `Dockerfile`, `.kamal/`, `config/deploy.yml`, `.ruby-version`, `public/` error pages.
@@ -65,14 +66,14 @@ through every version from 4.2 to 8.0, given there are no meaningful tests.
 
 | Remove | Replace with |
 |---|---|
-| `unicorn`, `rails_12factor`, `therubyracer`, `figaro` | Puma + Thruster (Rails 8 defaults), Rails credentials |
+| `unicorn`, `rails_12factor`, `therubyracer`, `figaro` | Puma + Thruster (Rails 8.1 defaults), Rails credentials |
 | `pg` | `sqlite3` |
-| `sass-rails`, `bootstrap-sass`, `autoprefixer-rails`, `uglifier`, `coffee-rails` | Propshaft; Bootstrap 5.3 CSS and its JS bundle (which includes Popper) loaded from `vendor/` through importmap; Bootstrap Icons |
-| `jquery-rails`, `jquery-ui-rails` | Stimulus + native browser features (Phase 4) |
-| `csv_builder` | Ruby's standard `csv` library |
+| `sass-rails`, `bootstrap-sass`, `autoprefixer-rails`, `uglifier`, `coffee-rails` | Propshaft; the precompiled Bootstrap 3.4.1 `dist/` files in `vendor/` (D2). No Sass is needed: `application.css.scss` only imports Bootstrap, and the rest is plain CSS |
+| `jquery-rails`, `jquery-ui-rails` | jQuery 3.7 in `vendor/`, kept only for Bootstrap 3's JS; Stimulus + native browser features replace jQuery UI and `jquery_ujs` (Phase 4) |
+| `csv_builder` | the `csv` gem (a bundled gem since Ruby 3.4, so it must be listed in the `Gemfile`) |
 | `validates_timeliness`, `default_value_for` | Native date fields; Rails `attribute ..., default:` |
-| `devise` 4.3, `cancancan` 2.0, `paper_trail` 8, `simple_form` 3.5 | Current major versions of each (all still maintained) |
-| `will_paginate`, `will_paginate-bootstrap` | `pagy` (it includes Bootstrap 5 pagination markup) |
+| `devise` 4.3, `cancancan` 2.0, `paper_trail` 8, `simple_form` 3.5 | Current major versions of each (all still maintained). Keep the existing Bootstrap 3 wrappers in `simple_form_bootstrap.rb` |
+| `will_paginate` 3.1, `will_paginate-bootstrap` | Current `will_paginate`. Keep `will_paginate-bootstrap` (Bootstrap 3 markup) if it still loads; otherwise replace it with a small Bootstrap 3 `LinkRenderer` in `app/` |
 | - | `omniauth-google-oauth2`, `omniauth-rails_csrf_protection` |
 
 ## Phase 2: Schema (about 1 evening)
@@ -96,7 +97,7 @@ Write one new migration, `db/migrate/…_create_house_bills.rb`, based on the ol
 
 ## Phase 3: Models (about 2–3 evenings)
 
-Changes required by moving from Rails 4.2 to 8:
+Changes required by moving from Rails 4.2 to 8.1:
 
 - [ ] `ActiveRecord::Base` → `ApplicationRecord`.
 - [ ] **In Rails 5+, `belongs_to` is required by default.** Add `optional: true` to every
@@ -144,7 +145,7 @@ Changes required by moving from Rails 4.2 to 8:
   - Remove `bill_account_entries/show` and the six `shareholder_account_entries/*` `GET`
     routes in `config/routes.rb`. They're left over from code generators, and one of them is a GET `destroy`.
 
-## Phase 4: Controllers, views, JS (about 3–4 evenings)
+## Phase 4: Controllers, views, JS (about 2–3 evenings)
 
 - [ ] `before_filter` → `before_action` everywhere.
 - [ ] Routes: Rails no longer supports dynamic `:action` route segments
@@ -154,24 +155,26 @@ Changes required by moving from Rails 4.2 to 8:
 - [ ] Delete links: `link_to … method: :delete` → `button_to` (Turbo), and
       `data: { confirm: }` → `data: { turbo_confirm: }`. This keeps the "Delete Account For Ever and Ever"
       confirmation.
-- [ ] simple_form: regenerate the initializer with `rails g simple_form:install --bootstrap`,
-      which now produces Bootstrap 5 wrappers. Delete the old `simple_form_bootstrap.rb`.
-- [ ] Port the views to Bootstrap 5. There are about 45 Bootstrap 3-specific class names across
-      roughly 1,100 lines of ERB:
-  - `glyphicon-*` → Bootstrap Icons (`bi-*`)
-  - `well` / `panel` → `card`
-  - `pull-right` → `float-end`
-  - `col-sm-offset-*` → `offset-sm-*`
-  - `btn-default` → `btn-secondary` / `btn-outline-secondary`
-  - `form-horizontal` / `control-label` → grid `row` + `col-form-label`
-  - the navbar markup in `layouts/_menu.html.erb` (BS5 expects different collapse markup)
-  - Pagination through `pagy_bootstrap_nav`.
-- [ ] Replace the CSS overrides in `application.css.scss` (negative margins on
-      `.search-toggle` and `.delete-button`, fixed widths) with BS5 utility classes where
-      possible, and move what's left to plain `application.css`.
-- [ ] Rewrite `application.js` (about 90 lines of jQuery) as Stimulus controllers:
-  - `search-toggle`: show/hide the filter form and remember the choice in a cookie. This could use BS5's
-    `collapse` component plus a few lines to set the cookie.
+- [ ] simple_form: keep the existing Bootstrap 3 initializer (`simple_form_bootstrap.rb`).
+      Don't run `rails g simple_form:install --bootstrap`, which now generates Bootstrap 5
+      wrappers. Check the wrappers still load on current simple_form and fix any renamed options.
+- [ ] Bootstrap 3 assets (D2): put Bootstrap 3.4.1's `dist/` folder in `vendor/bootstrap/`
+      with its `css/` and `fonts/` layout unchanged. Then the Glyphicons `../fonts/` URLs in
+      `bootstrap.min.css` still resolve, and Propshaft rewrites them to digested paths.
+      Load `bootstrap.min.css` before the app's stylesheet. Load jQuery and `bootstrap.min.js`
+      as classic `<script>` tags in the layout, not as importmap modules, because Bootstrap 3's
+      plugins expect a global `jQuery`. Its data-api handlers are attached to `document`, so the
+      navbar collapse and dropdowns keep working across Turbo page changes.
+- [ ] Views: no markup port. The Bootstrap 3 classes, Glyphicons, navbar and
+      `will_paginate` calls stay as they are. The only view changes are the Turbo, date-field
+      and sign-in changes in this phase.
+- [ ] Rename `application.css.scss` to `application.css`. Remove the `@import "bootstrap…"`
+      lines and the Sprockets `*= require` directives, keep the overrides as they are, and delete the
+      jQuery UI theme images in `app/assets/stylesheets/images/`.
+- [ ] Rewrite `application.js` (about 90 lines of jQuery) as Stimulus controllers. Remove
+      `jquery_ujs` and jQuery UI; jQuery itself stays only for Bootstrap 3:
+  - `search-toggle`: show/hide the filter form and remember the choice in a cookie. This could use
+    Bootstrap 3's `collapse` plugin plus a few lines to set the cookie.
   - Datepicker → native `<input type="date">`.
   - Payee autocomplete (jQuery UI) → `<datalist>` filled from the account's payees.
   - "Expand bill" (a blocking `$.ajax`) → a lazy-loaded `<turbo-frame>` that requests `show_shares`.
@@ -228,7 +231,7 @@ The current test suite is essentially empty. Add the minimum needed to be confid
 
 - [ ] Create a GCP project. Set a **budget alert at $1**.
 - [ ] Create the VM: **e2-micro, `us-central1`** (or `us-east1`/`us-west1`; the free tier only
-      applies in these regions), Debian 12, **30 GB "standard" persistent disk**. The console
+      applies in these regions), Debian 13, **30 GB "standard" persistent disk**. The console
       defaults to "balanced", which isn't free. Reserve a static external IPv4 address
       (about $3.65/month).
 - [ ] Firewall: allow 22, 80 and 443. Use OS Login or SSH keys, and turn on unattended-upgrades.
@@ -303,13 +306,37 @@ Uses the backup layers agreed earlier:
 - [ ] Check that the ledger, CSV export and pagination give the same results before and after.
       About 1–2 evenings of work.
 
+## Phase 12 (optional, after launch): port to Bootstrap 5
+
+About 2–3 evenings. Pages and workflows stay the same; only the markup and styling change.
+
+- [ ] Replace the vendored Bootstrap 3 files with Bootstrap 5.3's CSS and JS bundle (which
+      includes Popper), loaded through importmap, plus Bootstrap Icons. Remove jQuery.
+- [ ] simple_form: regenerate the initializer with `rails g simple_form:install --bootstrap`,
+      which produces Bootstrap 5 wrappers. Delete the old `simple_form_bootstrap.rb`.
+- [ ] Port the views. There are about 45 Bootstrap 3-specific class names across
+      roughly 1,100 lines of ERB:
+  - `glyphicon-*` → Bootstrap Icons (`bi-*`)
+  - `well` / `panel` → `card`
+  - `pull-right` → `float-end`
+  - `col-sm-offset-*` → `offset-sm-*`
+  - `btn-default` → `btn-secondary` / `btn-outline-secondary`
+  - `form-horizontal` / `control-label` → grid `row` + `col-form-label`
+  - `data-toggle` / `data-target` → `data-bs-toggle` / `data-bs-target`
+  - the navbar markup in `layouts/_menu.html.erb` (BS5 expects different collapse markup)
+  - Pagination: switch to `pagy` and `pagy_bootstrap_nav`, or a Bootstrap 5 `will_paginate` renderer.
+- [ ] Replace the CSS overrides in `application.css` (negative margins on
+      `.search-toggle` and `.delete-button`, fixed widths) with BS5 utility classes where possible.
+- [ ] Switch the `search-toggle` Stimulus controller to BS5's `collapse` component.
+- [ ] Compare each page against screenshots taken before the port.
+
 ---
 
 ## Effort and cost
 
 | | |
 |---|---|
-| Effort | About 14–19 evenings part-time, not counting the spreadsheet import (the Bootstrap 5 port adds about 2–3) |
+| Effort | About 12–16 evenings part-time, not counting the spreadsheet import or the optional phases (the Bootstrap 5 port in Phase 12 adds about 2–3) |
 | Ongoing cost | About $3.65/month (IPv4 address); VM, disk, bucket and image storage fall within the free tier |
 | Ongoing maintenance | Occasional `bundle update` + `kamal deploy`; Debian security updates install automatically |
 
@@ -320,6 +347,7 @@ Uses the backup layers agreed earlier:
 | Integer-cents `calc_shares` differs from the old float version on some old bills | Stored amounts are copied unchanged, so balances can't move. `ledger:verify` lists the differences; each is reviewed once and added to the allowlist |
 | `balance_entries` drifts from the bills (a bug, a bulk change, a manual fix) | `ledger:verify` runs weekly and its result is shown in the admin footer |
 | A member's old email doesn't match their Google account, so they appear as a new user | Check and update emails before launch (Phase 10); users are matched by `uid` once they've signed in |
-| Old PaperTrail YAML can't be read on Ruby 3.4 | Allow the classes it uses (Phase 3); if some versions still can't be read, keep them as raw text |
-| Not enough memory on the e2-micro | 1 Puma worker, jemalloc (Rails 8 Dockerfile default), swap; a larger VM (e2-small) costs about $12/month |
+| Old PaperTrail YAML can't be read on Ruby 4.0 | Allow the classes it uses (Phase 3); if some versions still can't be read, keep them as raw text |
+| Not enough memory on the e2-micro | 1 Puma worker, jemalloc (Rails 8.1 Dockerfile default), swap; a larger VM (e2-small) costs about $12/month |
+| Bootstrap 3 and its jQuery dependency have had no fixes since 2019 | 3.4.1 includes the last XSS fixes. The app only uses the collapse and dropdown plugins (no tooltips or popovers with user content), and the assets are served locally. Phase 12 removes both |
 | Free-tier terms change | The Litestream copy and the monthly SQL dumps mean the app can move to any VM in under an hour |
