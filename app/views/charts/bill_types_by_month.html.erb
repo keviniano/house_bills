@@ -2,13 +2,13 @@
   <div class="form-group">
     <%= label :q, :start_date, "Entry start date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :q, :start_date, class: 'datepicker', placeholder: 'the very start' %>
+      <%= date_field :q, :start_date %>
     </div>
   </div>
   <div class="form-group">
     <%= label :q, :end_date, "Entry end date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :q, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
+      <%= date_field :q, :end_date %>
     </div>
   </div>
   <div class="form-group">
@@ -20,7 +20,7 @@
   <button type="submit" class="btn btn-primary col-sm-offset-2">Filter</button>
 </form>
 
-<%= chart_tag('bill_types_by_month_for_current_user_line_chart', 400, params) %>
+<%= chart_tag(account_bill_types_by_month_line_chart_path(@account, request.query_parameters.symbolize_keys.merge(format: :json)), 400) %>
 
 <table class="table table-striped">
   <thead>

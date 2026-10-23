@@ -1,14 +1,11 @@
 <% content_for :title, "#{@account.name} Account Events" %>
 <h1><%= @account.name %> Account Events</h1>
-<button type="button" id="search-toggle-bills" class="search-toggle btn btn-large pull-right">
+<div data-controller="search-toggle" data-search-toggle-cookie-value="show_search_bills">
+<button type="button" id="search-toggle-bills" class="search-toggle btn btn-large pull-right" data-action="search-toggle#toggle">
   Search Options
-  <% if cookies[:show_search_bills] %>
-    <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
-  <% else %>
-    <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-  <% end %>
+  <span class="glyphicon glyphicon-chevron-<%= cookies[:show_search_bills] ? "up" : "down" %>" aria-hidden="true" data-search-toggle-target="icon"></span>
 </button>
-<form id="search" class="well form-horizontal" style="display:<%= cookies[:show_search_bills] ? "block" : "none" %>;">
+<form id="search" class="well form-horizontal" data-search-toggle-target="form" style="display:<%= cookies[:show_search_bills] ? "block" : "none" %>;">
   <div class="form-group">
     <%= label :q, :balance_shareholder_id, "Show costs for", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
@@ -30,13 +27,13 @@
   <div class="form-group">
     <%= label :q, :start_date, "Entry start date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :q, :start_date, class: 'datepicker', placeholder: 'the very start' %>
+      <%= date_field :q, :start_date %>
     </div>
   </div>
   <div class="form-group">
     <%= label :q, :end_date, "Entry end date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :q, :end_date, :class => 'datepicker', placeholder: 'the very end' %>
+      <%= date_field :q, :end_date %>
     </div>
   </div>
   <div class="form-group">
@@ -54,18 +51,19 @@
   <div class="form-group">
     <%= label :q, :changed_at_start_date, "Changed at start date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :q, :changed_at_start_date, class: 'datepicker', placeholder: 'the very start' %>
+      <%= date_field :q, :changed_at_start_date %>
     </div>
   </div>
   <div class="form-group">
     <%= label :q, :changed_at_end_date, "Changed at end date", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= text_field :q, :changed_at_end_date, :class => 'datepicker', placeholder: 'the very end' %>
+      <%= date_field :q, :changed_at_end_date %>
     </div>
   </div>
   <button type="submit" class="btn btn-primary col-sm-offset-2">Search</button>
-  <button type="submit" name="output" value="CSV" class="btn btn-info">Export</button>
+  <button type="submit" name="output" value="CSV" class="btn btn-info" data-turbo="false">Export</button>
 </form>
+</div>
 
 <table class="table table-hover table-condensed">
   <tr>

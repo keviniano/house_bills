@@ -1,23 +1,11 @@
-<script>
-  $(function() {
-    <% if account_entry.type == 'UnboundAccountEntry' %>
-      var availablePayees = [
-        <%= @payees.map{|p| "\"#{p.name}\""}.join(',').html_safe %>
-      ];
-      $("#unbound_account_entry_payee").autocomplete({ source: availablePayees, delay: 0 });
-    <% end %>
-    <% if @account.lock_records_before.present? %>
-      $(".datepicker").datepicker("option", "minDate", new Date("<%= (@account.lock_records_before.to_date + 1.day).to_s(:db) %>"));
-    <% end %>
-  });
-</script>
 <%= simple_form_for([@account,account_entry], :html => {:class => 'form-horizontal' }) do |f| %>
   <%= f.error_notification %>
   <%= f.input :entry_type, :as => :radio_buttons, :collection => AccountEntry.valid_entry_types %>
-  <%= f.input :date, as: :date, html5: true, label: 'Date' %>
+  <%= f.input :date, as: :date, html5: true, label: 'Date', input_html: { min: @account.lock_records_before } %>
   <%= f.input :check_number, :input_html => {:class => "check-number"} %>
   <% if account_entry.type == 'UnboundAccountEntry' %>
-    <%= f.input :payee, :input_html => {:class => "payee"} %>
+    <%= f.input :payee, :input_html => {:class => "payee", list: "payees", autocomplete: "off"} %>
+    <%= render "payees/datalist", payees: @payees %>
   <% else %>
     <%= f.association :shareholder, :collection => account_entry.open_shareholders, :include_blank => false, :input_html => {:class => "shareholder"} %>
   <% end %>

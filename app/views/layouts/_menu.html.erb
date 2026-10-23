@@ -58,7 +58,7 @@
                 <%= link_to 'Account overview', account_path(@account) %>
               </li>
               <li <%= current_page?(account_path(@account)) ? 'class="disabled"'.html_safe : nil %>>
-                <%= link_to 'Bill types by month', account_charts_path(account_id: @account, action: :bill_types_by_month) %>
+                <%= link_to 'Bill types by month', account_bill_types_by_month_chart_path(@account) %>
               </li>
             </ul>
           </li>
@@ -66,14 +66,12 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <% if user_signed_in? %>
+          <% balance = Shareholder.by_user(current_user)&.balance %>
           <li>
-            <%= link_to "Signed in as #{current_user.name}: #{number_to_currency(Shareholder.by_user(current_user).balance)}", edit_user_registration_path %>
+            <p class="navbar-text">Signed in as <%= current_user.name %><%= ": #{number_to_currency(balance)}" if balance %></p>
           </li>
-          <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
+          <li><%= link_to "Sign out", destroy_user_session_path, data: { turbo_method: :delete } %></li>
         <% else %>
-          <% unless request.original_fullpath == new_user_registration_path %>
-            <li><%= link_to "Sign up", new_user_registration_path %></li>
-          <% end %>
           <% unless request.original_fullpath == new_user_session_path %>
             <li><%= link_to "Sign in", new_user_session_path %></li>
           <% end %>

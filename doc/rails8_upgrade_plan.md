@@ -184,31 +184,31 @@ Changes required by moving from Rails 4.2 to 8.1:
 
 ## Phase 4: Controllers, views, JS (about 2–3 evenings)
 
-- [ ] `before_filter` → `before_action` everywhere.
-- [ ] Routes: Rails no longer supports dynamic `:action` route segments
+- [x] `before_filter` → `before_action` everywhere.
+- [x] Routes: Rails no longer supports dynamic `:action` route segments
       (`get 'charts(/:action)' => 'charts#:action'`). Replace them with explicit chart routes.
-- [ ] CSV export (`balance_events`, `account_entries`): use `respond_to { |f| f.csv { send_data … } }`
+- [x] CSV export (`balance_events`, `account_entries`): use `respond_to { |f| f.csv { send_data … } }`
       with a small exporter class built on `CSV.generate`. Keep the 250-row limit.
-- [ ] Delete links: `link_to … method: :delete` → `button_to` (Turbo), and
+- [x] Delete links: `link_to … method: :delete` → `button_to` (Turbo), and
       `data: { confirm: }` → `data: { turbo_confirm: }`. This keeps the "Delete Account For Ever and Ever"
       confirmation.
-- [ ] simple_form: keep the existing Bootstrap 3 initializer (`simple_form_bootstrap.rb`).
+- [x] simple_form: keep the existing Bootstrap 3 initializer (`simple_form_bootstrap.rb`).
       Don't run `rails g simple_form:install --bootstrap`, which now generates Bootstrap 5
       wrappers. Check the wrappers still load on current simple_form and fix any renamed options.
-- [ ] Bootstrap 3 assets (D2): put Bootstrap 3.4.1's `dist/` folder in `vendor/bootstrap/`
+- [x] Bootstrap 3 assets (D2): put Bootstrap 3.4.1's `dist/` folder in `vendor/bootstrap/`
       with its `css/` and `fonts/` layout unchanged. Then the Glyphicons `../fonts/` URLs in
       `bootstrap.min.css` still resolve, and Propshaft rewrites them to digested paths.
       Load `bootstrap.min.css` before the app's stylesheet. Load jQuery and `bootstrap.min.js`
       as classic `<script>` tags in the layout, not as importmap modules, because Bootstrap 3's
       plugins expect a global `jQuery`. Its data-api handlers are attached to `document`, so the
       navbar collapse and dropdowns keep working across Turbo page changes.
-- [ ] Views: no markup port. The Bootstrap 3 classes, Glyphicons, navbar and
+- [x] Views: no markup port. The Bootstrap 3 classes, Glyphicons, navbar and
       `will_paginate` calls stay as they are. The only view changes are the Turbo, date-field
       and sign-in changes in this phase.
-- [ ] Rename `application.css.scss` to `application.css`. Remove the `@import "bootstrap…"`
+- [x] Rename `application.css.scss` to `application.css`. Remove the `@import "bootstrap…"`
       lines and the Sprockets `*= require` directives, keep the overrides as they are, and delete the
       jQuery UI theme images in `app/assets/stylesheets/images/`.
-- [ ] Rewrite `application.js` (about 90 lines of jQuery) as Stimulus controllers. Remove
+- [x] Rewrite `application.js` (about 90 lines of jQuery) as Stimulus controllers. Remove
       `jquery_ujs` and jQuery UI; jQuery itself stays only for Bootstrap 3:
   - `search-toggle`: show/hide the filter form and remember the choice in a cookie. This could use
     Bootstrap 3's `collapse` plugin plus a few lines to set the cookie.
@@ -217,7 +217,7 @@ Changes required by moving from Rails 4.2 to 8.1:
   - "Expand bill" (a blocking `$.ajax`) → a lazy-loaded `<turbo-frame>` that requests `show_shares`.
   - Charts: replace the retired `google.com/jsapi` with Google Charts'
     `gstatic.com/charts/loader.js`. Charts look exactly the same and the JSON endpoints don't change.
-- [ ] Sign-in (D1):
+- [x] Sign-in (D1):
   - Delete `app/views/devise/*` and replace it with one sign-in page holding a
     "Sign in with Google" button. It must be a `button_to` POST, because
     `omniauth-rails_csrf_protection` rejects GET requests.
@@ -230,6 +230,32 @@ Changes required by moving from Rails 4.2 to 8.1:
     The existing `User#attach_shareholders` callback already links members by email,
     so an invitation is just adding a member with their email address.
   - Remove `configure_permitted_parameters` from `ApplicationController` (there's no sign-up form any more).
+- [x] Notes from doing Phase 4:
+  - CSV export keeps the existing `output=CSV` form button (no `.csv` URLs), with `send_data` and
+    `BalanceEventsCsv`/`AccountEntriesCsv` built on `CSV.generate`. An empty result now exports just
+    the header row instead of crashing.
+  - Delete controls use `data-turbo-method`/`turbo_confirm` links where they were links (to keep the
+    look), and `button_to` with `form: { data: { turbo_confirm: } }` where they were buttons. Redirects
+    after a delete return 303, and failed form submissions render with 422 so Turbo shows the errors.
+  - Removed the two chart actions no page linked to (`balance_line_chart`, `bill_types_by_month_line_chart`)
+    and the dead `balance_events#chart` route.
+  - Sign-in: `users.remember_token` was added to the schema migration (Devise's remember-me needs it
+    without passwords). Member and user emails now match case-insensitively. Members are remembered for a year.
+  - Local sign-in before the OAuth client exists: `DEV_GOOGLE_EMAIL=you@example.com bin/rails server`
+    (development only, via OmniAuth test mode).
+  - Bugs found and fixed:
+    - `update_cleared` passed the whole form to `AccountEntry.update`, unscoped: any signed-in user
+      could change any field (including the amount) of any account's entries by id. It now updates
+      only `cleared`, only on this account's entries the user may update.
+    - Exporting more than 250 events set the error but never loaded the page's rows, so the page crashed.
+    - The ledger CSV called a nonexistent `AccountEntry#balance`, so ledger export always failed.
+    - The account overview's tab script used a selector jQuery 3 rejects, so no tab worked.
+    - The bill form's Delete button checked `:delete`, which the lock-date rule doesn't cover, so locked
+      bills showed a button that then failed. The bill type Delete link had no permission check.
+    - Chart drill-down links pass ISO dates, which the old `mm-dd-yyyy` parsing rejected.
+  - Checked in a browser against the dev server: sign-in, activity page, search toggle, Expand,
+    navbar dropdowns, chart, overview tabs (also after a Turbo visit), ledger, and entering a bill
+    including a validation error.
 
 ## Phase 5: Tests (alongside Phases 3–4)
 

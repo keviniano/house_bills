@@ -162,6 +162,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
     t.string "uid"
     t.string "name"
     t.string "email", default: "", null: false
+    t.string "remember_token"
     t.datetime "remember_created_at"
     t.integer "sign_in_count", default: 0
     t.datetime "current_sign_in_at"

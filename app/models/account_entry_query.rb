@@ -26,14 +26,21 @@ class AccountEntryQuery
 
     @cleared_status = (params[:cleared_status] == 'true' ? true : false) if params[:cleared_status].present?
     @with_text = params[:with_text] if params[:with_text].present?
-    @start_date = Date.strptime(params[:start_date],'%m-%d-%Y') if params[:start_date].present?
-    @end_date = Date.strptime(params[:end_date],'%m-%d-%Y') if params[:end_date].present?
+    @start_date = parse_date(params[:start_date]) if params[:start_date].present?
+    @end_date = parse_date(params[:end_date]) if params[:end_date].present?
     @payee_shareholder_id = params[:payee_shareholder_id].to_i if params[:payee_shareholder_id].present?
     @entry_type = params[:entry_type] if params[:entry_type].present?
   end
 
   def persisted?
     false
+  end
+
+  # Search forms send yyyy-mm-dd from <input type="date">; ignore anything else.
+  def parse_date(value)
+    Date.iso8601(value)
+  rescue Date::Error, TypeError
+    nil
   end
 
   def apply_conditions(account_entries)

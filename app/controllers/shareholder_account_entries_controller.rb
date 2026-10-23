@@ -1,5 +1,5 @@
 class ShareholderAccountEntriesController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
   load_and_authorize_resource :shareholder_account_entry, :through => :account
 
@@ -16,7 +16,7 @@ class ShareholderAccountEntriesController < ApplicationController
     if @shareholder_account_entry.save
       redirect_to [:edit,@account,@shareholder_account_entry], :notice => 'Account entry was successfully created.'
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -25,17 +25,16 @@ class ShareholderAccountEntriesController < ApplicationController
   end
 
   def update
-    if @shareholder_account_entry.update_attributes(resource_params)
+    if @shareholder_account_entry.update(resource_params)
       redirect_to [:edit,@account,@shareholder_account_entry], :notice => 'Account entry was successfully updated.'
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    # TODO fix up redirect, flash msg
     @shareholder_account_entry.destroy
-    redirect_to :action => :index, :controller => :account_entries
+    redirect_to account_account_entries_path(@account), notice: 'Account entry was successfully deleted.', status: :see_other
   end
 
   private

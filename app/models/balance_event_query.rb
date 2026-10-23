@@ -30,19 +30,19 @@ class BalanceEventQuery
     @current_user = user
     params ||= {}
     if params[:start_date].present?
-      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y')
+      @start_date = parse_date(params[:start_date])
     else
       @start_date = Date.current.beginning_of_month - 3.months
     end
-    @end_date = Date.strptime(params[:end_date],'%m-%d-%Y') if params[:end_date].present?
+    @end_date = parse_date(params[:end_date]) if params[:end_date].present?
 
     @bill_type_id = (params[:bill_type_id] =~ /^[0-9]+$/ ? params[:bill_type_id].to_i : params[:bill_type_id]) if params[:bill_type_id].present?
     @with_text             = params[:with_text] if params[:with_text].present?
     @share_shareholder_id  = params[:share_shareholder_id].to_i if params[:share_shareholder_id].present?
     @payee_shareholder_id  = params[:payee_shareholder_id].to_i if params[:payee_shareholder_id].present?
 
-    @changed_at_start_date = Date.strptime(params[:changed_at_start_date],'%m-%d-%Y') if params[:changed_at_start_date].present?
-    @changed_at_end_date   = Date.strptime(params[:changed_at_end_date],'%m-%d-%Y')   if params[:changed_at_end_date].present?
+    @changed_at_start_date = parse_date(params[:changed_at_start_date]) if params[:changed_at_start_date].present?
+    @changed_at_end_date   = parse_date(params[:changed_at_end_date])   if params[:changed_at_end_date].present?
     @show_change_date_fields = @changed_at_start_date.present? || @changed_at_end_date.present?
 
     if params[:balance_shareholder_id].present?
@@ -54,6 +54,13 @@ class BalanceEventQuery
 
   def persisted?
     false
+  end
+
+  # Search forms send yyyy-mm-dd from <input type="date">; ignore anything else.
+  def parse_date(value)
+    Date.iso8601(value)
+  rescue Date::Error, TypeError
+    nil
   end
 
   def apply_conditions(balance_events)

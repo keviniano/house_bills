@@ -117,7 +117,7 @@
             </div>
             <% unless bill_type.bills.exists? %>
               <div class="grid-cell">
-                <%= link_to "Delete", [@account,bill_type], :method => :delete, data: { confirm: "Delete the bill type \"#{bill_type.name}\"?" } %>
+                <%= link_to "Delete", [@account,bill_type], data: { turbo_method: :delete, turbo_confirm: "Delete the bill type \"#{bill_type.name}\"?" } if can? :destroy, bill_type %>
               </div>
             <% end %>
           </div>
@@ -141,7 +141,7 @@
               <%= link_to "Rename", [:edit,@account,payee] if can? :edit, payee %>
             </div>
             <div class="grid-cell">
-              <%= link_to "Delete", [@account,payee], :method => :delete, data: { confirm: "Delete the payee \"#{payee.name}\"?" } if can? :delete, payee %>
+              <%= link_to "Delete", [@account,payee], data: { turbo_method: :delete, turbo_confirm: "Delete the payee \"#{payee.name}\"?" } if can? :destroy, payee %>
             </div>
           </div>
         <% end %>
@@ -158,7 +158,7 @@
         <li><%= link_to "Edit Account", [:edit,@account] %></li>
       <% end %>
       <% if can? :destroy, @account %>
-        <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, data: { confirm: "Are you really really REALLY sure??" } %></li>
+        <li><%= link_to "Delete Account For Ever and Ever", @account, data: { turbo_method: :delete, turbo_confirm: "Are you really really REALLY sure??" } %></li>
       <% end %>
     </ul>
   </div>
@@ -169,7 +169,7 @@
     var hash = document.location.hash;
     var tabSuffix = "-tab";
     if (hash) {
-      $('#account-tab a[href=' + hash.replace(tabSuffix,"") + ']').tab('show');
+      $('#account-tab a[href="' + hash.replace(tabSuffix,"") + '"]').tab('show');
     } else {
       $('#account-tab a:first').tab('show');
     }

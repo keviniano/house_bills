@@ -1,5 +1,5 @@
 class UnboundAccountEntriesController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
   load_and_authorize_resource :unbound_account_entry, :through => :account
 
@@ -16,7 +16,7 @@ class UnboundAccountEntriesController < ApplicationController
       redirect_to [:edit,@account,@unbound_account_entry], :notice => 'Account entry was successfully created.'
     else
       prep_edit
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -25,17 +25,17 @@ class UnboundAccountEntriesController < ApplicationController
   end
 
   def update
-    if @unbound_account_entry.update_attributes(resource_params)
+    if @unbound_account_entry.update(resource_params)
       redirect_to [:edit,@account,@unbound_account_entry], :notice => 'Account entry was successfully updated.'
     else
       prep_edit
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @unbound_account_entry.destroy
-    redirect_to account_account_entries_path(@account), notice: 'Account entry was successfully deleted.'
+    redirect_to account_account_entries_path(@account), notice: 'Account entry was successfully deleted.', status: :see_other
   end
 
   private

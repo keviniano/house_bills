@@ -76,6 +76,6 @@ class Shareholder < ApplicationRecord
   private
 
     def attach_user
-      self.user = User.find_by(email: email) if email.present?
+      self.user = User.where("lower(email) = ?", email.strip.downcase).first if email.present?
     end
 end

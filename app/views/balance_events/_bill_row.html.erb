@@ -17,10 +17,12 @@
     <td><%= bill_row.created_at %></td>
     <td><%= bill_row.updated_at %></td>
   <% end %>
-  <td><%= link_to('Expand', [@account,bill_row], class: "view-bill", data: { url: url_for(show_shares_account_bill_url(@account,bill_row))}) %></td>
+  <td><%= link_to('Expand', [@account,bill_row], class: "view-bill", data: { controller: "bill-shares", action: "bill-shares#toggle" }) %></td>
   <td><%= link_to('Details', [@account,bill_row]) if can? :read, bill_row %></td>
 </tr>
 <tr style="display:none">
-  <td colspan="12", class="shares">
+  <td colspan="12" class="shares">
+    <%# Lazy frames load once visible, so the shares are fetched on first expand. %>
+    <%= turbo_frame_tag dom_id(bill_row, :shares), src: show_shares_account_bill_path(@account, bill_row), loading: :lazy %>
   </td>
 </tr>

@@ -15,13 +15,13 @@ class ChartQuery
   def initialize(params, session, user, account)
     params ||= {}
     if params[:start_date].present?
-      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y')
+      @start_date = parse_date(params[:start_date])
     else
       @start_date = Date.current.beginning_of_month - 1.year
     end
 
     if params[:end_date].present?
-      @end_date = Date.strptime(params[:end_date],'%m-%d-%Y')
+      @end_date = parse_date(params[:end_date])
     else
       @end_date = Date.current.end_of_month
     end
@@ -35,6 +35,13 @@ class ChartQuery
 
   def persisted?
     false
+  end
+
+  # Search forms send yyyy-mm-dd from <input type="date">; ignore anything else.
+  def parse_date(value)
+    Date.iso8601(value)
+  rescue Date::Error, TypeError
+    nil
   end
 
   def apply_conditions(model)

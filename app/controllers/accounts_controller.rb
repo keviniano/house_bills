@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource
 
   # GET /accounts
@@ -33,23 +33,23 @@ class AccountsController < ApplicationController
     if @account.save
       redirect_to @account, notice: "Account '#{@account.name}' was successfully created."
     else
-      render action: "new"
+      render :new, status: :unprocessable_entity
     end
   end
 
   # PATCH /accounts/1
   def update
-    if @account.update_attributes(resource_params)
+    if @account.update(resource_params)
       redirect_to account_path(@account, anchor: "admin-tab"), notice: "Account '#{@account.name}' was successfully edited."
     else
-      render action: "edit"
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /accounts/1
   def destroy
     @account.destroy
-    redirect_to :accounts, notice: "Account '#{@account.name}' was successfully deleted"
+    redirect_to :accounts, notice: "Account '#{@account.name}' was successfully deleted", status: :see_other
   end
 
   def edit_pot

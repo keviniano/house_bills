@@ -1,10 +1,7 @@
 module ApplicationHelper
-  def chart_tag (action, height,params = {})
-    params[:format] ||= :json
-    params[:action]   = action
-    path = charts_path(action, params)
-    content_tag(:div, :'data-chart' => path, :style => "height: #{height}px;") do
-    end
+  # A Google chart drawn by the chart Stimulus controller from the JSON at url.
+  def chart_tag(url, height)
+    content_tag(:div, nil, data: { controller: "chart", chart_url_value: url }, style: "height: #{height}px;")
   end
 
   def bill_description(bill)

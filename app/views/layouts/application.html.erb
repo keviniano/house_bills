@@ -2,13 +2,13 @@
 <html lang="en" dir="ltr">
   <head>
     <title><%= content_for?(:title) ? yield(:title) : "Shared Bills" %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <%= javascript_include_tag "application" %>
-    <%= stylesheet_link_tag "application" %>
-    <%= csrf_meta_tag %>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag "bootstrap/css/bootstrap.min", "application", "data-turbo-track": "reload" %>
+    <%# Bootstrap 3's plugins need a global jQuery, so they load as classic scripts. %>
+    <%= javascript_include_tag "jquery/jquery.min", "bootstrap/js/bootstrap.min", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
     <%= yield(:head) %>
   </head>
   <body>

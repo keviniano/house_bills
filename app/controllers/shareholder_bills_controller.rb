@@ -1,5 +1,5 @@
 class ShareholderBillsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
   load_and_authorize_resource :shareholder_bill, :through => :account
 
@@ -25,23 +25,23 @@ class ShareholderBillsController < ApplicationController
     if @shareholder_bill.save
       redirect_to [@account,@shareholder_bill], :notice => 'Bill was successfully created.'
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
   # PATCH /shareholder_bills/1
   def update
-    if @shareholder_bill.update_attributes(resource_params)
+    if @shareholder_bill.update(resource_params)
       redirect_to [@account,@shareholder_bill], :notice => 'Bill was successfully updated.'
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /shareholder_bills/1
   def destroy
     @shareholder_bill.destroy
-    redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.'
+    redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.', status: :see_other
   end
 
   private

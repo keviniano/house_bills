@@ -12,6 +12,8 @@ class CreateHouseBills < ActiveRecord::Migration[8.1]
       t.string   :uid
       t.string   :name
       t.string   :email, null: false, default: ""
+      # Devise remember-me without passwords needs its own token.
+      t.string   :remember_token
       t.datetime :remember_created_at
       t.integer  :sign_in_count, default: 0
       t.datetime :current_sign_in_at

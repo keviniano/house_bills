@@ -1,25 +1,13 @@
-<script>
-  $(function() {
-    <% if bill.type == 'AccountBill' %>
-      var availablePayees = [
-        <%= @payees.map{|p| "\"#{p.name}\""}.join(',').html_safe %>
-      ];
-      $("#account_bill_payee").autocomplete({ source: availablePayees, delay: 0 });
-    <% end %>
-    <% if @account.lock_records_before.present? %>
-      $(".datepicker").datepicker("option", "minDate", new Date("<%= (@account.lock_records_before.to_date + 1.day).to_s(:db) %>"));
-    <% end %>
-  });
-</script>
 <%= simple_form_for([@account,bill], html: {class: 'form-horizontal' }) do |f| %>
   <%= f.error_notification %>
   <%= f.input :entry_type, as: :radio_buttons, collection: Bill.valid_entry_types %>
-  <%= f.input :date, as: :date, html5: true, label: 'Date', required: true %>
+  <%= f.input :date, as: :date, html5: true, label: 'Date', required: true, input_html: { min: @account.lock_records_before } %>
   <% if bill.type == 'AccountBill' %>
     <%=  f.simple_fields_for :bill_account_entry, bill.bill_account_entry do |bae| %>
       <%= bae.input :check_number, input_html: {class: "check-number"} %>
     <% end %>
-    <%= f.input :payee, input_html: {class: "payee"} %>
+    <%= f.input :payee, input_html: {class: "payee", list: "payees", autocomplete: "off"} %>
+    <%= render "payees/datalist", payees: @payees %>
   <% else %>
     <%= f.association :shareholder, collection: bill.open_shareholders, include_blank: false, input_html: {class: "shareholder"} %>
   <% end %>
@@ -82,6 +70,6 @@
     <%= f.button :submit, class: "btn btn-primary" %>
   </div>
 <% end %>
-<% if !bill.new_record? && can?(:delete, bill) %>
-  <%= button_to "Delete Bill", [@account,bill], {method: :delete, data: { confirm: "Are you sure you want to delete this bill?" }, class: "btn btn-danger pull-right delete-button"} %>
+<% if !bill.new_record? && can?(:destroy, bill) %>
+  <%= button_to "Delete Bill", [@account,bill], {method: :delete, form: { data: { turbo_confirm: "Are you sure you want to delete this bill?" } }, class: "btn btn-danger pull-right delete-button"} %>
 <% end %>

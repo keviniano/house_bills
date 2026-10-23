@@ -1,5 +1,5 @@
 class AccountBillsController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
   load_and_authorize_resource :account_bill, through: :account
 
@@ -26,24 +26,24 @@ class AccountBillsController < ApplicationController
       redirect_to [@account,@account_bill], notice: 'Bill was successfully created.'
     else
       prep_edit
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
   # PATCH /account_bills/1
   def update
-    if @account_bill.update_attributes(resource_params)
+    if @account_bill.update(resource_params)
       redirect_to [@account,@account_bill], notice: 'Bill was successfully updated.'
     else
       prep_edit
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /account_bills/1
   def destroy
     @account_bill.destroy
-    redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.'
+    redirect_to account_balance_events_path(@account), notice: 'Bill was successfully deleted.', status: :see_other
   end
 
   private

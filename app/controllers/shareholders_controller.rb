@@ -1,5 +1,5 @@
 class ShareholdersController < ApplicationController
-  before_filter :authenticate_user!
+  before_action :authenticate_user!
   load_and_authorize_resource :account
   load_and_authorize_resource :shareholder, through: :account
 
@@ -18,25 +18,25 @@ class ShareholdersController < ApplicationController
     if @shareholder.save
       redirect_to account_path(@account, anchor: "shareholders-tab"), notice: "Shareholder '#{@shareholder.name}' was successfully created."
     else
-      render action: "new"
+      render :new, status: :unprocessable_entity
     end
   end
 
   # PATCH /shareholders/1
   def update
-    if @shareholder.update_attributes(update_resource_params)
+    if @shareholder.update(update_resource_params)
       redirect_to account_path(@account, anchor: "shareholders-tab"), notice: "Shareholder '#{@shareholder.name}' was successfully updated."
     else
-      render action: "edit"
+      render :edit, status: :unprocessable_entity
     end
   end
 
   # DELETE /shareholders/1
   def destroy
     if @shareholder.destroy
-      redirect_to account_path(@account, anchor: "shareholders-tab"), notice: "Shareholder '#{@shareholder.name}' was successfully deleted."
+      redirect_to account_path(@account, anchor: "shareholders-tab"), notice: "Shareholder '#{@shareholder.name}' was successfully deleted.", status: :see_other
     else
-      redirect_to account_path(@account, anchor: "shareholders-tab"), alert: "Shareholder '#{@shareholder.name}' has entries, so they can't be deleted. Set a closed date instead."
+      redirect_to account_path(@account, anchor: "shareholders-tab"), alert: "Shareholder '#{@shareholder.name}' has entries, so they can't be deleted. Set a closed date instead.", status: :see_other
     end
   end
 
