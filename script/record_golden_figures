@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Records the reference figures from the restored legacy Postgres dump (plan Phase 0),
+# straight from SQL so the old app doesn't need to run. GoldenFigures compares the
+# imported SQLite database against this file.
+#
+#   script/record_golden_figures postgres://postgres@127.0.0.1:5433/house_bills_2016
+#
+# The output holds real balances, so test/fixtures/golden/ is gitignored (the repo is public).
+set -euo pipefail
+
+url=${1:?usage: script/record_golden_figures POSTGRES_URL}
+out=${2:-test/fixtures/golden/figures.json}
+mkdir -p "$(dirname "$out")"
+
+psql "$url" -v ON_ERROR_STOP=1 -At <<'SQL' > "$out"
+SELECT jsonb_pretty(jsonb_build_object(
+  'counts', (SELECT jsonb_object_agg(t, n) FROM (VALUES
+      ('accounts',        (SELECT count(*) FROM accounts)),
+      ('account_entries', (SELECT count(*) FROM account_entries)),
+      ('balance_entries', (SELECT count(*) FROM balance_entries)),
+      ('balance_events',  (SELECT count(*) FROM balance_events)),
+      ('bill_types',      (SELECT count(*) FROM bill_types)),
+      ('bills',           (SELECT count(*) FROM bills)),
+      ('payees',          (SELECT count(*) FROM payees)),
+      ('roles',           (SELECT count(*) FROM roles)),
+      ('shareholders',    (SELECT count(*) FROM shareholders)),
+      ('users',           (SELECT count(*) FROM users)),
+      ('versions',        (SELECT count(*) FROM versions))) AS c(t, n)),
+  'accounts', (SELECT jsonb_object_agg(a.id, jsonb_build_object(
+      'balance_cents',         (SELECT COALESCE(SUM(ROUND(amount * 100)), 0)::bigint FROM account_entries WHERE account_id = a.id),
+      'cleared_balance_cents', (SELECT COALESCE(SUM(ROUND(amount * 100)), 0)::bigint FROM account_entries WHERE account_id = a.id AND cleared),
+      'pot_cents',             (SELECT COALESCE(SUM(ROUND(amount * 100)), 0)::bigint FROM balance_entries WHERE account_id = a.id AND type = 'PotBalanceEntry'),
+      'balance_entries_cents', (SELECT COALESCE(SUM(ROUND(amount * 100)), 0)::bigint FROM balance_entries WHERE account_id = a.id),
+      'bills_cents',           (SELECT COALESCE(SUM(ROUND(amount * 100)), 0)::bigint FROM bills WHERE account_id = a.id)))
+    FROM accounts a),
+  'shareholders', (SELECT jsonb_object_agg(s.id,
+      (SELECT COALESCE(SUM(ROUND(amount * 100)), 0)::bigint FROM balance_entries WHERE shareholder_id = s.id))
+    FROM shareholders s)
+));
+SQL
+echo "Wrote $out"

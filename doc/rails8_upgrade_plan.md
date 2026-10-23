@@ -34,8 +34,8 @@ Goals, in order:
 ## Phase 0: Preparation (about 1 evening)
 
 - [x] Create a branch `rails8` so all of the existing git history is kept.
-- [ ] Restore the pre-decommission dump into a local Postgres 17 (`pg_restore --no-owner`).
-- [ ] **Record the reference figures** straight from the dump with SQL, so the old app
+- [x] Restore the pre-decommission dump into a local Postgres 17 (`pg_restore --no-owner`).
+- [x] **Record the reference figures** straight from the dump with SQL, so the old app
       doesn't need to run:
   - each member's balance: `SUM(balance_entries.amount)` grouped by `shareholder_id`
   - the account balance and the cleared balance per account
@@ -43,6 +43,19 @@ Goals, in order:
   - the pot balance per account
 
   Save these in `test/fixtures/golden/` so the import and the tests can compare against them.
+  *Done with `script/record_golden_figures` → `test/fixtures/golden/figures.json`. That folder is
+  **gitignored**: the GitHub repo is public and these are real members' balances. Keep a copy with
+  the dump in the backup bucket's `genesis/`.*
+- [x] What the dump (`2022-02-15 House Bills DB Backup`, Postgres 12 custom format) holds:
+  - one account, 26 members (4 still open), 13 users, 5,989 bills, 2,156 account entries,
+    37,956 balance entries, 20,548 versions
+  - data runs to **2020-12-16**, not ~2016; `lock_records_before` is already 2018-01-01
+  - two bills are dated before the year 2000 (typos such as `0017-09-04`); decide in Phase 6
+    whether to fix them
+  - no NULL `balance_entries.amount`; `balance_offset_id` and `is_pot_entry` are never set,
+    so Phase 6 can drop both columns
+  - balance entries total $860.52 (members $703.10 + pot $157.42) but the account register
+    totals $860.69: a 17¢ gap for `ledger:verify` to explain in Phase 6
 - [ ] *(Optional, for nostalgia and reference)* Run the old app once in Docker
       (`ruby:2.2` image + the dump) to capture screenshots and a few CSV exports. These
       give a visual target and some extra reference files. Skip this if `therubyracer`
@@ -174,9 +187,11 @@ Changes required by moving from Rails 4.2 to 8.1:
     calls `set_paper_trail_whodunnit`, and sets `Current.user` for the userstamps.
   - `AccountEntryQuery`, `BalanceEventQuery` and `ChartQuery` moved from their controller files
     to `app/models/` so they autoload. `AccountEntryQuery.grouped_shareholders` was also scoped to the account.
-- [ ] **Open question:** `Shareholder#admin?` checks for a role named `Administrator`, but the
-      seeds create `User`, `Power User` and `Owner`. Check the dump's `roles` table: if it
-      has no `Administrator`, then only owners have admin rights, and `Power User` may have been meant.
+- [x] **Open question:** `Shareholder#admin?` checks for a role named `Administrator`, but the
+      seeds create `User`, `Power User` and `Owner`. *Answered by the dump: its roles are exactly
+      `User`, `Power User` and `Owner`, and no member has `Power User` (1 owner, 25 users). So only
+      the owner has ever had admin rights. Left as is; rename the check to `Power User` only if
+      someone needs admin rights without being the owner.*
 - [x] With foreign keys in place, destroying a member or bill type that still has entries now
       fails instead of leaving orphaned rows. Add `dependent: :restrict_with_error` to
       `Shareholder#bills`/`#account_entries`/`#balance_entries` and `BillType#bills`, and show
@@ -261,12 +276,20 @@ Changes required by moving from Rails 4.2 to 8.1:
 
 The current test suite is essentially empty. Add the minimum needed to be confident in the result:
 
-- [ ] Model tests: `calc_shares`, edge cases of `Bill`/`ShareholderBill`/`AccountBill` (shares,
+- [x] Model tests: `calc_shares`, edge cases of `Bill`/`ShareholderBill`/`AccountBill` (shares,
       offset entries, pot), `Shareholder` open/active/closed by date, `locked?`.
-- [ ] `Ability` tests: owner/admin/user × own/other entries × locked/unlocked.
-- [ ] **Golden test:** import the dump and check that every member's balance, the account balance
+- [x] `Ability` tests: owner/admin/user × own/other entries × locked/unlocked.
+- [x] **Golden test:** import the dump and check that every member's balance, the account balance
       and the pot match `test/fixtures/golden/` to the cent.
-- [ ] Browser (system) tests: sign in → add a bill → check balances on the ledger page → export CSV.
+      *`bin/rails ledger:golden` compares the current database with `figures.json` (row counts,
+      each account's register/cleared/pot/balance-entry/bill totals, every member's balance) and
+      exits 1 on any difference. `GoldenFiguresTest` covers the comparer; the real run is in Phase 6,
+      once the import exists.*
+- [x] Browser (system) tests: sign in → add a bill → check balances on the ledger page → export CSV.
+      *`test/system/bill_workflow_test.rb` (headless Chrome, Google mocked by OmniAuth test mode):
+      sign in, enter a bill with a 1:1:2 split, check the activity page and the stored balances,
+      expand the shares, credit a member on the ledger, and export both CSVs. Run with
+      `bin/rails test:system`; `bin/rails test` skips it.*
 
 ## Phase 6: Data import (about 2 evenings; spreadsheet work is separate)
 

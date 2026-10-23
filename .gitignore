@@ -38,3 +38,6 @@
 *.swo
 .DS_Store
 tags
+
+# Reference balances recorded from the legacy dump; real people's money, and this repo is public.
+/test/fixtures/golden/
