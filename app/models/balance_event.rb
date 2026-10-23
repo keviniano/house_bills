@@ -1,7 +1,7 @@
-class BalanceEvent < ActiveRecord::Base
-  belongs_to :account
-  belongs_to :bill
-  belongs_to :account_entry
+class BalanceEvent < ApplicationRecord
+  belongs_to :account, optional: true
+  belongs_to :bill, optional: true
+  belongs_to :account_entry, optional: true
   has_many   :bill_share_balance_entries, primary_key: :bill_id, foreign_key: :bill_id
   has_one    :bill_offset_balance_entry, primary_key: :bill_id, foreign_key: :bill_id
   has_one    :pot_balance_entry, primary_key: :bill_id, foreign_key: :bill_id
@@ -9,8 +9,8 @@ class BalanceEvent < ActiveRecord::Base
 
   scope :default_order,             -> { order 'balance_events.date DESC, balance_events.account_entry_id DESC, balance_events.bill_id DESC' }
   scope :all_includes,              -> { includes({:bill => [:bill_share_balance_entries, :bill_offset_balance_entry, :shareholder, :bill_type], :account_entry => :shareholder}) }
-  scope :deposits,                  -> { where 'balance_events.account_entry_id IN (SELECT id FROM account_entries WHERE amount >= 0)' }
-  scope :withdrawals,               -> { where 'balance_events.account_entry_id IN (SELECT id FROM account_entries WHERE amount < 0)' }
+  scope :deposits,                  -> { where 'balance_events.account_entry_id IN (SELECT id FROM account_entries WHERE amount_cents >= 0)' }
+  scope :withdrawals,               -> { where 'balance_events.account_entry_id IN (SELECT id FROM account_entries WHERE amount_cents < 0)' }
   scope :with_bill_type_id,         -> (bill_type_id)   { where('balance_events.bill_id IN (SELECT id FROM bills WHERE bill_type_id = ?)',bill_type_id) }
   scope :starting_on,               -> (start_date)     { where("balance_events.date >= ?", start_date) }
   scope :ending_on,                 -> (end_date)       { where("balance_events.date <= ?", end_date) }
@@ -43,32 +43,37 @@ class BalanceEvent < ActiveRecord::Base
                                             where("(balance_events.bill_id IN (
                                                      SELECT id
                                                      FROM bills
-                                                     WHERE payee ILIKE :text OR note ILIKE :text) OR
+                                                     WHERE payee LIKE :text OR note LIKE :text) OR
                                                    balance_events.account_entry_id IN (
                                                      SELECT id
                                                      FROM account_entries
-                                                     WHERE payee ILIKE :text OR note ILIKE :text)
+                                                     WHERE payee LIKE :text OR note LIKE :text)
                                                    )", text: "%#{text}%") }
 
   def self.sum_of_amounts
-    joins(:bill).
-      sum("bills.amount") +
-    joins(:account_entry).
-      sum("account_entries.amount")
+    MoneyColumn.from_cents(
+      joins(:bill).
+        sum("bills.amount_cents") +
+      joins(:account_entry).
+        sum("account_entries.amount_cents"))
   end
 
   def self.sum_of_share_amounts(shareholder_id)
     joins(:bill_share_balance_entries).
       where(balance_entries: {shareholder_id: shareholder_id}).
-      sum("balance_entries.amount")
+      sum_money_of_balance_entries
   end
 
   def self.sum_of_offset_amounts(shareholder_id)
     joins(:bill_offset_balance_entry).
       where(balance_entries: {shareholder_id: shareholder_id}).
-      sum("balance_entries.amount") +
+      sum_money_of_balance_entries +
     joins(:account_offset_balance_entry).
       where(balance_entries: {shareholder_id: shareholder_id}).
-      sum("balance_entries.amount")
+      sum_money_of_balance_entries
+  end
+
+  def self.sum_money_of_balance_entries
+    MoneyColumn.from_cents(sum("balance_entries.amount_cents"))
   end
 end

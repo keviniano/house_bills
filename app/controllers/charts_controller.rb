@@ -1,49 +1,3 @@
-class ChartQuery
-  include ActiveModel::Conversion
-  extend ActiveModel::Naming
-
-  attr_reader :start_date, :end_date, :shareholder_id
-
-  def self.grouped_shareholders
-    result = {'All' => [['Anyone',nil]],'Active' => [], 'Inactive' => []}
-    Shareholder.order(:name).each do |sh|
-      result[sh.status].push([sh.name, sh.id])
-    end
-    [['All',result['All']], ['Active', result['Active']], ['Inactive', result['Inactive']]]
-  end
-
-  def initialize(params, session, user, account)
-    params ||= {}
-    if params[:start_date].present?
-      @start_date = Date.strptime(params[:start_date],'%m-%d-%Y')
-    else
-      @start_date = Date.today.beginning_of_month - 1.year
-    end
-
-    if params[:end_date].present?
-      @end_date = Date.strptime(params[:end_date],'%m-%d-%Y')
-    else
-      @end_date = Date.today.end_of_month
-    end
-
-    if params[:shareholder_id].present?
-      @shareholder_id = params[:shareholder_id].to_i
-    else
-      @shareholder_id = user.shareholder_for_account(account).id
-    end
-  end
-
-  def persisted?
-    false
-  end
-
-  def apply_conditions(model)
-    model = model.starting_on(start_date) if start_date
-    model = model.ending_on(end_date) if end_date
-    model
-  end
-end
-
 class ChartsController < ApplicationController
   before_filter :authenticate_user!
   load_and_authorize_resource :account
@@ -66,11 +20,12 @@ class ChartsController < ApplicationController
   def balance_line_chart
     balance_entries = @account.balance_entries.accessible_by(current_ability)
     authorize! :show, BalanceEvent
+    query = ChartQuery.new(params[:query],session,current_user,@account)
     balance_entries_to_display = query.apply_conditions(balance_entries)
-    @shareholders = Shareholder.find(balance_entries_to_display.uniq.pluck(:shareholder_id)).sort_by{|sh| sh.name }
+    @shareholders = Shareholder.find(balance_entries_to_display.distinct.pluck(:shareholder_id)).sort_by{|sh| sh.name }
 
     @starting_balances = balance_entries.
-      select("shareholder_id, SUM(amount) AS amount").
+      select("shareholder_id, SUM(amount_cents) AS amount_cents").
       group("shareholder_id").
       where(shareholder_id: @shareholders.map{|sh| sh.id }).
       where("date < ?",query.start_date).
@@ -80,7 +35,7 @@ class ChartsController < ApplicationController
     @shareholders.each {|sh| balances[sh] ||= 0 }
 
     @change_entries = balance_entries_to_display.
-      select("date, shareholder_id, SUM(amount) AS amount").
+      select("date, shareholder_id, SUM(amount_cents) AS amount_cents").
       group("date, shareholder_id").
       includes(:shareholder)
     changes = {}
@@ -121,9 +76,9 @@ class ChartsController < ApplicationController
     authorize! :show, BalanceEvent
     query = ChartQuery.new(params[:query],session,current_user,@account)
     bills_to_display = query.apply_conditions(bills).
-      select  ('bill_type_id, extract(month from date) AS month, extract(year from date) AS year,  sum(amount) as amount').
-      group   ('bill_type_id, extract(month from date), extract(year from date)').
-      order   ('extract(year from date), extract(month from date)').
+      select  ("bill_type_id, #{Bill::MONTH_SQL} AS month, #{Bill::YEAR_SQL} AS year, SUM(amount_cents) AS amount_cents").
+      group   ("bill_type_id, #{Bill::MONTH_SQL}, #{Bill::YEAR_SQL}").
+      order   (Arel.sql("#{Bill::YEAR_SQL}, #{Bill::MONTH_SQL}")).
       includes(:bill_type)
 
     values = {}

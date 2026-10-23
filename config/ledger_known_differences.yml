@@ -1,0 +1,11 @@
+# Differences reported by `bin/rails ledger:verify` that have been reviewed and accepted,
+# typically cents where 2011-era Float rounding differs from integer cents. Each entry
+# must match a reported difference exactly; if the stored value changes, it's reported again.
+#
+# - check: share
+#   record: ShareholderBill#123
+#   shareholder_id: 4
+#   stored: -334
+#   expected: -333
+#   note: Reviewed 2026-11-01, Float rounding in 2012
+[]

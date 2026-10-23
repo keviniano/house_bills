@@ -6,7 +6,7 @@ class Ability
     alias_action :create, :update, :destroy, :to => :alter
 
     open_holdings         = Shareholder.open_now.where(user_id: user.id).to_a
-    active_holdings       = Shareholder.open_now.where(user_id: user.id).reject {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.today }
+    active_holdings       = Shareholder.open_now.where(user_id: user.id).reject {|holding| !holding.inactivated_on.nil? && holding.inactivated_on <= Date.current }
 
     open_account_ids      = open_holdings.map{|r| r.account_id }
     active_account_ids    = active_holdings.map{|r| r.account_id }
@@ -20,7 +20,7 @@ class Ability
     # Admins can manage
     can    :manage, Account, :id => admin_account_ids
     # But non-owners cannot delete
-    cannot :delete, Account, :id => non_owner_account_ids
+    cannot :destroy, Account, :id => non_owner_account_ids
 
     # Any open user can read
     can    :read,   BillType, :account_id => open_account_ids
@@ -30,7 +30,7 @@ class Ability
     # Any open user can read
     can    :read,   Payee, :account_id => open_account_ids
     # Admins can manage
-    can    :manage, Payee
+    can    :manage, Payee, :account_id => admin_account_ids
 
     # Admins can manage the shareholder records of others
     can    :manage, Shareholder, :account_id => admin_account_ids

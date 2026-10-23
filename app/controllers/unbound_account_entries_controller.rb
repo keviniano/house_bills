@@ -47,7 +47,7 @@ class UnboundAccountEntriesController < ApplicationController
     def resource_params
       params.require(:unbound_account_entry).permit(
         :entry_type,
-        :date_string,
+        :date,
         :check_number,
         :payee,
         :entry_amount,

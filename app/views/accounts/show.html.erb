@@ -157,7 +157,7 @@
       <% if can? :edit, @account %>
         <li><%= link_to "Edit Account", [:edit,@account] %></li>
       <% end %>
-      <% if can? :delete, @account %>
+      <% if can? :destroy, @account %>
         <li><%= link_to "Delete Account For Ever and Ever", @account, :method => :delete, data: { confirm: "Are you really really REALLY sure??" } %></li>
       <% end %>
     </ul>

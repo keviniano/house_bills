@@ -43,7 +43,7 @@ class ShareholderAccountEntriesController < ApplicationController
     def resource_params
       params.require(:shareholder_account_entry).permit(
         :entry_type,
-        :date_string,
+        :date,
         :check_number,
         :shareholder_id,
         :entry_amount,

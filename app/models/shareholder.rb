@@ -1,28 +1,26 @@
-class Shareholder < ActiveRecord::Base
-  belongs_to :account
-  belongs_to :user
-  belongs_to :role
-  has_many   :bills
-  has_many   :account_entries
-  has_many   :balance_entries
+class Shareholder < ApplicationRecord
+  include Userstamps
+
+  belongs_to :account, optional: true
+  belongs_to :user, optional: true
+  belongs_to :role, optional: true
+  # Members with history can't be deleted; close them with closed_on instead.
+  has_many   :bills, dependent: :restrict_with_error
+  has_many   :account_entries, dependent: :restrict_with_error
+  has_many   :balance_entries, dependent: :restrict_with_error
 
   has_paper_trail
 
-  validate  :opened_on_string_format_must_be_valid
-  validate  :inactivated_on_string_format_must_be_valid
-  validate  :closed_on_string_format_must_be_valid
+  attribute :opened_on, default: -> { Date.current }
+
   validates :name, presence: true, uniqueness: { scope: :account_id }
   validates :role_id, presence: true
-  validates :opened_on_string, presence: true
+  validates :opened_on, presence: true
 
   before_create :attach_user
 
-  default_value_for :opened_on do
-    Date.today
-  end
-
   def balance
-    balance_entries.sum(:amount)
+    balance_entries.sum_money
   end
 
   def admin?
@@ -34,44 +32,11 @@ class Shareholder < ActiveRecord::Base
   end
 
   def active?
-    opened_on <= Date.today && (inactivated_on.nil? || inactivated_on > Date.today)
+    opened_on <= Date.current && (inactivated_on.nil? || inactivated_on > Date.current)
   end
 
   def status
     active? ? 'Active' : 'Inactive'
-  end
-
-  def opened_on_string=(value)
-    @opened_on_string = value
-    self.opened_on = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
-  rescue ArgumentError
-    @opened_on_string_invalid = true
-  end
-
-  def opened_on_string
-    @opened_on_string || opened_on.try(:strftime,'%m-%d-%Y')
-  end
-
-  def inactivated_on_string=(value)
-    @inactivated_on_string = value
-    self.inactivated_on = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
-  rescue ArgumentError
-    @inactivated_on_string_invalid = true
-  end
-
-  def inactivated_on_string
-    @inactivated_on_string || inactivated_on.try(:strftime,'%m-%d-%Y')
-  end
-
-  def closed_on_string=(value)
-    @closed_on_string = value
-    self.closed_on = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
-  rescue ArgumentError
-    @closed_on_string_invalid = true
-  end
-
-  def closed_on_string
-    @closed_on_string || closed_on.try(:strftime,'%m-%d-%Y')
   end
 
   def updated_through_user=(val)
@@ -88,11 +53,11 @@ class Shareholder < ActiveRecord::Base
     end
 
     def open_now
-      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.closed_on,?)",Date.today,Date.today])
+      open_as_of(Date.current)
     end
 
     def active_now
-      where(["? BETWEEN shareholders.opened_on AND COALESCE(shareholders.inactivated_on,?)",Date.today,Date.today])
+      active_as_of(Date.current)
     end
 
     def open_as_of(date)
@@ -112,18 +77,5 @@ class Shareholder < ActiveRecord::Base
 
     def attach_user
       self.user = User.find_by(email: email) if email.present?
-      true
-    end
-
-    def opened_on_string_format_must_be_valid
-      errors.add(:opened_on_string, "is invalid") if @opened_on_string_invalid
-    end
-
-    def inactivated_on_string_format_must_be_valid
-      errors.add(:inactivated_on_string, "is invalid") if @inactivated_on_string_invalid
-    end
-
-    def closed_on_string_format_must_be_valid
-      errors.add(:closed_on_string, "is invalid") if @closed_on_string_invalid
     end
 end

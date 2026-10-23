@@ -15,14 +15,22 @@ module MoneyColumn
       cents_column = :"#{name}_cents"
 
       define_method(name) do
-        cents = self[cents_column]
-        BigDecimal(cents) / 100 unless cents.nil?
+        MoneyColumn.from_cents(self[cents_column])
       end
 
       define_method(:"#{name}=") do |value|
         self[cents_column] = MoneyColumn.to_cents(value)
       end
     end
+
+    # Sums a money attribute across a relation: account_entries.sum_money(:amount)
+    def sum_money(name = :amount)
+      MoneyColumn.from_cents(sum(:"#{name}_cents"))
+    end
+  end
+
+  def self.from_cents(cents)
+    BigDecimal(cents) / 100 unless cents.nil?
   end
 
   def self.to_cents(value)

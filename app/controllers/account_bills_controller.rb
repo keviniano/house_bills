@@ -55,7 +55,7 @@ class AccountBillsController < ApplicationController
     def resource_params
       params.require(:account_bill).permit(
         :entry_type,
-        :date_string,
+        :date,
         :payee,
         :entry_amount,
         :bill_type_id,

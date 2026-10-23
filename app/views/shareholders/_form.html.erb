@@ -4,9 +4,9 @@
   <%= s.association :role, :prompt => true, :include_blank => false %>
   <%= s.input :email, :disabled => @shareholder.user.present?, :input_html => { :size => 25 } %>
   <% unless @shareholder.new_record? %>
-    <%= s.input :opened_on_string, as: :string, label: "Opened", input_html: { class: :datepicker } %>
-    <%= s.input :inactivated_on_string, as: :string, label: "Inactivated", input_html: { class: :datepicker } %>
-    <%= s.input :closed_on_string, as: :string, label: "Closed", input_html: { class: :datepicker } %>
+    <%= s.input :opened_on, as: :date, html5: true, label: "Opened" %>
+    <%= s.input :inactivated_on, as: :date, html5: true, label: "Inactivated" %>
+    <%= s.input :closed_on, as: :date, html5: true, label: "Closed" %>
   <% end %>
   <%= s.button :submit %>
 <% end %>

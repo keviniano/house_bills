@@ -33,8 +33,11 @@ class ShareholdersController < ApplicationController
 
   # DELETE /shareholders/1
   def destroy
-    @shareholder.destroy
-    redirect_to account_path(@account, anchor: "shareholders-tab"), notice: "Shareholder '#{@shareholder.name}' was successfully deleted."
+    if @shareholder.destroy
+      redirect_to account_path(@account, anchor: "shareholders-tab"), notice: "Shareholder '#{@shareholder.name}' was successfully deleted."
+    else
+      redirect_to account_path(@account, anchor: "shareholders-tab"), alert: "Shareholder '#{@shareholder.name}' has entries, so they can't be deleted. Set a closed date instead."
+    end
   end
 
   private
@@ -47,9 +50,9 @@ class ShareholdersController < ApplicationController
     def update_resource_params
       allowed_params = [
         :role_id, 
-        :opened_on_string, 
-        :inactivated_on_string, 
-        :closed_on_string
+        :opened_on, 
+        :inactivated_on, 
+        :closed_on
       ]
       allowed_params.concat([:name, :email]) if @shareholder.user.blank?
       params.require(:shareholder).permit(allowed_params)

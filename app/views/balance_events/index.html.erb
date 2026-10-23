@@ -12,7 +12,7 @@
   <div class="form-group">
     <%= label :q, :balance_shareholder_id, "Show costs for", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :q, :balance_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders,@q.balance_shareholder_id) %>
+      <%= select :q, :balance_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders(@account),@q.balance_shareholder_id) %>
     </div>
   </div>
   <div class="form-group">
@@ -42,13 +42,13 @@
   <div class="form-group">
     <%= label :q, :payee_shareholder_id, "Entered by", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :q, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders_plus_all,@q.payee_shareholder_id) %>
+      <%= select :q, :payee_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders_plus_all(@account),@q.payee_shareholder_id) %>
     </div>
   </div>
   <div class="form-group">
     <%= label :q, :share_shareholder_id, "Shared by", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :q, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders_plus_all,@q.share_shareholder_id) %>
+      <%= select :q, :share_shareholder_id, grouped_options_for_select(BalanceEventQuery.grouped_shareholders_plus_all(@account),@q.share_shareholder_id) %>
     </div>
   </div>
   <div class="form-group">

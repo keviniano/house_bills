@@ -1,6 +1,9 @@
-class Bill < ActiveRecord::Base
-  belongs_to  :shareholder
-  belongs_to  :account
+class Bill < ApplicationRecord
+  include MoneyColumn
+  include Userstamps
+
+  belongs_to  :shareholder, optional: true
+  belongs_to  :account, optional: true
   belongs_to  :bill_type
   has_many    :bill_share_balance_entries, dependent: :destroy, autosave: true
   has_one     :bill_offset_balance_entry,  dependent: :destroy, autosave: true
@@ -9,55 +12,76 @@ class Bill < ActiveRecord::Base
   has_one     :balance_event,              dependent: :destroy, autosave: true
 
   has_paper_trail
-  
+
+  money_attribute :amount
+  attribute :date, default: -> { Date.current }
+
   before_validation :set_amount
   after_validation  :update_balance_entries, :update_balance_event
 
   accepts_nested_attributes_for :bill_share_balance_entries, allow_destroy: true,
       reject_if: proc { |attrs| attrs['shareholder_id'].blank? || attrs['share'].blank? || attrs['share'] == '0' }
 
+  MONTH_SQL = "CAST(strftime('%m', bills.date) AS INTEGER)"
+  YEAR_SQL  = "CAST(strftime('%Y', bills.date) AS INTEGER)"
+
   def self.valid_entry_types
     %w( Bill Credit )
   end
 
   def self.sum_of_bills_by_type_and_month_for_shareholder(shareholder_id)
-    select('bills.bill_type_id, extract(month from bills.date) AS month, extract(year from bills.date) AS year, -sum(balance_entries.amount) as amount').
+    select("bills.bill_type_id, #{MONTH_SQL} AS month, #{YEAR_SQL} AS year, -SUM(balance_entries.amount_cents) AS amount_cents").
     joins(:bill_share_balance_entries).
     where("balance_entries.shareholder_id = ?", shareholder_id).
-    group('bill_type_id, extract(month from bills.date), extract(year from bills.date)').
-    order('bill_type_id, extract(year from bills.date), extract(month from bills.date)').
+    group("bills.bill_type_id, #{MONTH_SQL}, #{YEAR_SQL}").
+    order(Arel.sql("bills.bill_type_id, #{YEAR_SQL}, #{MONTH_SQL}")).
     includes(:bill_type)
   end
 
+  # Splits a bill of bill_cents across integer share ratios. Returns
+  # [base_cents, gcd, remainder_cents]: each share gets -(share / gcd) * base_cents and
+  # the pot gets remainder_cents. When the bill doesn't divide evenly, the base portion is
+  # one cent above the floor of the exact split (rounded up for bills, towards zero for
+  # credits) and the pot takes the difference, exactly as the 2011 Float version did.
+  # With no positive shares there's nothing to split, and the remainder is nil.
+  def self.calc_shares(share_ratios, bill_cents)
+    positive = share_ratios.select(&:positive?)
+    return [0, nil, nil] if positive.empty?
+
+    gcd = positive.reduce(:gcd)
+    units = share_ratios.sum / gcd
+
+    if bill_cents % units == 0
+      [bill_cents / units, gcd, 0]
+    else
+      base_cents = bill_cents.div(units) + 1
+      [base_cents, gcd, units * base_cents - bill_cents]
+    end
+  end
+
   def balance_for(shareholder)
-    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).sum(:amount)
+    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).sum_money
   end
 
   def balances_for(shareholders)
-    balance_entries = BalanceEntry.for_shareholders(shareholders).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).select('shareholder_id, SUM(amount) AS amount').group('shareholder_id')
+    balance_entries = BalanceEntry.for_shareholders(shareholders).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) <= ?)",self.date,self.date,self.id,self.id).select('shareholder_id, SUM(amount_cents) AS amount_cents').group('shareholder_id')
     result = {}
     balance_entries.each {|be| result[be.shareholder_id] = be.amount }
     result
   end
 
   def prior_balance_for(shareholder)
-    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) < ?)",self.date,self.date,self.id,self.id).sum(:amount)
+    BalanceEntry.by_shareholder(shareholder).where("balance_entries.date < ? OR (balance_entries.date = ? AND COALESCE(balance_entries.bill_id,?) < ?)",self.date,self.date,self.id,self.id).sum_money
   end
 
-  validate                  :date_string_format_must_be_valid
   validates_presence_of     :entry_type
   validates_inclusion_of    :entry_type, in: valid_entry_types
   validates_numericality_of :entry_amount, greater_than_or_equal_to: 0
   validates_presence_of     :bill_type_id
-  validates_presence_of     :date_string
+  validates_presence_of     :date
   validates_associated      :bill_share_balance_entries
   validates_presence_of     :entry_amount
 # TODO: Make sure there's always at least one bill share entry
-
-  default_value_for :date do
-    Date.today
-  end
-  default_value_for :amount, 0
 
   scope :starting_on, -> (start_date) { where("bills.date >= ?", start_date) }
   scope :ending_on,   -> (end_date) { where("bills.date <= ?", end_date) }
@@ -78,17 +102,6 @@ class Bill < ActiveRecord::Base
     else
       []
     end
-  end
-
-  def date_string=(value)
-    @date_string = value
-    self.date = (value.blank? ? nil : DateTime.strptime(value,'%m-%d-%Y'))
-  rescue ArgumentError
-    @date_invalid = true
-  end
-
-  def date_string
-    @date_string || date.strftime('%m-%d-%Y')
   end
 
   def recipient
@@ -161,10 +174,6 @@ class Bill < ActiveRecord::Base
 
   private
 
-  def date_string_format_must_be_valid
-    errors.add(:date_string, "is invalid") if @date_invalid
-  end
-
   def set_amount
     self.amount = (entry_type == 'Credit' ? - @entry_amount.to_d : @entry_amount)
   end
@@ -172,15 +181,14 @@ class Bill < ActiveRecord::Base
   def update_balance_entries
     s = bill_share_balance_entries.find_all {|e| !e.marked_for_destruction? }
     p = (pot_balance_entry.blank? ? build_pot_balance_entry(account: account) : pot_balance_entry)
-    if s.size > 0 && self.amount.present?
-      share_ratios = s.map { |s| s.share }
-      base_portion, gcd, remainder = Bill.calc_shares(share_ratios, amount)
+    if s.size > 0 && self.amount_cents.present?
+      base_cents, gcd, remainder_cents = Bill.calc_shares(s.map(&:share), amount_cents)
 
       s.each do |b|
-        b.amount = (b.share == 0) ? 0 : (-b.share/gcd) * base_portion
+        b.amount_cents = (b.share == 0) ? 0 : -(b.share / gcd) * base_cents
         b.date = self.date
       end
-      p.amount = remainder
+      p.amount_cents = remainder_cents
       p.date = self.date
     end
   end
@@ -190,25 +198,4 @@ class Bill < ActiveRecord::Base
     balance_event.account = account
     balance_event.date = date
   end
-
-  def self.calc_shares(share_ratios, bill_amount)
-    gcd = nil
-    total_shares = share_ratios.inject {|sum, n| sum + n }
-    share_ratios.each do |s|
-      gcd = (gcd ||= s).gcd(s) unless s <= 0
-    end
-    if total_shares == 0
-      base_portion = 0
-    else
-      if (bill_amount * 100) % (total_shares / gcd) == 0
-        base_portion = bill_amount / (total_shares / gcd)
-        remainder = 0
-      else
-        base_portion = (((bill_amount.to_f / (total_shares / gcd) * 100).floor.to_f / 100) + 0.01)
-        remainder = -((bill_amount - ((total_shares / gcd) * base_portion)) * 100).round.to_f / 100
-      end
-    end
-    [base_portion, gcd, remainder]
-  end
-
 end

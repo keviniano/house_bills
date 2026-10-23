@@ -1,20 +1,4 @@
 HouseBills::Application.routes.draw do
-  get "bill_account_entries/show"
-
-  get "shareholder_account_entries/new"
-
-  get "shareholder_account_entries/create"
-
-  get "shareholder_account_entries/edit"
-
-  get "shareholder_account_entries/update"
-
-  get "shareholder_account_entries/index"
-
-  get "shareholder_account_entries/destroy"
-
-  get "shareholder_account_entries/show"
-
   devise_for :users
 
   resources :accounts do

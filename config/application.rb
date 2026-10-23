@@ -34,6 +34,11 @@ module HouseBills
     # in config/environments, which are processed later.
     #
     config.time_zone = "Pacific Time (US & Canada)"
+
+    # PaperTrail stores versions as YAML; allow the classes 2011-era rows contain.
+    config.active_record.yaml_column_permitted_classes = [
+      BigDecimal, Date, Time, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone
+    ]
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

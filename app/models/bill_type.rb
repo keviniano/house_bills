@@ -1,5 +1,7 @@
-class BillType < ActiveRecord::Base
-  has_many :bills
+class BillType < ApplicationRecord
+  include Userstamps
+
+  has_many :bills, dependent: :restrict_with_error
 
   has_paper_trail
   

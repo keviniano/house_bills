@@ -33,8 +33,11 @@ class BillTypesController < ApplicationController
 
   # DELETE /bill_types/1
   def destroy
-    @bill_type.destroy
-    redirect_to account_path(@account, anchor: "bill-types-tab"), notice: 'Bill type was successfully deleted.'
+    if @bill_type.destroy
+      redirect_to account_path(@account, anchor: "bill-types-tab"), notice: 'Bill type was successfully deleted.'
+    else
+      redirect_to account_path(@account, anchor: "bill-types-tab"), alert: "Bill type '#{@bill_type.name}' is used by bills, so it can't be deleted."
+    end
   end
 
   private

@@ -14,7 +14,7 @@
   <div class="form-group">
     <%= label :q, :shareholder_id, "Show costs for", class: 'col-sm-2 control-label' %>
     <div class="col-sm-10">
-      <%= select :q, :shareholder_id, grouped_options_for_select(ChartQuery.grouped_shareholders,@q.shareholder_id) %>
+      <%= select :q, :shareholder_id, grouped_options_for_select(ChartQuery.grouped_shareholders(@account),@q.shareholder_id) %>
     </div>
   </div>
   <button type="submit" class="btn btn-primary col-sm-offset-2">Filter</button>

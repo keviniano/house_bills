@@ -1,35 +1,35 @@
-class AccountEntry < ActiveRecord::Base
+class AccountEntry < ApplicationRecord
+  include MoneyColumn
+  include Userstamps
+
   before_validation :set_amount
 
-  belongs_to :bill
-  belongs_to :shareholder
-  belongs_to :account
+  belongs_to :bill, optional: true
+  belongs_to :shareholder, optional: true
+  belongs_to :account, optional: true
   has_one    :account_offset_balance_entry, :dependent => :destroy, :autosave => true
   has_one    :balance_event, :dependent => :destroy, :autosave => true
 
   has_paper_trail
 
-  validate                  :date_string_format_must_be_valid
+  money_attribute :amount
+  attribute :date, default: -> { Date.current }
+  attribute :cleared, default: false
+
   validates_presence_of     :entry_amount
   validates_presence_of     :entry_type
   validates_numericality_of :check_number, :allow_nil => true
-  validates_presence_of     :date_string
+  validates_presence_of     :date
   validates_associated      :account_offset_balance_entry
 
-  scope :with_text,    -> (text) { where("payee ILIKE :text OR note ILIKE :text", text: "%#{text}%")}
+  scope :with_text,    -> (text) { where("payee LIKE :text OR note LIKE :text", text: "%#{text}%")}
   scope :starting_on,  -> (start_date) { where("date >= ?", start_date)}
   scope :ending_on,    -> (end_date) { where("date <= ?", end_date)}
-  scope :deposits,     -> { where 'amount >= 0' }
-  scope :withdrawals,  -> { where 'amount < 0' }
+  scope :deposits,     -> { where 'amount_cents >= 0' }
+  scope :withdrawals,  -> { where 'amount_cents < 0' }
   scope :cleared,      -> { where cleared: true }
   scope :pending,      -> { where cleared: false }
   scope :with_payee_shareholder_id, -> (shareholder) { where(shareholder_id: shareholder)}
-
-  default_value_for :date do
-    Date.today
-  end
-  default_value_for :amount, 0
-  default_value_for :cleared, false
 
   def open_shareholders
     account.shareholders.open_as_of(date) if account.present?
@@ -48,58 +48,48 @@ class AccountEntry < ActiveRecord::Base
   end
 
   def self.balance_before(d)
-    self.where('date < ?', d).sum(:amount) || 0
+    self.where('date < ?', d).sum_money
   end
 
   def self.balance_as_of(d)
-    self.where('date <= ?', d).sum(:amount) || 0
+    self.where('date <= ?', d).sum_money
   end
 
   def self.cleared_balance_before(d)
-    self.where('cleared = ? and date < ?', true, d).sum(:amount) || 0
+    self.where('cleared = ? and date < ?', true, d).sum_money
   end
 
   def self.cleared_balance_as_of(d)
-    self.where('cleared = ? and date <= ?', true, d).sum(:amount) || 0
+    self.where('cleared = ? and date <= ?', true, d).sum_money
   end
 
   def balance_for(shareholder)
     BalanceEntry.by_shareholder(shareholder).
       where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id <= ?)", date, date, id).
-      sum(:amount)
+      sum_money
   end
 
   def prior_balance_for(shareholder)
     BalanceEntry.by_shareholder(shareholder).
       where("balance_entries.date < ? OR (balance_entries.date = ? AND balance_entries.account_entry_id < ?)", date, date, id).
-      sum(:amount)
+      sum_money
   end
 
-  def date_string=(value)
-    @date_string = value
-    self.date = (value.blank? ? nil : DateTime.strptime(value, '%m-%d-%Y'))
-  rescue ArgumentError
-    @date_invalid = true
-  end
-
-  def date_string
-    @date_string || date.strftime('%m-%d-%Y')
-  end
-
+  # Running balances on the account register, up to and including (or just before) this entry.
   def cleared_balance
-    AccountEntry.where('cleared = ? and date < ? or (date = ? and id <= ?)', true, date, date, id).sum(:amount)
+    account_entries_in_account.where(cleared: true).where('date < ? or (date = ? and id <= ?)', date, date, id).sum_money
   end
 
   def prior_cleared_balance
-    AccountEntry.where('cleared = ? and date < ? or (date = ? and id < ?)', true, date, date, id).sum(:amount)
+    account_entries_in_account.where(cleared: true).where('date < ? or (date = ? and id < ?)', date, date, id).sum_money
   end
 
   def this_balance
-    AccountEntry.where('date < ? or (date = ? and id <= ?)', date, date, id).sum(:amount)
+    account_entries_in_account.where('date < ? or (date = ? and id <= ?)', date, date, id).sum_money
   end
 
   def prior_balance
-    AccountEntry.where('date < ? or (date = ? and id < ?)', date, date, id).sum(:amount)
+    account_entries_in_account.where('date < ? or (date = ? and id < ?)', date, date, id).sum_money
   end
 
   def entry_type
@@ -144,8 +134,8 @@ class AccountEntry < ActiveRecord::Base
 
 private
 
-  def date_string_format_must_be_valid
-    errors.add(:date_string, "is invalid") if @date_invalid
+  def account_entries_in_account
+    AccountEntry.where(account_id: account_id)
   end
 
   def set_amount

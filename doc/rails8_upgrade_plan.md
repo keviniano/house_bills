@@ -99,43 +99,45 @@ Write one new migration, `db/migrate/…_create_house_bills.rb`, based on the ol
 
 Changes required by moving from Rails 4.2 to 8.1:
 
-- [ ] `ActiveRecord::Base` → `ApplicationRecord`.
-- [ ] **In Rails 5+, `belongs_to` is required by default.** Add `optional: true` to every
+- [x] `ActiveRecord::Base` → `ApplicationRecord`.
+- [x] **In Rails 5+, `belongs_to` is required by default.** Add `optional: true` to every
       association whose column can be null. Examples: `Bill#shareholder`,
       `AccountEntry#bill`/`#shareholder`, `BalanceEntry#bill`/`#account_entry`/`#shareholder`,
       `Shareholder#user`, `BalanceEvent#bill`/`#account_entry`.
-- [ ] `.uniq` → `.distinct`. Affects `BalanceEntry.unique_shareholders` and
+- [x] `.uniq` → `.distinct`. Affects `BalanceEntry.unique_shareholders` and
       `ChartsController#balance_line_chart`.
-- [ ] Raw SQL passed to `order`, `pluck` or `select` must be wrapped in `Arel.sql(...)`. Affects
+- [x] Raw SQL passed to `order`, `pluck` or `select` must be wrapped in `Arel.sql(...)`. Affects
       `pluck("DISTINCT shareholder_id")` and the `extract(...)` ordering in `Bill` and charts.
-- [ ] `default_value_for` → `attribute :date, default: -> { Date.current }` etc.
-- [ ] Postgres → SQLite:
+- [x] `default_value_for` → `attribute :date, default: -> { Date.current }` etc.
+- [x] Postgres → SQLite:
   - `ILIKE` → `LIKE` (`account_entry.rb:19`, `balance_event.rb:46,50`)
   - `extract(month|year from x)` → `CAST(strftime('%m'|'%Y', x) AS INTEGER)`
     (`bill.rb:24-28`, `charts_controller.rb:124-126`)
-- [ ] **Rewrite `Bill.calc_shares` using integer cents.** It currently mixes `Float` and
+- [x] **Rewrite `Bill.calc_shares` using integer cents.** It currently mixes `Float` and
       `BigDecimal`. Keep the exact behaviour: the base portion is rounded up to the cent, and the remainder
       goes to the pot. Add unit tests that compare it with the old implementation on every
       bill in the dump.
-- [ ] **`bin/rails ledger:verify`** (D5). For each bill and member account entry,
+- [x] **`bin/rails ledger:verify`** (D5). For each bill and member account entry,
       recalculate what its generated rows should be: the share, offset and pot entries,
       the `BillAccountEntry`, and the `balance_event`. Use the record plus the stored `share`
       ratios. Compare against the stored rows and report each difference with the bill id,
       member, stored amount, recalculated amount and the difference. Report only; never
       rewrite the stored rows.
-  - Option `--account=<id>`, and machine-readable output (JSON) so the weekly check can
-    record the result.
+  - `ACCOUNT=<id>` limits it to one account, and `FORMAT=json` gives machine-readable output
+    so the weekly check can record the result. It exits 1 when there are unexpected differences.
   - Expected results: the old dump's bills may differ by a cent where the old float
     rounding differs from integer cents. Those are reviewed once and recorded in an
     allowlist (`config/ledger_known_differences.yml`). Anything new beyond that list counts as drift.
   - Shares with an explicit amount (added in the spreadsheet import) are checked against
     their stored amount, not against a recalculation.
-- [ ] Remove the `*_string` date getters and setters (`'%m-%d-%Y'`) in favour of `<input type="date">`.
-      Keep the mm-dd-yyyy display format through `I18n`.
-- [ ] PaperTrail: set `config.active_record.yaml_column_permitted_classes` (`BigDecimal`,
+- [x] Remove the `*_string` date getters and setters (`'%m-%d-%Y'`) in favour of `<input type="date">`.
+      Done in the record forms and their permitted params too. Lists already showed dates
+      as `yyyy-mm-dd`, so there's no display format to keep. The search forms' date
+      fields still parse `mm-dd-yyyy` until Phase 4 replaces the datepicker.
+- [x] PaperTrail: set `config.active_record.yaml_column_permitted_classes` (`BigDecimal`,
       `Date`, `Time`, `ActiveSupport::TimeWithZone`, `ActiveSupport::TimeZone`) so that 2011-era
       versions can still be read and reconstructed.
-- [ ] **Fix existing bugs found during review:**
+- [x] **Fix existing bugs found during review:**
   - `AccountEntry#cleared_balance`, `#prior_cleared_balance`, `#this_balance` and
     `#prior_balance` aren't limited to the current account.
   - `BillShareBalanceEntry.shareholder` uses `where(:shareholder_id == s.id)`, which
@@ -149,17 +151,33 @@ Changes required by moving from Rails 4.2 to 8.1:
     entries, so ordinary members can't edit anything they've entered since then. Set both
     columns from the signed-in user again (e.g. `Current.user` plus a `before_save` concern),
     and backfill the legacy rows during the import (Phase 6).
-- [ ] Money (D4), found while writing the schema:
+- [x] Money (D4), found while writing the schema:
   - `include MoneyColumn` + `money_attribute :amount` in `Bill`, `AccountEntry` and `BalanceEntry`.
   - `ShareholderBill` and `ShareholderAccountEntry` copy `amount` into their offset entries
     with `self[attr]`, which reads the column directly and bypasses `MoneyColumn`. Copy
     `amount_cents` instead.
   - SQL sums (`sum(:amount)`, `SUM(amount)`, `sum("bills.amount")`, the `amount >= 0` scopes)
     must use `amount_cents`, and the Ruby side divides by 100.
-- [ ] The `BillShareBalanceEntry`, `BillOffsetBalanceEntry`, `PotBalanceEntry` and
+- [x] The `BillShareBalanceEntry`, `BillOffsetBalanceEntry`, `PotBalanceEntry` and
       `AccountOffsetBalanceEntry` subclasses declare `belongs_to :balance_event`, but
       `balance_entries` has no `balance_event_id` column. Remove those associations.
-- [ ] With foreign keys in place, destroying a member or bill type that still has entries now
+- [x] More bugs found while porting the models:
+  - `Ability` used `cannot :delete, Account`, but the destroy action checks `:destroy`, so
+    admins who aren't owners could still delete an account (only the button was hidden).
+  - `AccountEntry#cleared_balance`/`#prior_cleared_balance` were missing parentheses, so
+    uncleared entries on the same date were counted in the cleared balance.
+  - `ChartsController#balance_line_chart` called an undefined `query` and failed on every request.
+    It and `bill_types_by_month_line_chart` aren't linked from any page; consider deleting them in Phase 4.
+  - `Date.today` (the server's time zone, UTC on Heroku and on the VM) → `Date.current` (Pacific),
+    for defaults, "open now"/"active now" and the default search ranges.
+  - PaperTrail 10+ no longer records `whodunnit` automatically; `ApplicationController` now
+    calls `set_paper_trail_whodunnit`, and sets `Current.user` for the userstamps.
+  - `AccountEntryQuery`, `BalanceEventQuery` and `ChartQuery` moved from their controller files
+    to `app/models/` so they autoload. `AccountEntryQuery.grouped_shareholders` was also scoped to the account.
+- [ ] **Open question:** `Shareholder#admin?` checks for a role named `Administrator`, but the
+      seeds create `User`, `Power User` and `Owner`. Check the dump's `roles` table: if it
+      has no `Administrator`, then only owners have admin rights, and `Power User` may have been meant.
+- [x] With foreign keys in place, destroying a member or bill type that still has entries now
       fails instead of leaving orphaned rows. Add `dependent: :restrict_with_error` to
       `Shareholder#bills`/`#account_entries`/`#balance_entries` and `BillType#bills`, and show
       the error on the page.

@@ -1,5 +1,7 @@
-class Payee < ActiveRecord::Base
-  belongs_to :account
+class Payee < ApplicationRecord
+  include Userstamps
+
+  belongs_to :account, optional: true
 
   has_paper_trail
 

@@ -49,7 +49,7 @@ class ShareholderBillsController < ApplicationController
     def resource_params
       params.require(:shareholder_bill).permit(
         :entry_type,
-        :date_string,
+        :date,
         :shareholder_id,
         :entry_amount,
         :bill_type_id,
