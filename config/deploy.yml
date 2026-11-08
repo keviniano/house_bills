@@ -7,6 +7,10 @@ servers:
   web:
     - 35.252.107.44
 
+# The e2-micro needs more than Kamal's default 30s to migrate and boot a new version while the
+# old one is still running.
+deploy_timeout: 180
+
 # kamal-proxy gets a Let's Encrypt certificate for this host (assume_ssl/force_ssl are on in production.rb).
 proxy:
   ssl: true
