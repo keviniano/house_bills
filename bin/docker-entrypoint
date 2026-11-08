@@ -1,8 +1,12 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
+# If running the rails server: restore the database from Cloud Storage when the volume has
+# none, create or migrate it, then run the server under Litestream so every change is replicated.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  litestream restore -config config/litestream.yml -if-db-not-exists -if-replica-exists \
+    /rails/storage/production.sqlite3
   ./bin/rails db:prepare
+  exec litestream replicate -config config/litestream.yml -exec "${*}"
 fi
 
 exec "${@}"

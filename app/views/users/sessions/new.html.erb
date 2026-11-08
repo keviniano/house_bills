@@ -1,7 +1,10 @@
 <% title "Sign in" %>
 
-<p>Sign in with the Google account an account admin invited.</p>
+<p>Shared Bills tracks a household's shared bills and each housemate's balance.
+Sign in with the Google account an account admin invited.</p>
 
 <%# OmniAuth only accepts POST, and the redirect to Google must be a full page load. %>
 <%= button_to "Sign in with Google", user_google_oauth2_omniauth_authorize_path,
       class: "btn btn-primary btn-lg", data: { turbo: false } %>
+
+<p style="margin-top: 20px"><%= link_to "Privacy Policy", privacy_path %></p>

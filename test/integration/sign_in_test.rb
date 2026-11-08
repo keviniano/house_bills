@@ -25,6 +25,13 @@ class SignInTest < ActionDispatch::IntegrationTest
     get new_user_session_path
     assert_response :success
     assert_select "form[action='#{user_google_oauth2_omniauth_authorize_path}'][method=post]"
+    assert_select "a[href='#{privacy_path}']"
+  end
+
+  test "the privacy policy is public" do
+    get privacy_path
+    assert_response :success
+    assert_select "h1", text: "Privacy Policy"
   end
 
   test "signed-out visitors are sent to sign in" do

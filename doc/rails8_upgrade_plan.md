@@ -25,7 +25,7 @@ Goals, in order:
 |---|---|---|
 | D1 | **Login** | **Decided: Google sign-in only.** Use Devise with only the `:omniauthable` (Google OAuth), `:rememberable` and `:trackable` modules. No passwords, no confirmation emails, no password resets, so the app needs no email service. |
 | D2 | **Styling** | **Decided: stay on Bootstrap 3 for the port.** Load the precompiled Bootstrap 3.4.1 CSS, JS and Glyphicons fonts from `vendor/` (3.4.1 is the final 3.x release and a drop-in replacement for the current 3.3.7, with XSS fixes). The views and their markup stay as they are, which keeps the port smaller and the screens identical. jQuery stays, because Bootstrap 3's navbar collapse and dropdowns need it. Porting to Bootstrap 5 is optional, after launch (Phase 12). |
-| D3 | **Domain** for HTTPS and the Google sign-in redirect | **Deferred until Phase 7.** Two things depend on it: kamal-proxy needs a hostname to get a Let's Encrypt certificate, and **Google sign-in only accepts redirect URLs on a real domain** (or `localhost` in development). Development and testing can go ahead without it, but production sign-in can't work until it's chosen. |
+| D3 | **Domain** for HTTPS and the Google sign-in redirect | **Decided: `house-bills.kevinchambers.com`**, a subdomain of a domain already owned, so there's nothing to register. DNS for `kevinchambers.com` is at GoDaddy (`domaincontrol.com`), with no CAA records, so Let's Encrypt can issue the certificate. The hostname is used for kamal-proxy's Let's Encrypt certificate and the Google sign-in redirect URL. |
 | D4 | **Money storage** | **Decided: integer cents** (`amount_cents`). |
 | D5 | Keep the precomputed `balance_entries` and `balance_events` tables? | **Decided: keep both for the port.** The amounts stored in `balance_entries` are the record of what each member was actually charged. Copy them unchanged and never recalculate them. Add `bin/rails ledger:verify` to catch the stored rows drifting away from the bills (Phase 3). Optionally, once the port is done, replace `balance_events` with a `UNION ALL` query over bills and member payments (Phase 11). |
 
@@ -341,45 +341,160 @@ The current test suite is essentially empty. Add the minimum needed to be confid
   - Decide whether the bill form should also let people enter explicit amounts going forward,
     or whether explicit amounts are only for imported rows.
 - [ ] Set `accounts.lock_records_before` to the switch-over date.
+- [x] **Account balance was 17¢ above the total of member balances** ($860.69 vs $860.52), already
+      so in the dump. Every bill and member payment reconciled; the unbound entries (money not
+      charged to members) netted to exactly $0.00 by January 2018, except three OnPoint dividends
+      entered as unbound instead of as bills like every other month: 2018-02-28 ($0.05),
+      2018-03-31 and 2018-04-30 ($0.06 each). *Fixed 2026-11-08 by re-entering them through the
+      models as Interest credits with Kevin's as the only share (bills 7643–7645, unbound entries
+      3151, 3202 and 3201 removed; PaperTrail records it). The totals now match.*
+  - `ledger:golden` now reports differences that are all expected: bills +3 (total 17¢ more credit),
+    balance_entries +6, balance_events +3, versions (plus 3 from local sign-ins on 2026-10-29),
+    balance_entries_cents +17 and shareholder 6 +17. Register, cleared and pot balances still match.
+    `figures.json` stays as the record of the dump.
 
 ## Phase 7: GCP infrastructure (about 1 evening)
 
-- [ ] Create a GCP project. Set a **budget alert at $1**.
-- [ ] Create the VM: **e2-micro, `us-central1`** (or `us-east1`/`us-west1`; the free tier only
-      applies in these regions), Debian 13, **30 GB "standard" persistent disk**. The console
-      defaults to "balanced", which isn't free. Reserve a static external IPv4 address
-      (about $3.65/month).
-- [ ] Firewall: allow 22, 80 and 443. Use OS Login or SSH keys, and turn on unattended-upgrades.
-- [ ] Add 2 GB of swap. The VM has 1 GB of RAM and Rails + Docker sits close to that.
-- [ ] Artifact Registry repo in the same region to hold the Docker image (0.5 GB free).
-- [ ] Cloud Storage bucket `house-bills-backups` in the same region:
-  - versioning on, soft delete on
-  - lifecycle rule: delete `daily/` objects after 30 days
-- [ ] Give the VM's service account `roles/storage.objectAdmin` on that bucket only, and
-      `roles/artifactregistry.reader` on the image repo.
-- [ ] Resolve **D3**, then add a DNS A record pointing at the static IP.
-- [ ] Google sign-in setup (in the same GCP project):
-  - OAuth consent screen: External, scopes `openid email profile` only. These basic scopes
-    don't need Google's app verification, so the app can be set to "In production".
-  - Create an OAuth client of type "Web application" with these redirect URLs:
+Everything goes in a new project on the personal Google account. Project `oak-street-house-bills`, zone `us-west1-b`, static IP `35.252.107.44`,
+bucket `gs://oak-street-house-bills-backups`.
+
+- [ ] **Local tools first.**
+  - `gcloud` on this Mac is signed in to a work account with a work project as its default.
+    Give House Bills its own named configuration so no command lands in the work project:
+    ```
+    gcloud config configurations create house-bills --no-activate
+    gcloud auth login --configuration=house-bills       # the personal account
+    export CLOUDSDK_ACTIVE_CONFIG_NAME=house-bills       # per shell; the default stays the work config
+    gcloud config set project oak-street-house-bills
+    gcloud config set compute/zone us-west1-b
+    ``` `.kamal/secrets` names
+    the configuration explicitly (Phase 8), so a deploy never depends on which one is active.
+  - Docker isn't installed. Install OrbStack (or Docker Desktop) and turn on Rosetta for
+    x86 emulation: this Mac is arm64 and the VM is amd64.
+- [x] Billing: link the billing account. Set a **budget of $5 with alerts at 80% and 100%**.
+      (A $1 alert would go off every month, because the IPv4 address alone is about $3.65.)
+- [x] `gcloud services enable compute.googleapis.com artifactregistry.googleapis.com`
+- [x] Service account for the VM, with **no project-level roles**:
+      `gcloud iam service-accounts create house-bills-vm`
+- [x] Static IP: `gcloud compute addresses create house-bills-ip --region us-west1`
+- [x] VM (e2-micro, Debian 13, 30 GB *standard* disk; the free tier only covers
+      `us-west1`, `us-central1` and `us-east1`):
+      ```
+      gcloud compute instances create house-bills \
+        --machine-type=e2-micro --image-family=debian-13 --image-project=debian-cloud \
+        --boot-disk-size=30GB --boot-disk-type=pd-standard \
+        --address=house-bills-ip --tags=web \
+        --service-account=house-bills-vm@oak-street-house-bills.iam.gserviceaccount.com \
+        --scopes=cloud-platform
+      ```
+      `--scopes=cloud-platform` matters: the default scopes make Cloud Storage read-only for
+      the VM whatever IAM says, so Litestream would fail with 403. Access is then limited by
+      the bucket role below.
+- [x] Firewall: `gcloud compute firewall-rules create allow-web --allow=tcp:80,tcp:443 --target-tags=web`.
+      Port 22 is already open through the default network's `default-allow-ssh`, key-only.
+- [x] SSH user for Kamal: add a key to the instance metadata as user `kamal`
+      (`gcloud compute instances add-metadata house-bills --metadata ssh-keys="kamal:$(cat ~/.ssh/id_ed25519.pub)"`).
+      The guest agent creates the user with passwordless sudo.
+- [x] Prepare the server (one SSH session as `kamal`):
+  - 2 GB swap file in `/etc/fstab`, with `vm.swappiness=10`. The VM has 1 GB of RAM.
+  - Docker: `curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker kamal`
+  - Docker log rotation in `/etc/docker/daemon.json` (`"log-opts": {"max-size": "10m", "max-file": "3"}`)
+  - Confirm `unattended-upgrades` is installed and enabled (Debian cloud images usually ship with it)
+- [x] Artifact Registry: `gcloud artifacts repositories create house-bills --repository-format=docker --location=us-west1`.
+      Add a cleanup policy that keeps the 3 newest images, which keeps the repo under the 0.5 GB free tier.
+- [x] Backup bucket (names are global, so `house-bills-backups` may already be taken):
+  - `gcloud storage buckets create gs://oak-street-house-bills-backups --location=us-west1 --uniform-bucket-level-access --public-access-prevention`
+  - versioning on; keep the default soft delete (7 days)
+  - lifecycle rules: delete `daily/` objects after 30 days, and noncurrent versions 30 days after
+    they're replaced (otherwise every overwritten Litestream file is kept forever)
+  - `gcloud storage buckets add-iam-policy-binding gs://oak-street-house-bills-backups --member=serviceAccount:house-bills-vm@oak-street-house-bills.iam.gserviceaccount.com --role=roles/storage.objectAdmin`
+  - The VM doesn't need an Artifact Registry role: Kamal logs the server in with a token from this Mac.
+- [ ] DNS (D3): in GoDaddy's DNS for `kevinchambers.com`, add an A record `house-bills` → `35.252.107.44`
+      (TTL 1 hour). Before the first deploy, check `dig +short house-bills.kevinchambers.com` returns it,
+      or Let's Encrypt can't issue the certificate.
+- [ ] Google sign-in (Google Auth Platform, in the same project):
+  - Audience: External, then **Publish app** ("In production"). Scopes `openid email profile` only;
+    these basic scopes don't need Google's app verification.
+  - Client of type "Web application" with redirect URLs
     `http://localhost:3000/users/auth/google_oauth2/callback` and
-    `https://<domain>/users/auth/google_oauth2/callback`.
-  - Put the client ID and secret in Rails credentials.
+    `https://house-bills.kevinchambers.com/users/auth/google_oauth2/callback`.
+  - `bin/rails credentials:edit` → `google: { client_id: …, client_secret: … }`, which is what
+    `config/initializers/devise.rb` reads. (Not set yet.)
+- [ ] Store `config/master.key` in a password manager. Without it the credentials, including
+      `secret_key_base` and the Google secret, can't be decrypted.
 
 ## Phase 8: Deployment (about 1 evening)
 
+- [ ] App changes, one commit before the first deploy:
+  - `production.rb`: turn on `assume_ssl`, `force_ssl` and the `/up` redirect exclusion; set
+    `config.hosts = [ "house-bills.kevinchambers.com" ]` with the `/up` `host_authorization` exclusion.
+  - `.dockerignore`: add `/test/fixtures/golden/`. **Without it, real members' balances are copied into the image.**
+  - Dockerfile: install a pinned Litestream release (amd64) in the base stage.
+  - `config/litestream.yml`: `/rails/storage/production.sqlite3` → `gs://oak-street-house-bills-backups/litestream`,
+    7-day retention. Credentials come from the VM's metadata server; there's no key file.
+  - `bin/docker-entrypoint`: when starting the server,
+    `litestream restore -if-db-not-exists -if-replica-exists …` → `bin/rails db:prepare` →
+    `exec litestream replicate -exec "./bin/thrust ./bin/rails server"`.
+    Only `production.sqlite3` is replicated; the cache, queue and cable databases can be thrown away.
 - [ ] `config/deploy.yml` (Kamal 2):
-  - one server, registry = Artifact Registry
-  - `proxy: ssl: true, host: <domain>`
-  - volume `house_bills_storage:/rails/storage`
-  - env: `WEB_CONCURRENCY=1`, `RAILS_MAX_THREADS=3`, `SOLID_QUEUE_IN_PUMA=true`
-- [ ] Build the image locally (x86, same as the VM). **Don't build on the e2-micro.** It doesn't have the memory.
-- [ ] Container entrypoint:
-      `litestream restore -if-db-not-exists -if-replica-exists …` → `bin/rails db:prepare` →
-      `litestream replicate -exec "./bin/thrust ./bin/rails server"`.
-- [ ] Back up only `production.sqlite3`. The cache and queue databases can be thrown away.
-- [ ] `kamal setup`. Then upload the imported database: either copy it into the volume before
-      the first boot, or seed the Litestream copy in the bucket and let the restore step pull it.
+      ```yaml
+      image: oak-street-house-bills/house-bills/house_bills
+      servers:
+        web:
+          - 35.252.107.44
+      proxy:
+        ssl: true
+        host: house-bills.kevinchambers.com
+      registry:
+        server: us-west1-docker.pkg.dev
+        username: oauth2accesstoken
+        password:
+          - KAMAL_REGISTRY_PASSWORD
+      ssh:
+        user: kamal
+      env:
+        clear:
+          SOLID_QUEUE_IN_PUMA: true
+          RAILS_MAX_THREADS: 3   # no WEB_CONCURRENCY: Puma stays in single mode, without a separate master process
+      ```
+      with the `house_bills_storage:/rails/storage` volume and `builder: arch: amd64` kept from the generated file.
+- [ ] `.kamal/secrets`: `KAMAL_REGISTRY_PASSWORD=$(gcloud auth print-access-token --configuration=house-bills)`.
+      The token lasts an hour, which covers a deploy.
+- [ ] Build on this Mac (`bin/kamal build push`). **Don't build on the e2-micro.** It doesn't have the memory.
+- [ ] **Freeze the data to upload.** Locally: `bin/rails ledger:verify` must pass, and
+      `bin/rails ledger:golden` must show only the expected differences from the dividend fix (Phase 6). Then:
+      ```
+      sqlite3 storage/development.sqlite3 ".backup production.sqlite3"
+      sqlite3 production.sqlite3 "PRAGMA integrity_check; UPDATE ar_internal_metadata SET value='production' WHERE key='environment';"
+      shasum -a 256 production.sqlite3
+      ```
+      The metadata update lets Rails's protected-environment checks work in production.
+- [ ] **Put the database in the volume before the app first boots.** Otherwise `db:prepare` creates
+      an empty database and Litestream replicates that instead.
+      ```
+      gcloud compute scp production.sqlite3 kamal@house-bills:~
+      ssh kamal@35.252.107.44 'docker volume create house_bills_storage &&
+        docker run --rm -v house_bills_storage:/data -v ~:/src debian:13-slim \
+          sh -c "cp /src/production.sqlite3 /data/ && chown -R 1000:1000 /data" &&
+        shasum -a 256 production.sqlite3 && rm production.sqlite3'
+      ```
+      The whole volume must belong to uid 1000 (`rails`), not just the file: SQLite creates its
+      `-wal`/`-shm` files next to the database, and Docker only copies the image's ownership into
+      a volume that's empty when first mounted.
+- [ ] `bin/kamal setup`. Litestream skips the restore because the database exists, `db:prepare`
+      has nothing to do, and replication uploads the first snapshot.
+- [ ] Check the deploy:
+  - `curl -I https://house-bills.kevinchambers.com/up` returns 200 with a valid certificate
+  - `bin/kamal app exec "bin/rails ledger:verify"` reports 0 unexpected differences
+  - `gcloud storage ls gs://oak-street-house-bills-backups/litestream/` shows a snapshot
+  - Sign in with Google as the owner and spot-check the ledger page against the local server
+  - **Golden check through the backup:** `figures.json` isn't in the image (by design). Restore the
+    replica locally (`litestream restore -o /tmp/restored.sqlite3 gs://oak-street-house-bills-backups/litestream`), swap it
+    in as `storage/development.sqlite3` (keep the original), and run `bin/rails ledger:golden`: it must
+    show the same expected differences as the frozen copy, and nothing else. This tests the upload and
+    the backup in one step.
+- [ ] Watch memory for a day (`free -m`, `docker stats`). If swap use stays high, drop to
+      `RAILS_MAX_THREADS=2`, or move to an e2-small (about $12/month).
 
 ## Phase 9: Backups and checks (about 1 evening)
 
@@ -465,4 +580,5 @@ About 2–3 evenings. Pages and workflows stay the same; only the markup and sty
 | Old PaperTrail YAML can't be read on Ruby 4.0 | Allow the classes it uses (Phase 3); if some versions still can't be read, keep them as raw text |
 | Not enough memory on the e2-micro | 1 Puma worker, jemalloc (Rails 8.1 Dockerfile default), swap; a larger VM (e2-small) costs about $12/month |
 | Bootstrap 3 and its jQuery dependency have had no fixes since 2019 | 3.4.1 includes the last XSS fixes. The app only uses the collapse and dropdown plugins (no tooltips or popovers with user content), and the assets are served locally. Phase 12 removes both |
+| `gcloud` defaults to the work account and project | A separate `house-bills` gcloud configuration (Phase 7); `.kamal/secrets` passes `--configuration=house-bills` explicitly |
 | Free-tier terms change | The Litestream copy and the monthly SQL dumps mean the app can move to any VM in under an hour |

@@ -30,6 +30,9 @@
 /tmp/storage/*
 !/tmp/storage/.keep
 
+# Reference balances recorded from the legacy dump; real people's money.
+/test/fixtures/golden/
+
 # Ignore assets.
 /node_modules/
 /app/assets/builds/*

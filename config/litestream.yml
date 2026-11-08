@@ -1,0 +1,13 @@
+# Litestream (plan Phase 8–9): continuous backup of the primary database to Cloud Storage.
+# Only production.sqlite3 is replicated; the cache, queue and cable databases are disposable.
+# Credentials come from the VM's service account through the metadata server.
+
+# A full snapshot daily, keeping a week of point-in-time history.
+snapshot:
+  interval: 24h
+  retention: 168h
+
+dbs:
+  - path: /rails/storage/production.sqlite3
+    replica:
+      url: gs://oak-street-house-bills-backups/litestream
