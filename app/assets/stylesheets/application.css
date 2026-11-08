@@ -192,3 +192,10 @@ form.form-inline br {
   margin: 4px;
   }
 
+
+/* Admin-only backup status (layouts/_backup_status) */
+.backup-status {
+  margin: 40px 0 20px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}

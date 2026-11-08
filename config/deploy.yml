@@ -28,6 +28,8 @@ env:
     # Solid Queue runs inside Puma. Puma in single mode (no WEB_CONCURRENCY) with 3 threads fits the 1 GB VM.
     SOLID_QUEUE_IN_PUMA: true
     RAILS_MAX_THREADS: 3
+    # Where DatabaseBackup uploads daily/ and monthly/ copies (Litestream's replica is in config/litestream.yml).
+    BACKUP_BUCKET: oak-street-house-bills-backups
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

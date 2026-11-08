@@ -1,0 +1,5 @@
+<footer class="backup-status text-muted small">
+  <%= backup_status_item "Last backup", "daily", stale_after: 36.hours %> ·
+  <%= backup_status_item "Last verified restore", "restore_test", stale_after: 8.days %> ·
+  <%= ledger_status_item %>
+</footer>

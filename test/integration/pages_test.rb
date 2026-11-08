@@ -18,6 +18,16 @@ class PagesTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
+  test "admins see the backup status footer, with failures in red" do
+    BackupCheck.create!(kind: "daily", ok: true, object_name: "gs://b/daily/x.gz")
+    BackupCheck.create!(kind: "restore_test", ok: false, details: { "differences" => [ "bills: restored 1, live 2" ], "ledger_unexpected" => 0 })
+
+    get accounts_path
+    assert_select "footer.backup-status", text: /Last backup less than a minute ago/
+    assert_select "footer.backup-status .text-danger", text: /Last verified restore: never \(last attempt failed\)/
+    assert_select "footer.backup-status", text: /Ledger: 0 unexpected differences/
+  end
+
   test "accounts index and overview" do
     get accounts_path
     assert_response :success

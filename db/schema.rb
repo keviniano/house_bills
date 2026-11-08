@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   create_table "account_entries", force: :cascade do |t|
     t.string "type"
     t.integer "bill_id"
@@ -46,6 +46,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_120000) do
     t.index ["creator_id"], name: "index_accounts_on_creator_id"
     t.index ["owner_id"], name: "index_accounts_on_owner_id"
     t.index ["updater_id"], name: "index_accounts_on_updater_id"
+  end
+
+  create_table "backup_checks", force: :cascade do |t|
+    t.string "kind", null: false
+    t.boolean "ok", null: false
+    t.string "object_name"
+    t.bigint "bytes"
+    t.json "details"
+    t.datetime "created_at", null: false
+    t.index ["kind", "created_at"], name: "index_backup_checks_on_kind_and_created_at"
   end
 
   create_table "balance_entries", force: :cascade do |t|

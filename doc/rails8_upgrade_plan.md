@@ -508,15 +508,31 @@ Uses the backup layers agreed earlier:
 |---|---|---|
 | Record-level undo | PaperTrail | Forever |
 | Continuous | Litestream → `gs://…/litestream/` | 7 days |
-| Daily | Cron job on the VM: `sqlite3 .backup` + `integrity_check` → `daily/` | 30 days |
-| Monthly | `.dump` (plain SQL, gzipped) → `monthly/` | Forever |
+| Daily | `BackupJob` (Solid Queue, 3:15am): SQLite online backup + `integrity_check`, gzipped → `daily/` | 30 days |
+| Monthly | `BackupJob` (1st of the month, 3:30am): `.dump` (plain SQL, gzipped) → `monthly/` | Forever |
 | Off-site | `gcloud storage rsync` of `monthly/` to a home machine | Forever |
 | Original sources | The original Postgres dump and spreadsheet CSV → `genesis/` | Forever |
 
-- [ ] Weekly test restore: restore from Litestream into a temporary file, run
-      `integrity_check`, and compare row counts and balances with the live database.
-      Then run `ledger:verify` on it. Record the result in `backup_checks`.
-- [ ] Footer visible only to admins: "Last backup · Last verified restore · Ledger: N unexpected differences".
+*The daily and monthly copies and the restore test run as Solid Queue recurring jobs
+(`config/recurring.yml`, Pacific time) rather than host cron, so they deploy with the app and record
+their results in `backup_checks`. `DatabaseBackup` does the work; `CloudStorage` uploads with the VM's
+service account token from the metadata server, so there's no key file. Every run records a row,
+pass or fail.*
+
+- [x] Original sources in `genesis/`: the 2022-02-15 Postgres dump (`2022-02-15-house-bills-postgres12.dump`,
+      MD5 checked) and `golden/figures.json` + `golden/final_balances.csv`. The spreadsheet CSV goes there
+      once the spreadsheet import is done.
+- [x] Weekly test restore (Sundays 4am): restore from Litestream into a temporary file, run
+      `integrity_check`, and compare row counts, money totals and every member's balance with the live
+      database. Record the result and the live `LedgerVerifier` count in `backup_checks`.
+      *The ledger check runs on the live database rather than the restored copy: the comparison has
+      already shown the two hold the same rows, and running it on a second database would need a
+      second Active Record connection for no extra assurance.*
+- [x] Footer visible only to admins: "Last backup · Last verified restore · Ledger: N unexpected differences".
+      Red when the last attempt failed, or when the last success is overdue (backup over 36 hours,
+      restore test over 8 days). Hover shows the details.
+- [ ] Off-site copy: `gcloud storage rsync gs://oak-street-house-bills-backups/monthly/ <home folder>`
+      now and then from a home machine (with the `house-bills` gcloud configuration).
 - [ ] Practise once: delete the VM, recreate it, run `kamal setup`, and confirm the data comes back.
 
 ## Phase 10: Launch

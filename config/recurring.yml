@@ -13,3 +13,16 @@ production:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+  # Backups (plan Phase 9; see DatabaseBackup), in the household's time zone.
+  daily_backup:
+    class: BackupJob
+    args: [ daily ]
+    schedule: "15 3 * * * America/Los_Angeles"
+  monthly_backup:
+    class: BackupJob
+    args: [ monthly ]
+    schedule: "30 3 1 * * America/Los_Angeles"
+  weekly_restore_test:
+    class: BackupJob
+    args: [ restore_test ]
+    schedule: "0 4 * * 0 America/Los_Angeles"
