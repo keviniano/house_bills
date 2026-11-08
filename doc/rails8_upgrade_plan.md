@@ -358,7 +358,7 @@ The current test suite is essentially empty. Add the minimum needed to be confid
 Everything goes in a new project on the personal Google account. Project `oak-street-house-bills`, zone `us-west1-b`, static IP `35.252.107.44`,
 bucket `gs://oak-street-house-bills-backups`.
 
-- [ ] **Local tools first.**
+- [x] **Local tools first.**
   - `gcloud` on this Mac is signed in to a work account with a work project as its default.
     Give House Bills its own named configuration so no command lands in the work project:
     ```
@@ -409,10 +409,10 @@ bucket `gs://oak-street-house-bills-backups`.
     they're replaced (otherwise every overwritten Litestream file is kept forever)
   - `gcloud storage buckets add-iam-policy-binding gs://oak-street-house-bills-backups --member=serviceAccount:house-bills-vm@oak-street-house-bills.iam.gserviceaccount.com --role=roles/storage.objectAdmin`
   - The VM doesn't need an Artifact Registry role: Kamal logs the server in with a token from this Mac.
-- [ ] DNS (D3): in GoDaddy's DNS for `kevinchambers.com`, add an A record `house-bills` → `35.252.107.44`
+- [x] DNS (D3): in GoDaddy's DNS for `kevinchambers.com`, add an A record `house-bills` → `35.252.107.44`
       (TTL 1 hour). Before the first deploy, check `dig +short house-bills.kevinchambers.com` returns it,
       or Let's Encrypt can't issue the certificate.
-- [ ] Google sign-in (Google Auth Platform, in the same project):
+- [x] Google sign-in (Google Auth Platform, in the same project):
   - Audience: External, then **Publish app** ("In production"). Scopes `openid email profile` only;
     these basic scopes don't need Google's app verification.
   - Client of type "Web application" with redirect URLs
@@ -425,18 +425,19 @@ bucket `gs://oak-street-house-bills-backups`.
 
 ## Phase 8: Deployment (about 1 evening)
 
-- [ ] App changes, one commit before the first deploy:
+- [x] App changes, one commit before the first deploy:
   - `production.rb`: turn on `assume_ssl`, `force_ssl` and the `/up` redirect exclusion; set
     `config.hosts = [ "house-bills.kevinchambers.com" ]` with the `/up` `host_authorization` exclusion.
   - `.dockerignore`: add `/test/fixtures/golden/`. **Without it, real members' balances are copied into the image.**
-  - Dockerfile: install a pinned Litestream release (amd64) in the base stage.
+  - Dockerfile: copy Litestream from the official `litestream/litestream` image, pinned by digest.
+    (Downloading the release from GitHub failed with 504s during the first deploy.)
   - `config/litestream.yml`: `/rails/storage/production.sqlite3` → `gs://oak-street-house-bills-backups/litestream`,
     7-day retention. Credentials come from the VM's metadata server; there's no key file.
   - `bin/docker-entrypoint`: when starting the server,
     `litestream restore -if-db-not-exists -if-replica-exists …` → `bin/rails db:prepare` →
     `exec litestream replicate -exec "./bin/thrust ./bin/rails server"`.
     Only `production.sqlite3` is replicated; the cache, queue and cable databases can be thrown away.
-- [ ] `config/deploy.yml` (Kamal 2):
+- [x] `config/deploy.yml` (Kamal 2):
       ```yaml
       image: oak-street-house-bills/house-bills/house_bills
       servers:
@@ -458,10 +459,10 @@ bucket `gs://oak-street-house-bills-backups`.
           RAILS_MAX_THREADS: 3   # no WEB_CONCURRENCY: Puma stays in single mode, without a separate master process
       ```
       with the `house_bills_storage:/rails/storage` volume and `builder: arch: amd64` kept from the generated file.
-- [ ] `.kamal/secrets`: `KAMAL_REGISTRY_PASSWORD=$(gcloud auth print-access-token --configuration=house-bills)`.
+- [x] `.kamal/secrets`: `KAMAL_REGISTRY_PASSWORD=$(gcloud auth print-access-token --configuration=house-bills)`.
       The token lasts an hour, which covers a deploy.
-- [ ] Build on this Mac (`bin/kamal build push`). **Don't build on the e2-micro.** It doesn't have the memory.
-- [ ] **Freeze the data to upload.** Locally: `bin/rails ledger:verify` must pass, and
+- [x] Build on this Mac (`bin/kamal build push`). **Don't build on the e2-micro.** It doesn't have the memory.
+- [x] **Freeze the data to upload.** Locally: `bin/rails ledger:verify` must pass, and
       `bin/rails ledger:golden` must show only the expected differences from the dividend fix (Phase 6). Then:
       ```
       sqlite3 storage/development.sqlite3 ".backup production.sqlite3"
@@ -469,7 +470,7 @@ bucket `gs://oak-street-house-bills-backups`.
       shasum -a 256 production.sqlite3
       ```
       The metadata update lets Rails's protected-environment checks work in production.
-- [ ] **Put the database in the volume before the app first boots.** Otherwise `db:prepare` creates
+- [x] **Put the database in the volume before the app first boots.** Otherwise `db:prepare` creates
       an empty database and Litestream replicates that instead.
       ```
       gcloud compute scp production.sqlite3 kamal@house-bills:~
@@ -481,9 +482,12 @@ bucket `gs://oak-street-house-bills-backups`.
       The whole volume must belong to uid 1000 (`rails`), not just the file: SQLite creates its
       `-wal`/`-shm` files next to the database, and Docker only copies the image's ownership into
       a volume that's empty when first mounted.
-- [ ] `bin/kamal setup`. Litestream skips the restore because the database exists, `db:prepare`
+- [x] `bin/kamal setup`. Litestream skips the restore because the database exists, `db:prepare`
       has nothing to do, and replication uploads the first snapshot.
-- [ ] Check the deploy:
+- [x] Check the deploy: *first deploy 2026-11-08. All checks passed: Let's Encrypt certificate,
+      HTTP→HTTPS redirect and HSTS, `ledger:verify` 0 differences, totals $860.69 = $860.69,
+      Litestream writing to the bucket, and a copy restored from the bucket shows only the expected
+      golden differences. Memory: app about 250 MB, about 160 MB of swap in use.*
   - `curl -I https://house-bills.kevinchambers.com/up` returns 200 with a valid certificate
   - `bin/kamal app exec "bin/rails ledger:verify"` reports 0 unexpected differences
   - `gcloud storage ls gs://oak-street-house-bills-backups/litestream/` shows a snapshot
