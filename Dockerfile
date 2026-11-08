@@ -20,14 +20,10 @@ RUN apt-get update -qq && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Litestream replicates the SQLite database to Cloud Storage (see config/litestream.yml)
-ARG LITESTREAM_VERSION=0.5.17
-ARG LITESTREAM_SHA256=cfb371176d164437ae869f8351cfde49bd1804ae71c61923f75c9cba9c9c006d
-RUN curl -fsSL -o /tmp/litestream.tar.gz \
-      "https://github.com/benbjohnson/litestream/releases/download/v${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-x86_64.tar.gz" && \
-    echo "${LITESTREAM_SHA256}  /tmp/litestream.tar.gz" | sha256sum -c - && \
-    tar -xzf /tmp/litestream.tar.gz -C /usr/local/bin litestream && \
-    rm /tmp/litestream.tar.gz
+# Litestream replicates the SQLite database to Cloud Storage (see config/litestream.yml).
+# Copied from the official image (0.5.17), pinned by digest.
+COPY --from=docker.io/litestream/litestream:0.5.17@sha256:4b02b9859a6b6b4087d8b8944e15f7e984bd7957cba322bbeee38b0e27b9656a \
+     /usr/local/bin/litestream /usr/local/bin/litestream
 
 # Set production environment variables and enable jemalloc for reduced memory usage and latency.
 ENV RAILS_ENV="production" \
